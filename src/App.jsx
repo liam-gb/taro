@@ -7,6 +7,18 @@ const btn = 'py-4 rounded-lg transition-colors'
 const btnPrimary = `${btn} bg-violet-900/30 hover:bg-violet-800/40 border border-violet-500/20 text-slate-300`
 const btnSecondary = `${btn} bg-slate-800 hover:bg-slate-700 text-slate-300`
 
+const Toggle = ({ label, hint, checked, onChange }) => (
+  <>
+    <label className="flex items-center justify-between cursor-pointer group">
+      <span className="text-slate-400 text-sm group-hover:text-slate-300">{label}</span>
+      <div onClick={onChange} className={`w-10 h-6 rounded-full transition-colors relative ${checked ? 'bg-violet-600' : 'bg-slate-700'}`}>
+        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${checked ? 'left-5' : 'left-1'}`} />
+      </div>
+    </label>
+    <p className="text-xs text-slate-600 -mt-1">{hint}</p>
+  </>
+)
+
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -47,10 +59,8 @@ export default function App() {
   const [useReversals, setUseReversals] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
 
-  const getActiveDeck = () => majorOnly ? MAJOR_ARCANA : FULL_DECK
-
   const shuffleDeck = () => {
-    const baseDeck = getActiveDeck()
+    const baseDeck = majorOnly ? MAJOR_ARCANA : FULL_DECK
     const d = shuffle(baseDeck).map(c => ({
       ...c,
       reversed: useReversals ? Math.random() < 0.3 : false
@@ -145,27 +155,8 @@ export default function App() {
               {/* Settings panel */}
               {showSettings && (
                 <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-800 space-y-3">
-                  <label className="flex items-center justify-between cursor-pointer group">
-                    <span className="text-slate-400 text-sm group-hover:text-slate-300">Major Arcana only</span>
-                    <div
-                      onClick={() => setMajorOnly(!majorOnly)}
-                      className={`w-10 h-6 rounded-full transition-colors relative ${majorOnly ? 'bg-violet-600' : 'bg-slate-700'}`}
-                    >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${majorOnly ? 'left-5' : 'left-1'}`} />
-                    </div>
-                  </label>
-                  <p className="text-xs text-slate-600 -mt-1">Use only the 22 Major Arcana cards</p>
-
-                  <label className="flex items-center justify-between cursor-pointer group">
-                    <span className="text-slate-400 text-sm group-hover:text-slate-300">Reversed cards</span>
-                    <div
-                      onClick={() => setUseReversals(!useReversals)}
-                      className={`w-10 h-6 rounded-full transition-colors relative ${useReversals ? 'bg-violet-600' : 'bg-slate-700'}`}
-                    >
-                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${useReversals ? 'left-5' : 'left-1'}`} />
-                    </div>
-                  </label>
-                  <p className="text-xs text-slate-600 -mt-1">Allow cards to appear reversed (inverted meaning)</p>
+                  <Toggle label="Major Arcana only" hint="Use only the 22 Major Arcana cards" checked={majorOnly} onChange={() => setMajorOnly(!majorOnly)} />
+                  <Toggle label="Reversed cards" hint="Allow cards to appear reversed (inverted meaning)" checked={useReversals} onChange={() => setUseReversals(!useReversals)} />
                 </div>
               )}
 
