@@ -1,14 +1,14 @@
 const styles = {
-  base: 'transition-colors',
-  primary: 'py-4 rounded-lg bg-violet-900/30 hover:bg-violet-800/40 border border-violet-500/20 text-slate-300',
-  secondary: 'py-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300',
-  text: 'text-slate-600 hover:text-slate-400'
+  base: 'relative font-light tracking-wide transition-all duration-300',
+  primary: 'btn-glass py-4 px-6 rounded-xl text-slate-200',
+  secondary: 'btn-glass-secondary py-4 px-6 rounded-xl',
+  text: 'btn-text py-2 px-4'
 }
 
 export default function Button({ variant = 'primary', className = '', children, ...props }) {
   return (
     <button className={`${styles.base} ${styles[variant]} ${className}`} {...props}>
-      {children}
+      <span className="relative z-10">{children}</span>
     </button>
   )
 }
