@@ -16,15 +16,66 @@ import {
   CELTIC_CROSS
 } from './constants'
 
-// Aurora Background Component
+// Aurora Background Component with Enhanced Ribbons
 const AuroraBackground = () => (
   <div className="aurora-bg">
+    {/* Original floating orbs */}
     <div className="aurora-orb aurora-orb-1" />
     <div className="aurora-orb aurora-orb-2" />
     <div className="aurora-orb aurora-orb-3" />
     <div className="aurora-orb aurora-orb-4" />
+    {/* Enhanced aurora ribbons for wow factor */}
+    <div className="aurora-ribbon aurora-ribbon-1" />
+    <div className="aurora-ribbon aurora-ribbon-2" />
+    <div className="aurora-ribbon aurora-ribbon-3" />
   </div>
 )
+
+// Cursor Spotlight Component - follows mouse with mystical glow
+const CursorSpotlight = () => {
+  const [position, setPosition] = useState({ x: -500, y: -500 })
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY })
+      if (!isVisible) setIsVisible(true)
+    }
+
+    const handleMouseLeave = () => {
+      setIsVisible(false)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    document.body.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      document.body.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [isVisible])
+
+  return (
+    <>
+      <div
+        className="cursor-spotlight"
+        style={{
+          left: position.x,
+          top: position.y,
+          opacity: isVisible ? 1 : 0
+        }}
+      />
+      <div
+        className="cursor-spotlight-inner"
+        style={{
+          left: position.x,
+          top: position.y,
+          opacity: isVisible ? 1 : 0
+        }}
+      />
+    </>
+  )
+}
 
 // Glass Toggle Component
 const Toggle = ({ label, hint, checked, onChange }) => (
@@ -222,6 +273,8 @@ export default function App() {
     <div className="min-h-screen text-slate-200 relative">
       {/* Animated Aurora Background */}
       <AuroraBackground />
+      {/* Cursor Spotlight Effect */}
+      <CursorSpotlight />
 
       {/* Header */}
       <div className="text-center py-8 md:py-10 relative">
@@ -593,7 +646,7 @@ export default function App() {
             {/* Reading Summary */}
             {allRevealed && (
               <div className="mt-14 max-w-2xl mx-auto">
-                <div className="summary-card rounded-2xl p-6 md:p-8">
+                <div className="summary-card rounded-2xl p-6 md:p-8 animated-border">
                   {/* Header */}
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-8 h-px bg-gradient-to-r from-violet-500/40 to-transparent" />
