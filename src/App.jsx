@@ -119,6 +119,7 @@ export default function App() {
   const [dealingIndex, setDealingIndex] = useState(-1)
   const [selectedCards, setSelectedCards] = useState([])
   const [raisedCenterCard, setRaisedCenterCard] = useState(1)
+  const [hoveredCelticCard, setHoveredCelticCard] = useState(null)
 
   // Deck settings
   const [majorOnly, setMajorOnly] = useState(false)
@@ -137,6 +138,14 @@ export default function App() {
   const cardRefs = useRef([])
   const [cardPositions, setCardPositions] = useState([])
   const readingContainerRef = useRef(null)
+  const celticContainerRef = useRef(null)
+
+  // Responsive scaling for Celtic Cross
+  const { width: windowWidth } = useWindowSize()
+  const celticPadding = 32
+  const celticScale = Math.min(1, (windowWidth - celticPadding) / CELTIC_CROSS.width)
+  const useMobileCeltic = windowWidth < 640
+  const isCeltic = spread === 'celtic'
 
   // Computed state - must be defined before useEffects that reference it
   const allRevealed = drawn.length > 0 && revealed.length === drawn.length
@@ -144,7 +153,9 @@ export default function App() {
   // Update card positions when cards are revealed
   useEffect(() => {
     if (phase === 'reading' && allRevealed && cardRefs.current.length > 0) {
-      const containerRect = readingContainerRef.current?.getBoundingClientRect()
+      const isCelticDesktop = isCeltic && !useMobileCeltic
+      const containerRef = isCelticDesktop ? celticContainerRef : readingContainerRef
+      const containerRect = containerRef.current?.getBoundingClientRect()
       if (!containerRect) return
 
       const positions = cardRefs.current.map(ref => {
@@ -159,13 +170,7 @@ export default function App() {
       })
       setCardPositions(positions)
     }
-  }, [phase, allRevealed, drawn.length])
-
-  // Responsive scaling for Celtic Cross
-  const { width: windowWidth } = useWindowSize()
-  const celticPadding = 32
-  const celticScale = Math.min(1, (windowWidth - celticPadding) / CELTIC_CROSS.width)
-  const useMobileCeltic = windowWidth < 640
+  }, [phase, allRevealed, drawn.length, isCeltic, useMobileCeltic])
 
   const shuffleDeck = () => {
     const baseDeck = majorOnly ? MAJOR_ARCANA : FULL_DECK
@@ -299,6 +304,7 @@ export default function App() {
     setDealingIndex(-1)
     setSelectedCards([])
     setRaisedCenterCard(1)
+    setHoveredCelticCard(null)
     setCardPositions([])
     setShuffleFadeOut(false)
     setSelectFadeIn(false)
@@ -312,7 +318,6 @@ export default function App() {
     setTimeout(() => setCopied(false), COPY_FEEDBACK_TIMEOUT_MS)
   }
 
-  const isCeltic = spread === 'celtic'
   const revealCard = (i) => setRevealed([...revealed, i])
 
   return (
@@ -607,6 +612,7 @@ export default function App() {
                 }}
               >
                 <div
+                  ref={celticContainerRef}
                   className="relative origin-top-left"
                   style={{
                     width: CELTIC_CROSS.width,
@@ -614,12 +620,28 @@ export default function App() {
                     transform: `scale(${celticScale})`
                   }}
                 >
+                  {/* Card Connection Lines */}
+                  <CardConnections
+                    cards={drawn}
+                    cardPositions={cardPositions}
+                    allRevealed={allRevealed}
+                  />
+
                   {drawn.map((card, i) => {
                     const isDealt = dealingIndex >= i
                     const pos = spreadData.layout[i]
                     const isOverlapping = i < 2
                     const isTopCard = isOverlapping && i === raisedCenterCard
                     const canSwap = isOverlapping && revealed.includes(0) && revealed.includes(1)
+                    const isHovered = hoveredCelticCard === i
+
+                    // Z-index logic: hovered cards go on top, then overlapping logic
+                    let zIndex = 1
+                    if (isHovered) {
+                      zIndex = 200 // Above everything including tooltips
+                    } else if (isOverlapping) {
+                      zIndex = isTopCard ? 10 : 5
+                    }
 
                     const handleClick = () => {
                       if (!revealed.includes(i) && isDealt) {
@@ -632,14 +654,17 @@ export default function App() {
                     return (
                       <div
                         key={card.id}
-                        className={`absolute transition-all duration-500 hover:z-50 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'} ${canSwap && isTopCard ? 'cursor-pointer' : ''}`}
+                        ref={el => cardRefs.current[i] = el}
+                        className={`absolute transition-all duration-500 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'} ${canSwap && isTopCard ? 'cursor-pointer' : ''}`}
                         style={{
                           left: CELTIC_CROSS.baseX + pos.x * CELTIC_CROSS.spacing,
                           top: CELTIC_CROSS.baseY + pos.y * CELTIC_CROSS.spacing,
                           transform: `rotate(${pos.rotate}deg)`,
-                          zIndex: isOverlapping ? (isTopCard ? 10 : 5) : 1
+                          zIndex
                         }}
                         onClick={handleClick}
+                        onMouseEnter={() => setHoveredCelticCard(i)}
+                        onMouseLeave={() => setHoveredCelticCard(null)}
                       >
                         {canSwap && isTopCard && i === 0 && (
                           <div
@@ -696,6 +721,7 @@ export default function App() {
                         size={cardSize}
                         variant="standard"
                         showKeywords={!isCeltic}
+                        hideInlineLabel={isCeltic}
                       />
                     </div>
                   )
