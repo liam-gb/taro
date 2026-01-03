@@ -11,7 +11,8 @@ export default function CardSlot({
   onReveal,
   size = 'normal',
   variant = 'standard',
-  showKeywords = false
+  showKeywords = false,
+  isMobile = false
 }) {
   const [hovered, setHovered] = useState(false)
 

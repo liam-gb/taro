@@ -5,6 +5,7 @@ import CardSlot from './components/CardSlot'
 import KeywordList from './components/KeywordList'
 import { FULL_DECK, MAJOR_ARCANA, SPREADS } from './data'
 import { generateReadingPrompt } from './utils/generatePrompt'
+import useWindowSize from './hooks/useWindowSize'
 import {
   CARD_DEAL_DELAY_MS,
   COPY_FEEDBACK_TIMEOUT_MS,
@@ -50,6 +51,11 @@ export default function App() {
   const [majorOnly, setMajorOnly] = useState(false)
   const [useReversals, setUseReversals] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+
+  // Responsive scaling for Celtic Cross
+  const { width: windowWidth } = useWindowSize()
+  const celticPadding = 32 // 16px padding on each side
+  const celticScale = Math.min(1, (windowWidth - celticPadding) / CELTIC_CROSS.width)
 
   const shuffleDeck = () => {
     const baseDeck = majorOnly ? MAJOR_ARCANA : FULL_DECK
@@ -203,8 +209,21 @@ export default function App() {
             {question && <p className="text-center text-slate-600 mb-4 md:mb-8 italic text-base md:text-lg px-4">"{question}"</p>}
 
             {isCeltic ? (
-              <div className="relative mx-auto mb-8 overflow-x-auto" style={{ minWidth: CELTIC_CROSS.width, height: CELTIC_CROSS.height }}>
-                <div className="relative" style={{ width: CELTIC_CROSS.width, height: CELTIC_CROSS.height, margin: '0 auto' }}>
+              <div
+                className="relative mx-auto mb-8"
+                style={{
+                  width: CELTIC_CROSS.width * celticScale,
+                  height: CELTIC_CROSS.height * celticScale
+                }}
+              >
+                <div
+                  className="relative origin-top-left"
+                  style={{
+                    width: CELTIC_CROSS.width,
+                    height: CELTIC_CROSS.height,
+                    transform: `scale(${celticScale})`
+                  }}
+                >
                   {drawn.map((card, i) => {
                     const isDealt = dealingIndex >= i
                     const pos = spreadData.layout[i]
@@ -227,6 +246,7 @@ export default function App() {
                           onReveal={() => revealCard(i)}
                           size="small"
                           variant="celtic"
+                          isMobile={celticScale < 1}
                         />
                       </div>
                     )
