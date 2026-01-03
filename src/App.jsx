@@ -128,6 +128,8 @@ export default function App() {
   // Shuffle animation state
   const [isShuffling, setIsShuffling] = useState(false)
   const [shuffleStep, setShuffleStep] = useState(0)
+  const [shuffleInteraction, setShuffleInteraction] = useState({ x: 0, y: 0 })
+  const shuffleContainerRef = useRef(null)
 
   // Card positions for reading layout (used for connections)
   const cardRefs = useRef([])
@@ -182,31 +184,58 @@ export default function App() {
   const startShuffleAnimation = () => {
     setIsShuffling(true)
     setShuffleStep(0)
+    setShuffleInteraction({ x: 0, y: 0 })
     setPhase('shuffle')
 
-    // Animate through shuffle steps
-    const steps = [1, 2, 3, 4, 5]
-    let stepIndex = 0
+    // Start with intro animation (step 0 -> 1)
+    setTimeout(() => {
+      setShuffleStep(1)
 
-    const animateStep = () => {
-      if (stepIndex < steps.length) {
-        setShuffleStep(steps[stepIndex])
-        // Actually shuffle the deck at each step for randomness
-        if (stepIndex === 2) shuffleDeck()
-        stepIndex++
-        setTimeout(animateStep, 400)
-      } else {
-        // Final shuffle and transition to select
-        shuffleDeck()
-        setTimeout(() => {
-          setIsShuffling(false)
-          setShuffleStep(0)
-          setPhase('select')
-        }, 600)
+      // Animate through shuffle steps
+      const steps = [2, 3, 4, 5]
+      let stepIndex = 0
+
+      const animateStep = () => {
+        if (stepIndex < steps.length) {
+          setShuffleStep(steps[stepIndex])
+          // Actually shuffle the deck at each step for randomness
+          if (stepIndex === 1) shuffleDeck()
+          stepIndex++
+          setTimeout(animateStep, 500)
+        } else {
+          // Final shuffle and transition to select
+          shuffleDeck()
+          setTimeout(() => {
+            setIsShuffling(false)
+            setShuffleStep(0)
+            setPhase('select')
+          }, 700)
+        }
       }
-    }
 
-    setTimeout(animateStep, 300)
+      setTimeout(animateStep, 600)
+    }, 100)
+  }
+
+  // Handle shuffle interaction (mouse/touch)
+  const handleShuffleInteraction = (e) => {
+    if (!shuffleContainerRef.current || shuffleStep === 0) return
+    const rect = shuffleContainerRef.current.getBoundingClientRect()
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    const x = ((clientX - rect.left) / rect.width - 0.5) * 2 // -1 to 1
+    const y = ((clientY - rect.top) / rect.height - 0.5) * 2 // -1 to 1
+    setShuffleInteraction({ x, y })
+  }
+
+  const handleShuffleTap = () => {
+    // On tap/click, add a random shuffle impulse
+    setShuffleInteraction({
+      x: (Math.random() - 0.5) * 2,
+      y: (Math.random() - 0.5) * 2
+    })
+    // Reset after a moment
+    setTimeout(() => setShuffleInteraction({ x: 0, y: 0 }), 300)
   }
 
   const dealCards = (cards) => {
@@ -401,7 +430,14 @@ export default function App() {
         {/* Shuffle Phase */}
         {phase === 'shuffle' && (
           <div className="text-center py-16">
-            <div className="relative h-64 flex items-center justify-center mb-8">
+            <div
+              ref={shuffleContainerRef}
+              className="relative h-64 flex items-center justify-center mb-8 cursor-pointer"
+              onMouseMove={handleShuffleInteraction}
+              onTouchMove={handleShuffleInteraction}
+              onClick={handleShuffleTap}
+              onTouchStart={handleShuffleTap}
+            >
               {/* Animated deck during shuffle */}
               <div className="relative">
                 {[...Array(7)].map((_, i) => {
@@ -411,40 +447,54 @@ export default function App() {
                   let xOffset = baseOffset
                   let yOffset = i * 2
                   let rotation = (i - 3) * 2
+                  let scale = 1
+
+                  // Add interaction influence
+                  const interactX = shuffleInteraction.x * 15 * (i - 3) * 0.3
+                  const interactY = shuffleInteraction.y * 10 * Math.abs(i - 3) * 0.2
+                  const interactRot = shuffleInteraction.x * 5 * (i - 3) * 0.2
 
                   // Animate cards based on shuffle step
-                  if (shuffleStep >= 1 && shuffleStep <= 5) {
-                    const phase = shuffleStep
-                    if (phase === 1) {
-                      // Split deck
-                      xOffset = isEven ? baseOffset - 40 : baseOffset + 40
-                    } else if (phase === 2) {
-                      // Riffle together
-                      xOffset = baseOffset + Math.sin(i * 0.8) * 20
-                      yOffset = i * 2 + (isEven ? -10 : 10)
-                    } else if (phase === 3) {
-                      // Fan out
-                      rotation = (i - 3) * 12
-                      xOffset = baseOffset + (i - 3) * 8
-                    } else if (phase === 4) {
-                      // Collapse back
-                      xOffset = baseOffset + Math.cos(i) * 15
-                      rotation = (i - 3) * 5
-                    } else if (phase === 5) {
-                      // Final gather
-                      xOffset = baseOffset * 0.5
-                      yOffset = i * 1.5
-                      rotation = (i - 3) * 1
-                    }
+                  if (shuffleStep === 0) {
+                    // Intro: cards scattered, then gather
+                    xOffset = (i - 3) * 60
+                    yOffset = (i % 2 === 0 ? -1 : 1) * 40 + Math.sin(i) * 20
+                    rotation = (i - 3) * 25
+                    scale = 0.85
+                  } else if (shuffleStep === 1) {
+                    // Gather together smoothly
+                    xOffset = baseOffset
+                    yOffset = i * 2
+                    rotation = (i - 3) * 3
+                  } else if (shuffleStep === 2) {
+                    // Split deck
+                    xOffset = isEven ? baseOffset - 50 : baseOffset + 50
+                    yOffset = i * 2.5
+                  } else if (shuffleStep === 3) {
+                    // Riffle together
+                    xOffset = baseOffset + Math.sin(i * 0.8) * 25
+                    yOffset = i * 2 + (isEven ? -12 : 12)
+                    rotation = (i - 3) * 4
+                  } else if (shuffleStep === 4) {
+                    // Fan out
+                    rotation = (i - 3) * 15
+                    xOffset = baseOffset + (i - 3) * 12
+                    yOffset = Math.abs(i - 3) * -3
+                  } else if (shuffleStep === 5) {
+                    // Final gather with gentle wave
+                    xOffset = baseOffset * 0.3
+                    yOffset = i * 1.5 + Math.sin(i * 0.5) * 3
+                    rotation = (i - 3) * 1
                   }
 
                   return (
                     <div
                       key={i}
-                      className="absolute transition-all duration-300 ease-out"
+                      className="absolute transition-all duration-500 ease-out"
                       style={{
-                        transform: `translateX(${xOffset}px) translateY(${yOffset}px) rotate(${rotation}deg)`,
-                        zIndex: i
+                        transform: `translateX(${xOffset + interactX}px) translateY(${yOffset + interactY}px) rotate(${rotation + interactRot}deg) scale(${scale})`,
+                        zIndex: i,
+                        transition: shuffleStep === 0 ? 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'all 0.5s ease-out'
                       }}
                     >
                       <Card3D size="small" />
@@ -454,7 +504,10 @@ export default function App() {
               </div>
             </div>
             <p className="text-slate-400/80 font-light tracking-wider text-sm animate-pulse">
-              Shuffling the deck...
+              {shuffleStep === 0 ? 'Gathering the cards...' : 'Shuffling the deck...'}
+            </p>
+            <p className="text-slate-600/60 text-xs font-light mt-2">
+              tap or move to influence
             </p>
           </div>
         )}
@@ -558,19 +611,19 @@ export default function App() {
                     return (
                       <div
                         key={card.id}
-                        className={`absolute transition-all duration-500 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'} ${canSwap && isTopCard ? 'cursor-pointer' : ''}`}
+                        className={`absolute transition-all duration-500 hover:z-50 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'} ${canSwap && isTopCard ? 'cursor-pointer' : ''}`}
                         style={{
                           left: CELTIC_CROSS.baseX + pos.x * CELTIC_CROSS.spacing,
                           top: CELTIC_CROSS.baseY + pos.y * CELTIC_CROSS.spacing,
                           transform: `rotate(${pos.rotate}deg)`,
-                          zIndex: isOverlapping ? (isTopCard ? 2 : 1) : 1
+                          zIndex: isOverlapping ? (isTopCard ? 10 : 5) : 1
                         }}
                         onClick={handleClick}
                       >
-                        {canSwap && isTopCard && (
+                        {canSwap && isTopCard && i === 0 && (
                           <div
-                            className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-xs text-violet-400/60 whitespace-nowrap font-light tracking-wide"
-                            style={{ transform: pos.rotate ? `translateX(-50%) rotate(-${pos.rotate}deg)` : 'translateX(-50%)' }}
+                            className="absolute -bottom-7 left-1/2 text-xs text-violet-400/60 whitespace-nowrap font-light tracking-wide pointer-events-none"
+                            style={{ transform: 'translateX(-50%)' }}
                           >
                             tap to swap
                           </div>
