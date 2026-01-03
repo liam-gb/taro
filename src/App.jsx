@@ -146,18 +146,10 @@ export default function App() {
                     }`}>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{s.name}</span>
-                      <span className="flex gap-0.5">
-                        {[...Array(Math.min(s.positions.length, 7))].map((_, i) => (
-                          <span
-                            key={i}
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              spread === k ? 'bg-violet-400' : 'bg-slate-600 group-hover:bg-slate-500'
-                            }`}
-                          />
-                        ))}
-                        {s.positions.length > 7 && (
-                          <span className={`text-xs ml-0.5 ${spread === k ? 'text-violet-400' : 'text-slate-600'}`}>+</span>
-                        )}
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        spread === k ? 'bg-violet-500/30 text-violet-300' : 'bg-slate-700/50 text-slate-500 group-hover:text-slate-400'
+                      }`}>
+                        {s.positions.length}
                       </span>
                     </div>
                   </button>
