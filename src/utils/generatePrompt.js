@@ -1,87 +1,54 @@
-import {
-  CARD_INTERPRETATIONS,
-  SUIT_INFO,
-  ELEMENTAL_DIGNITIES,
-  INTERPRETATION_GUIDE
-} from '../data'
+import { CARD_INTERPRETATIONS, SUIT_INFO, ELEMENTAL_DIGNITIES, INTERPRETATION_GUIDE } from '../data'
 
-function getElementalInteraction(elem1, elem2) {
-  const pairs = [`${elem1}-${elem2}`, `${elem2}-${elem1}`]
-  for (const category of ['friendly', 'challenging', 'neutral']) {
-    for (const pair of pairs) {
-      if (ELEMENTAL_DIGNITIES[category][pair]) {
-        return ELEMENTAL_DIGNITIES[category][pair]
-      }
-    }
-  }
-  return null
-}
+const getInteraction = (a, b) =>
+  ['friendly', 'challenging', 'neutral'].flatMap(cat =>
+    [ELEMENTAL_DIGNITIES[cat][`${a}-${b}`], ELEMENTAL_DIGNITIES[cat][`${b}-${a}`]]
+  ).find(Boolean)
 
-export function generateReadingPrompt(drawnCards, spread, question) {
-  const lines = ['# Tarot Reading Request\n']
+export function generateReadingPrompt(cards, spread, question) {
+  const suits = [...new Set(cards.filter(c => c.suit).map(c => c.suit))]
+  const majorCount = cards.filter(c => c.arcana === 'major').length
+  const elements = suits.map(s => SUIT_INFO[s].element)
 
-  if (question) {
-    lines.push(`## My Question\n"${question}"\n`)
-  }
+  let p = '# Tarot Reading Request\n\n'
+  if (question) p += `## My Question\n"${question}"\n\n`
 
   // Cards drawn
-  lines.push(`## The Reading: ${spread.name}\n`)
-  drawnCards.forEach((card, i) => {
-    const pos = spread.positions[i]
-    const orientation = card.reversed ? '**REVERSED**' : 'Upright'
-    lines.push(`**${pos.name}** (${pos.description}): ${card.name} — ${orientation}`)
+  p += `## The Reading: ${spread.name}\n\n`
+  cards.forEach((c, i) => {
+    p += `**${spread.positions[i].name}** (${spread.positions[i].description}): ${c.name} — ${c.reversed ? '**REVERSED**' : 'Upright'}\n`
   })
 
-  // Gather suit/element info
-  const suits = [...new Set(drawnCards.filter(c => c.suit).map(c => c.suit))]
-  const hasMajor = drawnCards.some(c => c.arcana === 'major')
-
   // Elemental context
-  if (suits.length > 0) {
-    lines.push('\n## Elemental Context')
-    suits.forEach(suit => {
-      const info = SUIT_INFO[suit]
-      lines.push(`**${suit} (${info.element})**: ${info.description}\n`)
-    })
+  if (suits.length) {
+    p += '\n## Elemental Context\n'
+    suits.forEach(s => p += `**${s} (${SUIT_INFO[s].element})**: ${SUIT_INFO[s].description}\n\n`)
   }
 
-  // Major arcana note
-  if (hasMajor) {
-    const count = drawnCards.filter(c => c.arcana === 'major').length
-    lines.push(`\n*Note: ${count} Major Arcana card${count > 1 ? 's appear' : ' appears'} in this reading, indicating significant life lessons or karmic themes.*`)
-  }
+  if (majorCount) p += `\n*Note: ${majorCount} Major Arcana card${majorCount > 1 ? 's appear' : ' appears'}, indicating significant life lessons or karmic themes.*\n`
 
   // Elemental interactions
-  if (suits.length >= 2) {
-    lines.push('\n## Elemental Interactions')
-    const elements = suits.map(s => SUIT_INFO[s].element)
-    for (let i = 0; i < elements.length; i++) {
+  if (elements.length >= 2) {
+    p += '\n## Elemental Interactions\n'
+    for (let i = 0; i < elements.length; i++)
       for (let j = i + 1; j < elements.length; j++) {
-        const interaction = getElementalInteraction(elements[i], elements[j])
-        if (interaction) lines.push(`- ${interaction}`)
+        const int = getInteraction(elements[i], elements[j])
+        if (int) p += `- ${int}\n`
       }
-    }
   }
 
   // Card meanings
-  lines.push('\n## Card Meanings for Your Reading\n')
-  drawnCards.forEach((card, i) => {
-    const pos = spread.positions[i]
-    const interp = CARD_INTERPRETATIONS[card.name]
-    if (interp) {
-      lines.push(`### ${card.name} (${pos.name} position)${card.reversed ? ' — REVERSED' : ''}`)
-      lines.push(`**Keywords**: ${interp.keywords.join(', ')}\n`)
-      lines.push(`**Upright meaning**: ${interp.upright}\n`)
-      lines.push(`**Reversed meaning**: ${interp.reversed}\n`)
-      if (card.reversed) {
-        lines.push(`*This card appeared reversed in your reading, so the reversed meaning is particularly relevant, though both orientations inform interpretation.*\n`)
-      }
-    }
+  p += '\n## Card Meanings for Your Reading\n\n'
+  cards.forEach((c, i) => {
+    const interp = CARD_INTERPRETATIONS[c.name]
+    if (!interp) return
+    p += `### ${c.name} (${spread.positions[i].name})${c.reversed ? ' — REVERSED' : ''}\n`
+    p += `**Keywords**: ${interp.keywords.join(', ')}\n\n**Upright**: ${interp.upright}\n\n**Reversed**: ${interp.reversed}\n\n`
+    if (c.reversed) p += `*Reversed meaning is particularly relevant here.*\n\n`
   })
 
-  // Guide and closing
-  lines.push(`---\n\n${INTERPRETATION_GUIDE}\n`)
-  lines.push(`---\n\n## Please Interpret My Reading\n\nUsing the card meanings and guidance above, please provide a thoughtful interpretation of this ${spread.name} reading${question ? ' in relation to my question' : ''}. Weave the cards together into a coherent narrative and end with actionable wisdom or a reflective question for me to consider.`)
+  p += `---\n\n${INTERPRETATION_GUIDE}\n\n---\n\n`
+  p += `## Please Interpret My Reading\n\nProvide a thoughtful interpretation of this ${spread.name} reading${question ? ' in relation to my question' : ''}. Weave the cards together into a coherent narrative and end with actionable wisdom.`
 
-  return lines.join('\n')
+  return p
 }
