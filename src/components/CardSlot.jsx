@@ -40,7 +40,7 @@ export default function CardSlot({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {hovered && <PositionTooltip position={position} showName={variant === 'celtic'} />}
+      {hovered && <PositionTooltip position={position} showName={variant !== 'celtic'} />}
 
       {variant === 'standard' && (
         <p className="text-slate-500 text-xs md:text-sm mb-2 md:mb-3 font-medium cursor-help">
