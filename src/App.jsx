@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Card3D from './components/Card3D'
 import Button from './components/Button'
 import CardSlot from './components/CardSlot'
 import KeywordList from './components/KeywordList'
+import CardConnections from './components/CardConnections'
 import { FULL_DECK, MAJOR_ARCANA, SPREADS } from './data'
 import { generateReadingPrompt } from './utils/generatePrompt'
 import useWindowSize from './hooks/useWindowSize'
@@ -73,6 +74,35 @@ export default function App() {
   const [useReversals, setUseReversals] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
 
+  // Shuffle animation state
+  const [isShuffling, setIsShuffling] = useState(false)
+  const [shuffleStep, setShuffleStep] = useState(0)
+
+  // Card positions for reading layout (used for connections)
+  const cardRefs = useRef([])
+  const [cardPositions, setCardPositions] = useState([])
+  const readingContainerRef = useRef(null)
+
+  // Update card positions when cards are revealed
+  useEffect(() => {
+    if (phase === 'reading' && allRevealed && cardRefs.current.length > 0) {
+      const containerRect = readingContainerRef.current?.getBoundingClientRect()
+      if (!containerRect) return
+
+      const positions = cardRefs.current.map(ref => {
+        if (!ref) return null
+        const rect = ref.getBoundingClientRect()
+        return {
+          x: rect.left - containerRect.left,
+          y: rect.top - containerRect.top,
+          width: rect.width,
+          height: rect.height
+        }
+      })
+      setCardPositions(positions)
+    }
+  }, [phase, allRevealed, drawn.length])
+
   // Responsive scaling for Celtic Cross
   const { width: windowWidth } = useWindowSize()
   const celticPadding = 32
@@ -94,6 +124,37 @@ export default function App() {
   const spreadData = SPREADS[spread]
   const hoverCards = deck.slice(0, HOVER_PREVIEW_COUNT)
   const allRevealed = drawn.length > 0 && revealed.length === drawn.length
+
+  // Shuffle animation - creates a visual shuffling experience
+  const startShuffleAnimation = () => {
+    setIsShuffling(true)
+    setShuffleStep(0)
+    setPhase('shuffle')
+
+    // Animate through shuffle steps
+    const steps = [1, 2, 3, 4, 5]
+    let stepIndex = 0
+
+    const animateStep = () => {
+      if (stepIndex < steps.length) {
+        setShuffleStep(steps[stepIndex])
+        // Actually shuffle the deck at each step for randomness
+        if (stepIndex === 2) shuffleDeck()
+        stepIndex++
+        setTimeout(animateStep, 400)
+      } else {
+        // Final shuffle and transition to select
+        shuffleDeck()
+        setTimeout(() => {
+          setIsShuffling(false)
+          setShuffleStep(0)
+          setPhase('select')
+        }, 600)
+      }
+    }
+
+    setTimeout(animateStep, 300)
+  }
 
   const dealCards = (cards) => {
     setDrawn(cards)
@@ -143,6 +204,8 @@ export default function App() {
     setDealingIndex(-1)
     setSelectedCards([])
     setRaisedCenterCard(1)
+    setCardPositions([])
+    cardRefs.current = []
     shuffleDeck()
   }
 
@@ -274,9 +337,70 @@ export default function App() {
             <p className="text-slate-600/80 text-xs font-light mb-8">
               Tip: Open-ended questions yield richer insights
             </p>
-            <Button variant="secondary" onClick={() => { shuffleDeck(); setPhase('select') }} className="w-full">
+            <Button variant="secondary" onClick={startShuffleAnimation} className="w-full">
               Continue
             </Button>
+          </div>
+        )}
+
+        {/* Shuffle Phase */}
+        {phase === 'shuffle' && (
+          <div className="text-center py-16">
+            <div className="relative h-64 flex items-center justify-center mb-8">
+              {/* Animated deck during shuffle */}
+              <div className="relative">
+                {[...Array(7)].map((_, i) => {
+                  // Create dynamic offsets based on shuffle step
+                  const isEven = i % 2 === 0
+                  const baseOffset = (i - 3) * 4
+                  let xOffset = baseOffset
+                  let yOffset = i * 2
+                  let rotation = (i - 3) * 2
+
+                  // Animate cards based on shuffle step
+                  if (shuffleStep >= 1 && shuffleStep <= 5) {
+                    const phase = shuffleStep
+                    if (phase === 1) {
+                      // Split deck
+                      xOffset = isEven ? baseOffset - 40 : baseOffset + 40
+                    } else if (phase === 2) {
+                      // Riffle together
+                      xOffset = baseOffset + Math.sin(i * 0.8) * 20
+                      yOffset = i * 2 + (isEven ? -10 : 10)
+                    } else if (phase === 3) {
+                      // Fan out
+                      rotation = (i - 3) * 12
+                      xOffset = baseOffset + (i - 3) * 8
+                    } else if (phase === 4) {
+                      // Collapse back
+                      xOffset = baseOffset + Math.cos(i) * 15
+                      rotation = (i - 3) * 5
+                    } else if (phase === 5) {
+                      // Final gather
+                      xOffset = baseOffset * 0.5
+                      yOffset = i * 1.5
+                      rotation = (i - 3) * 1
+                    }
+                  }
+
+                  return (
+                    <div
+                      key={i}
+                      className="absolute transition-all duration-300 ease-out"
+                      style={{
+                        transform: `translateX(${xOffset}px) translateY(${yOffset}px) rotate(${rotation}deg)`,
+                        zIndex: i
+                      }}
+                    >
+                      <Card3D size="small" />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <p className="text-slate-400/80 font-light tracking-wider text-sm animate-pulse">
+              Shuffling the deck...
+            </p>
           </div>
         )}
 
@@ -284,7 +408,7 @@ export default function App() {
         {phase === 'select' && (
           <div className="text-center">
             <p className="text-slate-300/90 font-light tracking-wide mb-2">Choose your cards</p>
-            <p className="text-slate-500/80 text-sm font-light mb-8">
+            <p className="text-slate-500/80 text-sm font-light mb-4">
               <span className="text-violet-400/80">{selectedCards.length}</span>
               <span className="text-slate-600/60 mx-2">of</span>
               <span>{spreadData.positions.length}</span>
@@ -293,7 +417,12 @@ export default function App() {
               )}
             </p>
 
-            {/* Card Fan */}
+            {/* Breathing pulse indicator */}
+            <div className="flex justify-center mb-8">
+              <div className="breathing-pulse w-3 h-3 rounded-full bg-violet-500/30" />
+            </div>
+
+            {/* Card Fan with slow hover reveal */}
             <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-10 max-w-4xl mx-auto">
               {deck.slice(0, Math.min(MAX_SELECTABLE_CARDS, deck.length)).map((card, i) => (
                 <div
@@ -302,14 +431,14 @@ export default function App() {
                   className={`transition-all duration-500 ${
                     selectedCards.includes(i)
                       ? 'opacity-10 scale-75 pointer-events-none'
-                      : 'hover:scale-110 hover:-translate-y-4 cursor-pointer hover:z-10'
+                      : 'cursor-pointer hover:z-10'
                   }`}
                   style={{
                     transform: `rotate(${(i - 10) * 2}deg)`,
                     marginLeft: i > 0 ? '-20px' : '0'
                   }}
                 >
-                  <Card3D size="small" />
+                  <Card3D size="small" enableSlowReveal={!selectedCards.includes(i)} />
                 </div>
               ))}
             </div>
@@ -327,11 +456,16 @@ export default function App() {
         {/* Reading Phase */}
         {phase === 'reading' && (
           <div>
-            {/* Question Display */}
+            {/* Question Echo - Enhanced Display */}
             {question && (
-              <p className="text-center text-slate-500/80 mb-6 md:mb-10 italic text-base md:text-lg font-light px-4">
-                "{question}"
-              </p>
+              <div className="text-center mb-8 md:mb-12 px-4">
+                <p className="text-slate-600/60 text-xs font-light tracking-widest uppercase mb-3">
+                  Your question
+                </p>
+                <p className="question-echo inline-block text-slate-300/90 text-lg md:text-xl font-light italic tracking-wide max-w-xl">
+                  {question}
+                </p>
+              </div>
             )}
 
             {/* Celtic Cross Layout */}
@@ -404,13 +538,24 @@ export default function App() {
               </div>
             ) : (
               /* Standard Card Layout */
-              <div className={`flex flex-wrap justify-center mb-8 md:mb-10 ${isCeltic ? 'gap-2' : 'gap-4 md:gap-8'}`}>
+              <div
+                ref={readingContainerRef}
+                className={`relative flex flex-wrap justify-center mb-8 md:mb-10 ${isCeltic ? 'gap-2' : 'gap-4 md:gap-8'}`}
+              >
+                {/* Card Connection Lines */}
+                <CardConnections
+                  cards={drawn}
+                  cardPositions={cardPositions}
+                  allRevealed={allRevealed}
+                />
+
                 {drawn.map((card, i) => {
                   const isDealt = dealingIndex >= i
                   const cardSize = spread === 'single' ? 'large' : (isCeltic ? 'small' : 'normal')
                   return (
                     <div
                       key={card.id}
+                      ref={el => cardRefs.current[i] = el}
                       className={`text-center relative transition-all duration-700 ${isDealt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-12'}`}
                     >
                       <CardSlot

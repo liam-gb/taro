@@ -495,3 +495,120 @@ body {
     transparent 100%
   );
 }
+
+/* ─── Breathing Pulse ─── */
+.breathing-pulse {
+  animation: breathing 4s ease-in-out infinite;
+}
+
+@keyframes breathing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 0.7;
+    box-shadow: 0 0 20px 10px rgba(139, 92, 246, 0.2);
+  }
+}
+
+/* ─── Slow Reveal Shimmer ─── */
+.selection-card-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.3) 25%,
+    rgba(6, 182, 212, 0.2) 50%,
+    rgba(236, 72, 153, 0.2) 75%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+  border-radius: 12px;
+}
+
+.selection-card-shimmer.active {
+  opacity: 1;
+  animation: shimmer-sweep 2s ease-in-out infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ─── Reversed Card Shadow Treatment ─── */
+.reversed-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  pointer-events: none;
+  border-radius: 12px;
+  z-index: 5;
+}
+
+.reversed-card-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  border-radius: 12px;
+  z-index: 5;
+}
+
+/* ─── Card Connection Lines ─── */
+.card-connection-line {
+  stroke-dasharray: 8 4;
+  animation: dash-flow 20s linear infinite;
+}
+
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+.card-connection-glow {
+  filter: blur(2px);
+  opacity: 0.6;
+}
+
+/* ─── Question Echo ─── */
+.question-echo {
+  position: relative;
+}
+
+.question-echo::before,
+.question-echo::after {
+  content: '"';
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2em;
+  line-height: 1;
+  color: rgba(139, 92, 246, 0.3);
+  position: absolute;
+  top: -0.2em;
+}
+
+.question-echo::before {
+  left: -0.5em;
+}
+
+.question-echo::after {
+  content: '"';
+  right: -0.5em;
+}

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CARD_IMAGES, getCardImage } from '../utils/cardImages'
 
 // Card sizes - matches PNG aspect ratio (300x527)
@@ -10,6 +10,9 @@ const sizes = {
 
 // Liquid glass transition with spring physics
 const transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease, filter 0.3s ease'
+
+// Slow reveal hover delay in ms
+const SLOW_REVEAL_DELAY = 800
 
 // Mystical shadow system with iridescent glow
 const shadow = {
@@ -34,14 +37,37 @@ const shadow = {
   `
 }
 
-export default function Card3D({ card = null, isRevealed = false, onClick, size = 'normal', enableHover = false, hoverCard = null }) {
+export default function Card3D({ card = null, isRevealed = false, onClick, size = 'normal', enableHover = false, hoverCard = null, enableSlowReveal = false }) {
   const [rot, setRot] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
+  const [showShimmer, setShowShimmer] = useState(false)
   const ref = useRef(null)
+  const hoverTimerRef = useRef(null)
 
   const { width, height } = sizes[size]
   const displayCard = hovered && hoverCard ? hoverCard : card
   const showFace = (enableHover && hovered && hoverCard) || isRevealed
+
+  // Handle slow reveal shimmer effect
+  useEffect(() => {
+    if (enableSlowReveal && hovered) {
+      // Start shimmer after delay
+      hoverTimerRef.current = setTimeout(() => {
+        setShowShimmer(true)
+      }, SLOW_REVEAL_DELAY)
+    } else {
+      setShowShimmer(false)
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current)
+      }
+    }
+
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current)
+      }
+    }
+  }, [enableSlowReveal, hovered])
 
   const onMove = (e) => {
     if (!ref.current) return
@@ -126,6 +152,16 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
             background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
             pointerEvents: 'none'
           }} />
+          {/* Slow reveal shimmer effect */}
+          {enableSlowReveal && (
+            <div
+              className={`selection-card-shimmer ${showShimmer ? 'active' : ''}`}
+              style={{
+                transition: 'opacity 0.6s ease',
+                opacity: showShimmer ? 1 : (hovered ? 0.3 : 0),
+              }}
+            />
+          )}
         </div>
 
         {/* Card Front */}
@@ -138,7 +174,8 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
             <div style={{
               width: '100%',
               height: '100%',
-              transform: displayCard.reversed ? 'rotate(180deg)' : 'none'
+              transform: displayCard.reversed ? 'rotate(180deg)' : 'none',
+              position: 'relative'
             }}>
               <img
                 src={getCardImage(displayCard)}
@@ -146,7 +183,8 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  filter: displayCard.reversed ? 'brightness(0.92) saturate(0.9)' : 'none'
                 }}
                 draggable={false}
               />
@@ -157,6 +195,13 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(255,255,255,0.03) 100%)',
                 pointerEvents: 'none'
               }} />
+              {/* Reversed card shadow/vignette treatment */}
+              {displayCard.reversed && (
+                <>
+                  <div className="reversed-card-overlay" />
+                  <div className="reversed-card-vignette" />
+                </>
+              )}
             </div>
           )}
         </div>
