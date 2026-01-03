@@ -78,7 +78,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-200">
       <div className="text-center py-6">
-        <h1 className="text-xl tracking-[0.4em] text-slate-500 font-light">TAROT</h1>
+        <h1 className="text-xl tracking-[0.3em] text-slate-500 font-light">🍠 TARO</h1>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 pb-12">
