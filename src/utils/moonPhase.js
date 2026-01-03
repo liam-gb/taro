@@ -13,13 +13,16 @@ const MOON_PHASES = [
 ]
 
 export function getMoonPhase(date = new Date()) {
-  // Known new moon: January 6, 2000
-  const knownNewMoon = new Date(2000, 0, 6, 18, 14)
+  // Known new moon: December 30, 2024 at 22:27 UTC
+  const knownNewMoon = new Date(Date.UTC(2024, 11, 30, 22, 27))
   const synodicMonth = 29.53058867
 
   const daysSinceNew = (date - knownNewMoon) / (1000 * 60 * 60 * 24)
-  const lunarAge = daysSinceNew % synodicMonth
-  const phaseIndex = Math.floor((lunarAge / synodicMonth) * 8) % 8
+  // Add half a phase width (~1.85 days) to center phases on their peak
+  const lunarAge = ((daysSinceNew % synodicMonth) + synodicMonth) % synodicMonth
+  const phaseWidth = synodicMonth / 8
+  const centeredAge = lunarAge + phaseWidth / 2
+  const phaseIndex = Math.floor((centeredAge / synodicMonth) * 8) % 8
 
   return MOON_PHASES[phaseIndex]
 }
