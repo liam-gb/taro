@@ -1,6 +1,59 @@
 import { useState, useRef, useEffect } from 'react'
 import { CARD_IMAGES, getCardImage } from '../utils/cardImages'
 
+// Sparkle particle component for card reveal
+const SparkleParticle = ({ style }) => (
+  <div className="sparkle" style={style} />
+)
+
+// Star-shaped sparkle
+const StarSparkle = ({ style }) => (
+  <div className="sparkle-star" style={style}>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
+    </svg>
+  </div>
+)
+
+// Generate sparkle particles
+const generateSparkles = (count = 12) => {
+  const sparkles = []
+  const colors = [
+    'rgba(139, 92, 246, 0.9)',   // violet
+    'rgba(6, 182, 212, 0.9)',    // cyan
+    'rgba(236, 72, 153, 0.8)',   // pink
+    'rgba(255, 255, 255, 0.9)',  // white
+    'rgba(245, 158, 11, 0.8)',   // amber
+  ]
+
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2
+    const distance = 40 + Math.random() * 60
+    const tx = Math.cos(angle) * distance
+    const ty = Math.sin(angle) * distance
+    const size = 3 + Math.random() * 6
+    const delay = Math.random() * 0.2
+
+    sparkles.push({
+      id: i,
+      type: Math.random() > 0.6 ? 'star' : 'dot',
+      style: {
+        '--tx': `${tx}px`,
+        '--ty': `${ty}px`,
+        left: '50%',
+        top: '50%',
+        width: size,
+        height: size,
+        background: colors[Math.floor(Math.random() * colors.length)],
+        color: colors[Math.floor(Math.random() * colors.length)],
+        animationDelay: `${delay}s`,
+        boxShadow: `0 0 ${size * 2}px ${colors[Math.floor(Math.random() * colors.length)]}`
+      }
+    })
+  }
+  return sparkles
+}
+
 // Card sizes - matches PNG aspect ratio (300x527)
 const sizes = {
   small: { width: 90, height: 158 },
@@ -41,8 +94,21 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
   const [rot, setRot] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
   const [showShimmer, setShowShimmer] = useState(false)
+  const [sparkles, setSparkles] = useState([])
+  const [wasRevealed, setWasRevealed] = useState(false)
   const ref = useRef(null)
   const hoverTimerRef = useRef(null)
+
+  // Trigger sparkles when card is revealed
+  useEffect(() => {
+    if (isRevealed && !wasRevealed) {
+      setWasRevealed(true)
+      setSparkles(generateSparkles(16))
+      // Clear sparkles after animation
+      const timer = setTimeout(() => setSparkles([]), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [isRevealed, wasRevealed])
 
   const { width, height } = sizes[size]
   const displayCard = hovered && hoverCard ? hoverCard : card
@@ -118,6 +184,15 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
       className="cursor-pointer relative"
       style={{ width, height, perspective: 1200 }}
     >
+      {/* Sparkle particles on reveal */}
+      {sparkles.map(sparkle => (
+        sparkle.type === 'star' ? (
+          <StarSparkle key={sparkle.id} style={sparkle.style} />
+        ) : (
+          <SparkleParticle key={sparkle.id} style={sparkle.style} />
+        )
+      ))}
+
       {/* Iridescent glow effect on hover */}
       {glowOverlay && <div style={glowOverlay} />}
 
