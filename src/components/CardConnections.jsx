@@ -108,9 +108,9 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
 
     // Small delay before showing connections for visual effect
     const timer = setTimeout(() => {
-      const newConnections = []
+      const allConnections = []
 
-      // Find notable card combinations
+      // Find notable card combinations (highest priority)
       const combinations = findCombinations(cards)
       combinations.forEach(combo => {
         const indices = combo.cards.map(name =>
@@ -118,11 +118,12 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
         ).filter(i => i !== -1)
 
         if (indices.length === 2) {
-          newConnections.push({
+          allConnections.push({
             from: indices[0],
             to: indices[1],
             type: 'combination',
-            meaning: combo.meaning
+            meaning: combo.meaning,
+            priority: 100 // Highest priority for symbolic combinations
           })
         }
       })
@@ -137,23 +138,35 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
           // Only show friendly and challenging relationships
           if (relationship === 'friendly' || relationship === 'challenging') {
             // Check if this connection already exists as a combination
-            const exists = newConnections.some(
+            const exists = allConnections.some(
               c => (c.from === i && c.to === j) || (c.from === j && c.to === i)
             )
 
-            if (!exists && newConnections.length < 6) {
-              newConnections.push({
+            if (!exists) {
+              // Priority based on relationship type and position adjacency
+              // Challenging relationships are more notable (tension to address)
+              // Adjacent cards (by position) have slightly higher priority
+              const adjacencyBonus = Math.abs(i - j) === 1 ? 10 : 0
+              const typePriority = relationship === 'challenging' ? 50 : 30
+
+              allConnections.push({
                 from: i,
                 to: j,
                 type: relationship,
-                elements: [elem1, elem2]
+                elements: [elem1, elem2],
+                priority: typePriority + adjacencyBonus
               })
             }
           }
         }
       }
 
-      setConnections(newConnections)
+      // Sort by priority (highest first) and take top connections
+      const sortedConnections = allConnections
+        .sort((a, b) => b.priority - a.priority)
+        .slice(0, 5) // Show up to 5 most important connections
+
+      setConnections(sortedConnections)
       setVisible(true)
     }, 800)
 
