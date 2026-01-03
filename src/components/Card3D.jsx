@@ -13,11 +13,11 @@ export default function Card3D({
   const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef(null)
 
-  // Responsive card sizes
+  // Responsive card sizes - matches PNG aspect ratio (300x527)
   const sizes = {
-    small: { width: 90, height: 148 },
-    normal: { width: 140, height: 230 },
-    large: { width: 180, height: 295 }
+    small: { width: 90, height: 158 },
+    normal: { width: 140, height: 246 },
+    large: { width: 180, height: 316 }
   }
 
   const s = sizes[size]
