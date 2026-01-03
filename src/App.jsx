@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react'
 import Card3D from './components/Card3D'
+import Button from './components/Button'
+import CardSlot from './components/CardSlot'
+import KeywordList from './components/KeywordList'
 import { FULL_DECK, MAJOR_ARCANA, SPREADS } from './data'
 import { generateReadingPrompt } from './utils/generatePrompt'
-
-const btn = 'py-4 rounded-lg transition-colors'
-const btnPrimary = `${btn} bg-violet-900/30 hover:bg-violet-800/40 border border-violet-500/20 text-slate-300`
-const btnSecondary = `${btn} bg-slate-800 hover:bg-slate-700 text-slate-300`
+import {
+  CARD_DEAL_DELAY_MS,
+  COPY_FEEDBACK_TIMEOUT_MS,
+  REVERSAL_PROBABILITY,
+  HOVER_PREVIEW_COUNT,
+  MAX_SELECTABLE_CARDS,
+  CELTIC_CROSS
+} from './constants'
 
 const Toggle = ({ label, hint, checked, onChange }) => (
   <>
@@ -28,20 +35,6 @@ function shuffle(arr) {
   return a
 }
 
-// Celtic Cross traditional layout positions (relative to center)
-const celticLayout = [
-  { x: 0, y: 0, rotate: 0 },      // 1: Present (center)
-  { x: 0, y: 0, rotate: 90 },     // 2: Challenge (crossing)
-  { x: -1, y: 0, rotate: 0 },     // 3: Past (left)
-  { x: 1, y: 0, rotate: 0 },      // 4: Future (right)
-  { x: 0, y: -1, rotate: 0 },     // 5: Above (crown)
-  { x: 0, y: 1, rotate: 0 },      // 6: Below (foundation)
-  { x: 2.2, y: 1.5, rotate: 0 },  // 7: Advice (staff bottom)
-  { x: 2.2, y: 0.5, rotate: 0 },  // 8: External (staff)
-  { x: 2.2, y: -0.5, rotate: 0 }, // 9: Hopes/Fears (staff)
-  { x: 2.2, y: -1.5, rotate: 0 }, // 10: Outcome (staff top)
-]
-
 export default function App() {
   const [phase, setPhase] = useState('welcome')
   const [question, setQuestion] = useState('')
@@ -52,7 +45,6 @@ export default function App() {
   const [copied, setCopied] = useState(false)
   const [dealingIndex, setDealingIndex] = useState(-1)
   const [selectedCards, setSelectedCards] = useState([])
-  const [hoveredPosition, setHoveredPosition] = useState(null)
 
   // Deck settings
   const [majorOnly, setMajorOnly] = useState(false)
@@ -63,7 +55,7 @@ export default function App() {
     const baseDeck = majorOnly ? MAJOR_ARCANA : FULL_DECK
     const d = shuffle(baseDeck).map(c => ({
       ...c,
-      reversed: useReversals ? Math.random() < 0.3 : false
+      reversed: useReversals ? Math.random() < REVERSAL_PROBABILITY : false
     }))
     setDeck(d)
     return d
@@ -72,19 +64,17 @@ export default function App() {
   useEffect(() => { shuffleDeck() }, [majorOnly, useReversals])
 
   const spreadData = SPREADS[spread]
-  const hoverCards = deck.slice(0, 5)
+  const hoverCards = deck.slice(0, HOVER_PREVIEW_COUNT)
   const allRevealed = drawn.length > 0 && revealed.length === drawn.length
 
-  // Staggered card dealing animation
   const dealCards = (cards) => {
     setDrawn(cards)
     setDealingIndex(-1)
     cards.forEach((_, i) => {
-      setTimeout(() => setDealingIndex(i), i * 300)
+      setTimeout(() => setDealingIndex(i), i * CARD_DEAL_DELAY_MS)
     })
   }
 
-  // User picks their own cards from the spread
   const selectCard = (index) => {
     if (selectedCards.includes(index)) return
     const newSelected = [...selectedCards, index]
@@ -113,8 +103,11 @@ export default function App() {
   const copy = () => {
     navigator.clipboard.writeText(generateReadingPrompt(drawn, spreadData, question))
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setTimeout(() => setCopied(false), COPY_FEEDBACK_TIMEOUT_MS)
   }
+
+  const isCeltic = spread === 'celtic'
+  const revealCard = (i) => setRevealed([...revealed, i])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-200">
@@ -144,7 +137,6 @@ export default function App() {
                 ))}
               </div>
 
-              {/* Settings toggle */}
               <button
                 onClick={() => setShowSettings(!showSettings)}
                 className="text-slate-600 hover:text-slate-400 text-sm transition-colors"
@@ -152,7 +144,6 @@ export default function App() {
                 {showSettings ? '▾ Hide options' : '▸ Deck options'}
               </button>
 
-              {/* Settings panel */}
               {showSettings && (
                 <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-800 space-y-3">
                   <Toggle label="Major Arcana only" hint="Use only the 22 Major Arcana cards" checked={majorOnly} onChange={() => setMajorOnly(!majorOnly)} />
@@ -160,7 +151,7 @@ export default function App() {
                 </div>
               )}
 
-              <button onClick={() => setPhase('question')} className={`w-full ${btnPrimary}`}>Begin Reading</button>
+              <Button onClick={() => setPhase('question')} className="w-full">Begin Reading</Button>
             </div>
           </div>
         )}
@@ -171,11 +162,10 @@ export default function App() {
             <textarea value={question} onChange={e => setQuestion(e.target.value)} placeholder="Your question (or leave blank for general guidance)..." rows={3}
               className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/50 resize-none mb-4" />
             <p className="text-slate-600 text-xs mb-6">Tip: Open-ended questions yield richer insights</p>
-            <button onClick={() => { shuffleDeck(); setPhase('select') }} className={`w-full ${btnSecondary}`}>Continue</button>
+            <Button variant="secondary" onClick={() => { shuffleDeck(); setPhase('select') }} className="w-full">Continue</Button>
           </div>
         )}
 
-        {/* Card Selection Phase */}
         {phase === 'select' && (
           <div className="text-center">
             <p className="text-slate-400 mb-2">Choose your cards</p>
@@ -186,7 +176,7 @@ export default function App() {
               )}
             </p>
             <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-8 max-w-4xl mx-auto">
-              {deck.slice(0, Math.min(21, deck.length)).map((card, i) => (
+              {deck.slice(0, Math.min(MAX_SELECTABLE_CARDS, deck.length)).map((card, i) => (
                 <div
                   key={i}
                   onClick={() => selectCard(i)}
@@ -204,9 +194,7 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <button onClick={reset} className="text-slate-600 hover:text-slate-400 text-sm">
-              Start Over
-            </button>
+            <Button variant="text" onClick={reset} className="text-sm">Start Over</Button>
           </div>
         )}
 
@@ -214,105 +202,56 @@ export default function App() {
           <div>
             {question && <p className="text-center text-slate-600 mb-4 md:mb-8 italic text-base md:text-lg px-4">"{question}"</p>}
 
-            {/* Celtic Cross special layout */}
-            {spread === 'celtic' ? (
-              <div className="relative mx-auto mb-8 overflow-x-auto" style={{ minWidth: 500, height: 450 }}>
-                <div className="relative" style={{ width: 500, height: 450, margin: '0 auto' }}>
+            {isCeltic ? (
+              <div className="relative mx-auto mb-8 overflow-x-auto" style={{ minWidth: CELTIC_CROSS.width, height: CELTIC_CROSS.height }}>
+                <div className="relative" style={{ width: CELTIC_CROSS.width, height: CELTIC_CROSS.height, margin: '0 auto' }}>
                   {drawn.map((card, i) => {
-                    const isRev = revealed.includes(i)
                     const isDealt = dealingIndex >= i
-                    const pos = celticLayout[i]
-                    const baseX = 140
-                    const baseY = 180
-                    const spacing = 100
-
+                    const pos = spreadData.layout[i]
                     return (
                       <div
                         key={card.id}
                         className={`absolute transition-all duration-500 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'}`}
                         style={{
-                          left: baseX + pos.x * spacing,
-                          top: baseY + pos.y * spacing,
+                          left: CELTIC_CROSS.baseX + pos.x * CELTIC_CROSS.spacing,
+                          top: CELTIC_CROSS.baseY + pos.y * CELTIC_CROSS.spacing,
                           transform: `rotate(${pos.rotate}deg)`,
                           zIndex: i === 1 ? 2 : 1
                         }}
                       >
-                        <div
-                          className="relative group"
-                          onMouseEnter={() => setHoveredPosition(i)}
-                          onMouseLeave={() => setHoveredPosition(null)}
-                        >
-                          {/* Position tooltip */}
-                          {hoveredPosition === i && (
-                            <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-slate-800 px-3 py-2 rounded-lg text-xs whitespace-nowrap z-20 border border-slate-700">
-                              <div className="text-violet-400 font-medium">{spreadData.positions[i].name}</div>
-                              <div className="text-slate-500">{spreadData.positions[i].description}</div>
-                            </div>
-                          )}
-                          <Card3D
-                            card={card}
-                            isRevealed={isRev}
-                            onClick={() => !isRev && isDealt && setRevealed([...revealed, i])}
-                            size="small"
-                            enableHover={isRev}
-                          />
-                          {isRev && (
-                            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                              <p className="text-slate-400 text-xs">{card.name.split(' ').slice(-2).join(' ')}</p>
-                              {card.reversed && <p className="text-amber-500/80 text-xs">Reversed</p>}
-                            </div>
-                          )}
-                        </div>
+                        <CardSlot
+                          card={card}
+                          position={spreadData.positions[i]}
+                          isDealt={isDealt}
+                          isRevealed={revealed.includes(i)}
+                          onReveal={() => revealCard(i)}
+                          size="small"
+                          variant="celtic"
+                        />
                       </div>
                     )
                   })}
                 </div>
               </div>
             ) : (
-              /* Standard horizontal layout for other spreads */
-              <div className={`flex flex-wrap justify-center mb-6 md:mb-8 gap-3 md:gap-6`}>
+              <div className="flex flex-wrap justify-center mb-6 md:mb-8 gap-3 md:gap-6">
                 {drawn.map((card, i) => {
-                  const isRev = revealed.includes(i)
                   const isDealt = dealingIndex >= i
                   return (
                     <div
                       key={card.id}
                       className={`text-center transition-all duration-500 ${isDealt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
-                      onMouseEnter={() => setHoveredPosition(i)}
-                      onMouseLeave={() => setHoveredPosition(null)}
                     >
-                      {/* Position name with tooltip */}
-                      <div className="relative">
-                        <p className="text-slate-500 text-xs md:text-sm mb-2 md:mb-3 font-medium cursor-help">
-                          {spreadData.positions[i].name}
-                        </p>
-                        {hoveredPosition === i && (
-                          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-slate-800 px-3 py-2 rounded-lg text-xs whitespace-nowrap z-20 border border-slate-700">
-                            <div className="text-slate-400">{spreadData.positions[i].description}</div>
-                          </div>
-                        )}
-                      </div>
-                      <Card3D
+                      <CardSlot
                         card={card}
-                        isRevealed={isRev}
-                        onClick={() => !isRev && isDealt && setRevealed([...revealed, i])}
+                        position={spreadData.positions[i]}
+                        isDealt={isDealt}
+                        isRevealed={revealed.includes(i)}
+                        onReveal={() => revealCard(i)}
                         size={spread === 'single' ? 'large' : 'normal'}
-                        enableHover={isRev}
+                        variant="standard"
+                        showKeywords
                       />
-                      {isRev && (
-                        <div className="mt-2 md:mt-3">
-                          <p className="text-slate-300 text-xs md:text-sm font-medium max-w-[120px] md:max-w-none mx-auto">{card.name}</p>
-                          {card.reversed && <p className="text-amber-500/80 text-xs mt-1">Reversed</p>}
-                          {/* Card keywords - show on hover */}
-                          <div className={`flex flex-wrap justify-center gap-1 mt-2 max-w-[140px] mx-auto transition-opacity duration-300 ${hoveredPosition === i ? 'opacity-100' : 'opacity-0'}`}>
-                            {card.keywords?.slice(0, 3).map((kw, ki) => (
-                              <span key={ki} className="text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
-                                {kw}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )
                 })}
@@ -333,19 +272,15 @@ export default function App() {
                         <span className="text-violet-400 font-medium min-w-[100px]">{spreadData.positions[i].name}:</span>
                         <div>
                           <span className="text-slate-300">{card.name}{card.reversed && <span className="text-amber-500/80 ml-2">(Reversed)</span>}</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {card.keywords?.map((kw, ki) => (
-                              <span key={ki} className="text-xs text-slate-500">{kw}{ki < card.keywords.length - 1 ? ' ·' : ''}</span>
-                            ))}
-                          </div>
+                          <KeywordList keywords={card.keywords} />
                         </div>
                       </div>
                     ))}
                   </div>
-                  <button onClick={copy} className={`mt-6 w-full text-sm ${btnPrimary}`}>{copied ? '✓ Copied!' : 'Copy for Claude or ChatGPT'}</button>
+                  <Button onClick={copy} className="mt-6 w-full text-sm">{copied ? '✓ Copied!' : 'Copy for Claude or ChatGPT'}</Button>
                 </div>
                 <div className="text-center mt-8">
-                  <button onClick={reset} className="text-slate-600 hover:text-slate-400 transition-colors">New Reading</button>
+                  <Button variant="text" onClick={reset}>New Reading</Button>
                 </div>
               </div>
             )}

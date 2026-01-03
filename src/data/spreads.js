@@ -1,3 +1,17 @@
+// Celtic Cross traditional layout positions (relative grid coordinates)
+const CELTIC_LAYOUT = [
+  { x: 0, y: 0, rotate: 0 },      // 1: Present (center)
+  { x: 0, y: 0, rotate: 90 },     // 2: Challenge (crossing)
+  { x: -1, y: 0, rotate: 0 },     // 3: Past (left)
+  { x: 1, y: 0, rotate: 0 },      // 4: Future (right)
+  { x: 0, y: -1, rotate: 0 },     // 5: Above (crown)
+  { x: 0, y: 1, rotate: 0 },      // 6: Below (foundation)
+  { x: 2.2, y: 1.5, rotate: 0 },  // 7: Advice (staff bottom)
+  { x: 2.2, y: 0.5, rotate: 0 },  // 8: External (staff)
+  { x: 2.2, y: -0.5, rotate: 0 }, // 9: Hopes/Fears (staff)
+  { x: 2.2, y: -1.5, rotate: 0 }, // 10: Outcome (staff top)
+]
+
 export const SPREADS = {
   single: {
     name: "Daily Draw",
@@ -21,6 +35,7 @@ export const SPREADS = {
   },
   celtic: {
     name: "Celtic Cross",
+    layout: CELTIC_LAYOUT,
     positions: [
       { name: "Present", description: "Current situation" },
       { name: "Challenge", description: "Obstacle you face" },
