@@ -10,8 +10,8 @@ export const MAX_SELECTABLE_CARDS = 21
 // Celtic Cross layout dimensions
 export const CELTIC_CROSS = {
   width: 500,
-  height: 450,
+  height: 550,
   baseX: 140,
-  baseY: 180,
+  baseY: 200,
   spacing: 100
 }
