@@ -269,7 +269,7 @@ export default function App() {
                   <div className="space-y-3">
                     {drawn.map((card, i) => (
                       <div key={card.id} className="flex items-start gap-3">
-                        <span className="text-violet-400 font-medium min-w-[100px]">{spreadData.positions[i].name}:</span>
+                        <span className="text-violet-400 font-medium min-w-[140px] shrink-0">{spreadData.positions[i].name}:</span>
                         <div>
                           <span className="text-slate-300">{card.name}{card.reversed && <span className="text-amber-500/80 ml-2">(Reversed)</span>}</span>
                           <KeywordList keywords={card.keywords} />
