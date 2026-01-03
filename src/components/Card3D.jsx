@@ -104,13 +104,13 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
     borderRadius: 16,
     background: `radial-gradient(
       circle at ${glowX}% ${glowY}%,
-      rgba(139, 92, 246, 0.35) 0%,
-      rgba(6, 182, 212, 0.2) 25%,
-      rgba(236, 72, 153, 0.12) 50%,
-      transparent 70%
+      rgba(139, 92, 246, 0.15) 0%,
+      rgba(6, 182, 212, 0.08) 25%,
+      rgba(236, 72, 153, 0.04) 50%,
+      transparent 60%
     )`,
-    filter: 'blur(10px)',
-    opacity: 0.7,
+    filter: 'blur(12px)',
+    opacity: 0.5,
     transition: 'background 0.2s ease-out',
     zIndex: -1,
     pointerEvents: 'none'
