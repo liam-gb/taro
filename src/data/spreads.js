@@ -15,7 +15,7 @@ const CELTIC_LAYOUT = [
 export const SPREADS = {
   single: {
     name: "Daily Draw",
-    positions: [{ name: "Message", description: "Your guidance for today" }]
+    positions: [{ name: "Today's Guidance", description: "Your guidance for today" }]
   },
   threeCard: {
     name: "Past · Present · Future",
