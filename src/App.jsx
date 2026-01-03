@@ -134,6 +134,9 @@ export default function App() {
   const [cardPositions, setCardPositions] = useState([])
   const readingContainerRef = useRef(null)
 
+  // Computed state - must be defined before useEffects that reference it
+  const allRevealed = drawn.length > 0 && revealed.length === drawn.length
+
   // Update card positions when cards are revealed
   useEffect(() => {
     if (phase === 'reading' && allRevealed && cardRefs.current.length > 0) {
@@ -174,7 +177,6 @@ export default function App() {
 
   const spreadData = SPREADS[spread]
   const hoverCards = deck.slice(0, HOVER_PREVIEW_COUNT)
-  const allRevealed = drawn.length > 0 && revealed.length === drawn.length
 
   // Shuffle animation - creates a visual shuffling experience
   const startShuffleAnimation = () => {
