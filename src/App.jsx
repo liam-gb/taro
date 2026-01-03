@@ -126,13 +126,31 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <div className="space-y-4 max-w-sm mx-auto">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-6 max-w-md mx-auto">
+              <div className="flex flex-wrap justify-center gap-3">
                 {Object.entries(SPREADS).map(([k, s]) => (
                   <button key={k} onClick={() => setSpread(k)}
-                    className={`p-4 rounded-lg transition-all text-left ${spread === k ? 'bg-slate-800 ring-1 ring-violet-500/40' : 'bg-slate-900/50 hover:bg-slate-800/50'}`}>
-                    <div className="text-slate-300 text-sm">{s.name}</div>
-                    <div className="text-xs text-slate-600 mt-1">{s.positions.length} card{s.positions.length > 1 ? 's' : ''}</div>
+                    className={`group px-5 py-3 rounded-full transition-all ${
+                      spread === k
+                        ? 'bg-violet-600/20 ring-1 ring-violet-500/50 text-violet-300'
+                        : 'bg-slate-900/40 hover:bg-slate-800/60 text-slate-400 hover:text-slate-300'
+                    }`}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{s.name}</span>
+                      <span className="flex gap-0.5">
+                        {[...Array(Math.min(s.positions.length, 7))].map((_, i) => (
+                          <span
+                            key={i}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              spread === k ? 'bg-violet-400' : 'bg-slate-600 group-hover:bg-slate-500'
+                            }`}
+                          />
+                        ))}
+                        {s.positions.length > 7 && (
+                          <span className={`text-xs ml-0.5 ${spread === k ? 'text-violet-400' : 'text-slate-600'}`}>+</span>
+                        )}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
