@@ -61,12 +61,31 @@ function getElementalRelationship(element1, element2) {
   return 'neutral'
 }
 
-// Connection line colors
+// Connection line colors - warm for tension, cool for support
 const relationshipColors = {
-  friendly: { stroke: 'rgba(139, 92, 246, 0.4)', glow: 'rgba(139, 92, 246, 0.2)' },
-  neutral: { stroke: 'rgba(148, 163, 184, 0.25)', glow: 'rgba(148, 163, 184, 0.1)' },
-  challenging: { stroke: 'rgba(245, 158, 11, 0.35)', glow: 'rgba(245, 158, 11, 0.15)' },
-  combination: { stroke: 'rgba(6, 182, 212, 0.5)', glow: 'rgba(6, 182, 212, 0.25)' }
+  // Cool colors for supporting/friendly connections
+  friendly: {
+    stroke: 'rgba(56, 189, 248, 0.6)',      // Sky blue
+    glow: 'rgba(56, 189, 248, 0.25)',
+    accent: 'rgba(139, 92, 246, 0.5)'       // Purple accent
+  },
+  neutral: {
+    stroke: 'rgba(148, 163, 184, 0.25)',
+    glow: 'rgba(148, 163, 184, 0.1)',
+    accent: 'rgba(148, 163, 184, 0.2)'
+  },
+  // Warm colors for challenging/tension connections
+  challenging: {
+    stroke: 'rgba(251, 146, 60, 0.6)',      // Orange
+    glow: 'rgba(239, 68, 68, 0.3)',         // Red glow
+    accent: 'rgba(245, 158, 11, 0.5)'       // Amber accent
+  },
+  // Mystical cyan/violet for special combinations
+  combination: {
+    stroke: 'rgba(192, 132, 252, 0.7)',     // Violet
+    glow: 'rgba(6, 182, 212, 0.35)',        // Cyan glow
+    accent: 'rgba(236, 72, 153, 0.5)'       // Pink accent
+  }
 }
 
 // Get human-readable explanation for a connection
@@ -222,15 +241,26 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
         }}
       >
         <defs>
-          {/* Gradient definitions for each relationship type */}
+          {/* Mystical gradient definitions with color transitions */}
           {Object.entries(relationshipColors).map(([type, colors]) => (
             <linearGradient key={type} id={`gradient-${type}`} x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor={colors.stroke} stopOpacity="0" />
-              <stop offset="20%" stopColor={colors.stroke} stopOpacity="1" />
-              <stop offset="80%" stopColor={colors.stroke} stopOpacity="1" />
+              <stop offset="15%" stopColor={colors.stroke} stopOpacity="0.8" />
+              <stop offset="50%" stopColor={colors.accent} stopOpacity="1" />
+              <stop offset="85%" stopColor={colors.stroke} stopOpacity="0.8" />
               <stop offset="100%" stopColor={colors.stroke} stopOpacity="0" />
             </linearGradient>
           ))}
+          {/* Animated glow filter for mystical effect */}
+          <filter id="mystical-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur1" />
+            <feGaussianBlur stdDeviation="6" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur2" />
+              <feMergeNode in="blur1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {connections.map((conn, idx) => {
@@ -271,30 +301,60 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
 
           return (
             <g key={idx} className="connection-group" style={{ opacity: 0, animation: `fade-in 0.6s ease ${idx * 0.15}s forwards` }}>
-              {/* Glow layer - wider for more visibility */}
+              {/* Outer glow layer - softest, widest */}
               <path
                 d={path}
                 fill="none"
                 stroke={colors.glow}
-                strokeWidth={isHovered ? "14" : "10"}
-                className="card-connection-glow"
-                style={{ transition: 'stroke-width 0.2s ease' }}
+                strokeWidth={isHovered ? "20" : "16"}
+                strokeLinecap="round"
+                style={{
+                  filter: 'blur(4px)',
+                  transition: 'stroke-width 0.3s ease',
+                  opacity: 0.5
+                }}
               />
-              {/* Main line - slightly thicker */}
+              {/* Inner glow layer */}
+              <path
+                d={path}
+                fill="none"
+                stroke={colors.glow}
+                strokeWidth={isHovered ? "10" : "8"}
+                strokeLinecap="round"
+                className="card-connection-glow"
+                style={{
+                  filter: 'url(#mystical-glow)',
+                  transition: 'stroke-width 0.3s ease'
+                }}
+              />
+              {/* Core energy line with gradient */}
               <path
                 d={path}
                 fill="none"
                 stroke={`url(#gradient-${conn.type})`}
-                strokeWidth={isHovered ? "3" : "2"}
+                strokeWidth={isHovered ? "3.5" : "2.5"}
+                strokeLinecap="round"
                 className="card-connection-line"
-                style={{ transition: 'stroke-width 0.2s ease' }}
+                style={{ transition: 'stroke-width 0.3s ease' }}
+              />
+              {/* Bright center highlight */}
+              <path
+                d={path}
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.3)"
+                strokeWidth={isHovered ? "1.5" : "1"}
+                strokeLinecap="round"
+                style={{
+                  transition: 'stroke-width 0.3s ease',
+                  opacity: isHovered ? 0.6 : 0.4
+                }}
               />
               {/* Invisible wider path for easier hover targeting */}
               <path
                 d={path}
                 fill="none"
                 stroke="transparent"
-                strokeWidth="20"
+                strokeWidth="24"
                 style={{ cursor: 'pointer', pointerEvents: 'stroke' }}
                 onMouseEnter={(e) => handleConnectionHover(conn, idx, e)}
                 onMouseMove={handleConnectionMove}
@@ -308,6 +368,25 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
           @keyframes fade-in {
             from { opacity: 0; }
             to { opacity: 1; }
+          }
+          @keyframes energy-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+          }
+          .connection-group .card-connection-glow {
+            animation: energy-pulse 3s ease-in-out infinite;
+          }
+          .connection-group:nth-child(2) .card-connection-glow {
+            animation-delay: 0.5s;
+          }
+          .connection-group:nth-child(3) .card-connection-glow {
+            animation-delay: 1s;
+          }
+          .connection-group:nth-child(4) .card-connection-glow {
+            animation-delay: 1.5s;
+          }
+          .connection-group:nth-child(5) .card-connection-glow {
+            animation-delay: 2s;
           }
         `}</style>
       </svg>
