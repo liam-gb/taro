@@ -5,85 +5,83 @@ import {
   INTERPRETATION_GUIDE
 } from '../data'
 
-export function generateReadingPrompt(drawnCards, spread, question) {
-  // Build a comprehensive, self-contained prompt
-  let prompt = `# Tarot Reading Request\n\n`
+function getElementalInteraction(elem1, elem2) {
+  const pairs = [`${elem1}-${elem2}`, `${elem2}-${elem1}`]
+  for (const category of ['friendly', 'challenging', 'neutral']) {
+    for (const pair of pairs) {
+      if (ELEMENTAL_DIGNITIES[category][pair]) {
+        return ELEMENTAL_DIGNITIES[category][pair]
+      }
+    }
+  }
+  return null
+}
 
-  // Add the question if provided
+export function generateReadingPrompt(drawnCards, spread, question) {
+  const lines = ['# Tarot Reading Request\n']
+
   if (question) {
-    prompt += `## My Question\n"${question}"\n\n`
+    lines.push(`## My Question\n"${question}"\n`)
   }
 
-  // Add the spread and cards drawn
-  prompt += `## The Reading: ${spread.name}\n\n`
-  drawnCards.forEach((card, index) => {
-    const pos = spread.positions[index]
+  // Cards drawn
+  lines.push(`## The Reading: ${spread.name}\n`)
+  drawnCards.forEach((card, i) => {
+    const pos = spread.positions[i]
     const orientation = card.reversed ? '**REVERSED**' : 'Upright'
-    prompt += `**${pos.name}** (${pos.description}): ${card.name} — ${orientation}\n`
+    lines.push(`**${pos.name}** (${pos.description}): ${card.name} — ${orientation}`)
   })
 
-  // Gather unique suits present for context
-  const suitsPresent = new Set()
-  const hasMajorArcana = drawnCards.some(c => c.arcana === 'major')
-  drawnCards.forEach(card => {
-    if (card.suit) suitsPresent.add(card.suit)
-  })
+  // Gather suit/element info
+  const suits = [...new Set(drawnCards.filter(c => c.suit).map(c => c.suit))]
+  const hasMajor = drawnCards.some(c => c.arcana === 'major')
 
-  // Add suit context if minor arcana present
-  if (suitsPresent.size > 0) {
-    prompt += `\n## Elemental Context\n`
-    suitsPresent.forEach(suit => {
+  // Elemental context
+  if (suits.length > 0) {
+    lines.push('\n## Elemental Context')
+    suits.forEach(suit => {
       const info = SUIT_INFO[suit]
-      prompt += `**${suit} (${info.element})**: ${info.description}\n\n`
+      lines.push(`**${suit} (${info.element})**: ${info.description}\n`)
     })
   }
 
-  // Add Major Arcana note if present
-  if (hasMajorArcana) {
-    const majorCount = drawnCards.filter(c => c.arcana === 'major').length
-    prompt += `\n*Note: ${majorCount} Major Arcana card${majorCount > 1 ? 's appear' : ' appears'} in this reading, indicating significant life lessons or karmic themes.*\n`
+  // Major arcana note
+  if (hasMajor) {
+    const count = drawnCards.filter(c => c.arcana === 'major').length
+    lines.push(`\n*Note: ${count} Major Arcana card${count > 1 ? 's appear' : ' appears'} in this reading, indicating significant life lessons or karmic themes.*`)
   }
 
-  // Add elemental interactions if multiple suits
-  if (suitsPresent.size >= 2) {
-    prompt += `\n## Elemental Interactions\n`
-    const elements = [...suitsPresent].map(s => SUIT_INFO[s].element)
+  // Elemental interactions
+  if (suits.length >= 2) {
+    lines.push('\n## Elemental Interactions')
+    const elements = suits.map(s => SUIT_INFO[s].element)
     for (let i = 0; i < elements.length; i++) {
       for (let j = i + 1; j < elements.length; j++) {
-        const pair1 = `${elements[i]}-${elements[j]}`
-        const pair2 = `${elements[j]}-${elements[i]}`
-        if (ELEMENTAL_DIGNITIES.friendly[pair1] || ELEMENTAL_DIGNITIES.friendly[pair2]) {
-          prompt += `- ${ELEMENTAL_DIGNITIES.friendly[pair1] || ELEMENTAL_DIGNITIES.friendly[pair2]}\n`
-        } else if (ELEMENTAL_DIGNITIES.challenging[pair1] || ELEMENTAL_DIGNITIES.challenging[pair2]) {
-          prompt += `- ${ELEMENTAL_DIGNITIES.challenging[pair1] || ELEMENTAL_DIGNITIES.challenging[pair2]}\n`
-        } else if (ELEMENTAL_DIGNITIES.neutral[pair1] || ELEMENTAL_DIGNITIES.neutral[pair2]) {
-          prompt += `- ${ELEMENTAL_DIGNITIES.neutral[pair1] || ELEMENTAL_DIGNITIES.neutral[pair2]}\n`
-        }
+        const interaction = getElementalInteraction(elements[i], elements[j])
+        if (interaction) lines.push(`- ${interaction}`)
       }
     }
   }
 
-  // Add detailed card meanings for each drawn card
-  prompt += `\n## Card Meanings for Your Reading\n\n`
-  drawnCards.forEach((card, index) => {
-    const pos = spread.positions[index]
+  // Card meanings
+  lines.push('\n## Card Meanings for Your Reading\n')
+  drawnCards.forEach((card, i) => {
+    const pos = spread.positions[i]
     const interp = CARD_INTERPRETATIONS[card.name]
     if (interp) {
-      prompt += `### ${card.name} (${pos.name} position)${card.reversed ? ' — REVERSED' : ''}\n`
-      prompt += `**Keywords**: ${interp.keywords.join(', ')}\n\n`
-      prompt += `**Upright meaning**: ${interp.upright}\n\n`
-      prompt += `**Reversed meaning**: ${interp.reversed}\n\n`
+      lines.push(`### ${card.name} (${pos.name} position)${card.reversed ? ' — REVERSED' : ''}`)
+      lines.push(`**Keywords**: ${interp.keywords.join(', ')}\n`)
+      lines.push(`**Upright meaning**: ${interp.upright}\n`)
+      lines.push(`**Reversed meaning**: ${interp.reversed}\n`)
       if (card.reversed) {
-        prompt += `*This card appeared reversed in your reading, so the reversed meaning is particularly relevant, though both orientations inform interpretation.*\n\n`
+        lines.push(`*This card appeared reversed in your reading, so the reversed meaning is particularly relevant, though both orientations inform interpretation.*\n`)
       }
     }
   })
 
-  // Add interpretation guide
-  prompt += `---\n\n${INTERPRETATION_GUIDE}\n\n`
+  // Guide and closing
+  lines.push(`---\n\n${INTERPRETATION_GUIDE}\n`)
+  lines.push(`---\n\n## Please Interpret My Reading\n\nUsing the card meanings and guidance above, please provide a thoughtful interpretation of this ${spread.name} reading${question ? ' in relation to my question' : ''}. Weave the cards together into a coherent narrative and end with actionable wisdom or a reflective question for me to consider.`)
 
-  // Add closing request
-  prompt += `---\n\n## Please Interpret My Reading\n\nUsing the card meanings and guidance above, please provide a thoughtful interpretation of this ${spread.name} reading${question ? ' in relation to my question' : ''}. Weave the cards together into a coherent narrative and end with actionable wisdom or a reflective question for me to consider.`
-
-  return prompt
+  return lines.join('\n')
 }

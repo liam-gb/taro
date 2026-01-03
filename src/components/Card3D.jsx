@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { CARD_IMAGES, getCardImage } from '../utils/cardImages'
+import { CARD_SIZES, CARD_TRANSITION, CARD_SHADOWS, HOVER_ROTATION_SCALE } from '../constants'
 
 export default function Card3D({
   card = null,
@@ -13,14 +14,7 @@ export default function Card3D({
   const [isHovered, setIsHovered] = useState(false)
   const cardRef = useRef(null)
 
-  // Responsive card sizes
-  const sizes = {
-    small: { width: 90, height: 148 },
-    normal: { width: 140, height: 230 },
-    large: { width: 180, height: 295 }
-  }
-
-  const s = sizes[size]
+  const { width, height } = CARD_SIZES[size]
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return
@@ -30,8 +24,8 @@ export default function Card3D({
     const centerX = rect.width / 2
     const centerY = rect.height / 2
     setRotation({
-      x: ((y - centerY) / centerY) * -10,
-      y: ((x - centerX) / centerX) * 10
+      x: ((y - centerY) / centerY) * -HOVER_ROTATION_SCALE,
+      y: ((x - centerX) / centerX) * HOVER_ROTATION_SCALE
     })
   }
 
@@ -42,6 +36,18 @@ export default function Card3D({
 
   const displayCard = isHovered && hoverCard ? hoverCard : card
   const showFace = (enableHover && isHovered && hoverCard) || isRevealed
+  const shadow = isHovered ? CARD_SHADOWS.hoveredGlow : CARD_SHADOWS.idle
+  const shadowSimple = isHovered ? CARD_SHADOWS.hovered : CARD_SHADOWS.idle
+
+  const cardFaceStyle = {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backfaceVisibility: 'hidden',
+    borderRadius: 8,
+    overflow: 'hidden',
+    transition: CARD_TRANSITION
+  }
 
   return (
     <div
@@ -51,7 +57,7 @@ export default function Card3D({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       className="cursor-pointer"
-      style={{ width: s.width, height: s.height, perspective: 1000 }}
+      style={{ width, height, perspective: 1000 }}
     >
       <div
         style={{
@@ -59,7 +65,7 @@ export default function Card3D({
           height: '100%',
           position: 'relative',
           transformStyle: 'preserve-3d',
-          transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: CARD_TRANSITION,
           transform: `
             rotateX(${rotation.x}deg)
             rotateY(${rotation.y}deg)
@@ -68,21 +74,7 @@ export default function Card3D({
         }}
       >
         {/* Card Back */}
-        <div
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            backfaceVisibility: 'hidden',
-            borderRadius: 8,
-            overflow: 'hidden',
-            boxShadow: isHovered
-              ? '0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(147, 112, 219, 0.2)'
-              : '0 10px 30px rgba(0,0,0,0.4)',
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: showFace ? 'rotateY(180deg)' : 'rotateY(0deg)',
-          }}
-        >
+        <div style={{ ...cardFaceStyle, boxShadow: shadow, transform: showFace ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
           <img
             src={CARD_IMAGES.back}
             alt="Card back"
@@ -91,19 +83,7 @@ export default function Card3D({
         </div>
 
         {/* Card Face */}
-        <div
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            backfaceVisibility: 'hidden',
-            borderRadius: 8,
-            overflow: 'hidden',
-            boxShadow: isHovered ? '0 25px 50px rgba(0,0,0,0.5)' : '0 10px 30px rgba(0,0,0,0.4)',
-            transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: showFace ? 'rotateY(0deg)' : 'rotateY(-180deg)',
-          }}
-        >
+        <div style={{ ...cardFaceStyle, boxShadow: shadowSimple, transform: showFace ? 'rotateY(0deg)' : 'rotateY(-180deg)' }}>
           {displayCard && (
             <div style={{
               width: '100%',
