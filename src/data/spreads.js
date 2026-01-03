@@ -48,5 +48,17 @@ export const SPREADS = {
       { name: "Hopes/Fears", description: "Inner conflict" },
       { name: "Outcome", description: "Final result" }
     ]
+  },
+  horseshoe: {
+    name: "Horseshoe",
+    positions: [
+      { name: "Past", description: "What has shaped the situation" },
+      { name: "Present", description: "Current circumstances" },
+      { name: "Hidden Influences", description: "Factors not immediately apparent" },
+      { name: "Obstacles", description: "Challenges to overcome" },
+      { name: "External Influences", description: "People or events affecting you" },
+      { name: "Advice", description: "Guidance for moving forward" },
+      { name: "Outcome", description: "Where this path leads" }
+    ]
   }
 }

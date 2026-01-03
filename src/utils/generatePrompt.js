@@ -1,4 +1,6 @@
 import { CARD_INTERPRETATIONS, SUIT_INFO, ELEMENTAL_DIGNITIES, INTERPRETATION_GUIDE } from '../data'
+import { getMoonPhase } from './moonPhase'
+import { findCombinations } from './cardCombinations'
 
 const getInteraction = (a, b) =>
   ['friendly', 'challenging', 'neutral'].flatMap(cat =>
@@ -9,8 +11,13 @@ export function generateReadingPrompt(cards, spread, question) {
   const suits = [...new Set(cards.filter(c => c.suit).map(c => c.suit))]
   const majorCount = cards.filter(c => c.arcana === 'major').length
   const elements = suits.map(s => SUIT_INFO[s].element)
+  const moonPhase = getMoonPhase()
+  const combinations = findCombinations(cards)
 
   let p = '# Tarot Reading Request\n\n'
+
+  p += `## Timing\n**Moon Phase**: ${moonPhase.name} ${moonPhase.icon} — ${moonPhase.meaning}\n\n`
+
   if (question) p += `## My Question\n"${question}"\n\n`
 
   p += `## The Reading: ${spread.name}\n\n`
@@ -32,6 +39,13 @@ export function generateReadingPrompt(cards, spread, question) {
         const int = getInteraction(elements[i], elements[j])
         if (int) p += `- ${int}\n`
       }
+  }
+
+  if (combinations.length > 0) {
+    p += '\n## Notable Card Combinations\n'
+    combinations.forEach(c => {
+      p += `**${c.cards.join(' + ')}**: ${c.meaning}\n\n`
+    })
   }
 
   p += '\n## Card Meanings for Your Reading\n\n'
