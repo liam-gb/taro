@@ -57,16 +57,9 @@ export default function CardSlot({
         <PositionTooltip
           position={position}
           showName={true}
-          card={variant === 'celtic' && isRevealed ? card : null}
         />
       )}
 
-      {/* Position label for standard variant */}
-      {variant === 'standard' && (
-        <p className="text-slate-400/80 text-xs md:text-sm mb-2 md:mb-3 font-light tracking-wider cursor-help transition-colors duration-300 hover:text-slate-300/90">
-          {position.name}
-        </p>
-      )}
 
       {/* The Card */}
       <Card3D
