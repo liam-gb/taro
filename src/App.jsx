@@ -299,7 +299,16 @@ export default function App() {
             )}
 
             {dealingIndex >= drawn.length - 1 && !allRevealed && (
-              <p className="text-center text-slate-600 animate-pulse">Click each card to reveal</p>
+              <div className="text-center space-y-3">
+                <p className="text-slate-600 animate-pulse">Click each card to reveal</p>
+                <Button
+                  variant="text"
+                  onClick={() => setRevealed(drawn.map((_, i) => i))}
+                  className="text-sm"
+                >
+                  Reveal All
+                </Button>
+              </div>
             )}
 
             {allRevealed && (
