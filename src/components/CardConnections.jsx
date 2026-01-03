@@ -187,40 +187,45 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
         const toX = toPos.x + toPos.width / 2 - minX
         const toY = toPos.y + toPos.height / 2 - minY
 
-        // Calculate control point for curved line
+        // Calculate control points for a more loopy cubic bezier curve
         const midX = (fromX + toX) / 2
         const midY = (fromY + toY) / 2
         const dx = toX - fromX
         const dy = toY - fromY
         const dist = Math.sqrt(dx * dx + dy * dy)
 
-        // Perpendicular offset for curve
-        const curveOffset = Math.min(dist * 0.2, 40)
+        // Much larger perpendicular offset for more pronounced curves
+        // Alternate curve direction based on index for visual variety
+        const curveDirection = idx % 2 === 0 ? 1 : -1
+        const curveOffset = Math.min(dist * 0.5, 80) * curveDirection
         const perpX = -dy / dist * curveOffset
         const perpY = dx / dist * curveOffset
 
-        const ctrlX = midX + perpX
-        const ctrlY = midY + perpY
+        // Use cubic bezier with two control points for S-curve effect
+        const ctrl1X = fromX + dx * 0.25 + perpX * 0.8
+        const ctrl1Y = fromY + dy * 0.25 + perpY * 0.8
+        const ctrl2X = fromX + dx * 0.75 + perpX
+        const ctrl2Y = fromY + dy * 0.75 + perpY
 
         const colors = relationshipColors[conn.type]
-        const path = `M ${fromX} ${fromY} Q ${ctrlX} ${ctrlY} ${toX} ${toY}`
+        const path = `M ${fromX} ${fromY} C ${ctrl1X} ${ctrl1Y} ${ctrl2X} ${ctrl2Y} ${toX} ${toY}`
 
         return (
           <g key={idx} className="connection-group" style={{ opacity: 0, animation: `fade-in 0.6s ease ${idx * 0.15}s forwards` }}>
-            {/* Glow layer */}
+            {/* Glow layer - wider for more visibility */}
             <path
               d={path}
               fill="none"
               stroke={colors.glow}
-              strokeWidth="6"
+              strokeWidth="10"
               className="card-connection-glow"
             />
-            {/* Main line */}
+            {/* Main line - slightly thicker */}
             <path
               d={path}
               fill="none"
               stroke={`url(#gradient-${conn.type})`}
-              strokeWidth="1.5"
+              strokeWidth="2"
               className="card-connection-line"
             />
           </g>
