@@ -97,6 +97,23 @@ export default function App() {
     }
   }
 
+  const drawAllCards = () => {
+    const needed = spreadData.positions.length - selectedCards.length
+    const available = deck
+      .slice(0, Math.min(MAX_SELECTABLE_CARDS, deck.length))
+      .map((_, i) => i)
+      .filter(i => !selectedCards.includes(i))
+    const shuffled = shuffle(available)
+    const toSelect = shuffled.slice(0, needed)
+    const allSelected = [...selectedCards, ...toSelect]
+    const cards = allSelected.map(i => deck[i])
+    setDeck(deck.filter((_, i) => !allSelected.includes(i)))
+    setRevealed([])
+    setPhase('reading')
+    dealCards(cards)
+    setSelectedCards([])
+  }
+
   const reset = () => {
     setPhase('welcome')
     setQuestion('')
@@ -213,7 +230,10 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <Button variant="text" onClick={reset} className="text-sm">Start Over</Button>
+            <div className="flex justify-center gap-4">
+              <Button variant="text" onClick={reset} className="text-sm">Start Over</Button>
+              <Button variant="text" onClick={drawAllCards} className="text-sm">Draw All Cards</Button>
+            </div>
           </div>
         )}
 
