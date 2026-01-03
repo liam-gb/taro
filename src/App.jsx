@@ -56,6 +56,7 @@ export default function App() {
   const { width: windowWidth } = useWindowSize()
   const celticPadding = 32 // 16px padding on each side
   const celticScale = Math.min(1, (windowWidth - celticPadding) / CELTIC_CROSS.width)
+  const useMobileCeltic = windowWidth < 640 // Use simple layout on narrow screens
 
   const shuffleDeck = () => {
     const baseDeck = majorOnly ? MAJOR_ARCANA : FULL_DECK
@@ -226,7 +227,7 @@ export default function App() {
           <div>
             {question && <p className="text-center text-slate-600 mb-4 md:mb-8 italic text-base md:text-lg px-4">"{question}"</p>}
 
-            {isCeltic ? (
+            {isCeltic && !useMobileCeltic ? (
               <div
                 className="relative mx-auto mb-8"
                 style={{
@@ -272,9 +273,10 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-wrap justify-center mb-6 md:mb-8 gap-3 md:gap-6">
+              <div className={`flex flex-wrap justify-center mb-6 md:mb-8 ${isCeltic ? 'gap-2' : 'gap-3 md:gap-6'}`}>
                 {drawn.map((card, i) => {
                   const isDealt = dealingIndex >= i
+                  const cardSize = spread === 'single' ? 'large' : (isCeltic ? 'small' : 'normal')
                   return (
                     <div
                       key={card.id}
@@ -286,9 +288,9 @@ export default function App() {
                         isDealt={isDealt}
                         isRevealed={revealed.includes(i)}
                         onReveal={() => revealCard(i)}
-                        size={spread === 'single' ? 'large' : 'normal'}
+                        size={cardSize}
                         variant="standard"
-                        showKeywords
+                        showKeywords={!isCeltic}
                       />
                     </div>
                   )
