@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react'
 import { CARD_IMAGES, getCardImage } from '../utils/cardImages'
 
+// Card sizes - matches PNG aspect ratio (300x527)
 const sizes = {
-  small: { width: 90, height: 148 },
-  normal: { width: 140, height: 230 },
-  large: { width: 180, height: 295 }
+  small: { width: 90, height: 158 },
+  normal: { width: 140, height: 246 },
+  large: { width: 180, height: 316 }
 }
 
 const transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
