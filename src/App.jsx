@@ -46,6 +46,7 @@ export default function App() {
   const [copied, setCopied] = useState(false)
   const [dealingIndex, setDealingIndex] = useState(-1)
   const [selectedCards, setSelectedCards] = useState([])
+  const [raisedCenterCard, setRaisedCenterCard] = useState(1) // Which overlapping card is on top (0 or 1)
 
   // Deck settings
   const [majorOnly, setMajorOnly] = useState(false)
@@ -104,6 +105,7 @@ export default function App() {
     setCopied(false)
     setDealingIndex(-1)
     setSelectedCards([])
+    setRaisedCenterCard(1)
     shuffleDeck()
   }
 
@@ -246,26 +248,62 @@ export default function App() {
                   {drawn.map((card, i) => {
                     const isDealt = dealingIndex >= i
                     const pos = spreadData.layout[i]
+                    const isOverlapping = i < 2
+                    const isTopCard = isOverlapping && i === raisedCenterCard
+                    const canSwap = isOverlapping && revealed.includes(0) && revealed.includes(1)
+
+                    const handleClick = () => {
+                      if (!revealed.includes(i) && isDealt) {
+                        revealCard(i)
+                      } else if (canSwap && isTopCard) {
+                        // Swap which center card is on top
+                        setRaisedCenterCard(raisedCenterCard === 1 ? 0 : 1)
+                      }
+                    }
+
                     return (
                       <div
                         key={card.id}
-                        className={`absolute transition-all duration-500 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'}`}
+                        className={`absolute transition-all duration-300 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'} ${canSwap && isTopCard ? 'cursor-pointer' : ''}`}
                         style={{
                           left: CELTIC_CROSS.baseX + pos.x * CELTIC_CROSS.spacing,
                           top: CELTIC_CROSS.baseY + pos.y * CELTIC_CROSS.spacing,
                           transform: `rotate(${pos.rotate}deg)`,
-                          zIndex: i === 1 ? 2 : 1
+                          zIndex: isOverlapping ? (isTopCard ? 2 : 1) : 1
                         }}
+                        onClick={handleClick}
                       >
+                        {/* Position label */}
+                        <div
+                          className="absolute -top-6 left-1/2 px-2 py-0.5 rounded bg-slate-900/90 border border-slate-700 shadow-lg"
+                          style={{
+                            zIndex: 10,
+                            transform: pos.rotate ? `translateX(-50%) rotate(-${pos.rotate}deg)` : 'translateX(-50%)'
+                          }}
+                        >
+                          <span className="text-xs font-medium text-slate-300 whitespace-nowrap">
+                            {spreadData.positions[i].name}
+                          </span>
+                        </div>
+                        {/* Swap hint for top overlapping card */}
+                        {canSwap && isTopCard && (
+                          <div
+                            className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-violet-400/70 whitespace-nowrap"
+                            style={{ transform: pos.rotate ? `translateX(-50%) rotate(-${pos.rotate}deg)` : 'translateX(-50%)' }}
+                          >
+                            tap to swap
+                          </div>
+                        )}
                         <CardSlot
                           card={card}
                           position={spreadData.positions[i]}
                           isDealt={isDealt}
                           isRevealed={revealed.includes(i)}
-                          onReveal={() => revealCard(i)}
+                          onReveal={() => {}}
                           size="small"
                           variant="celtic"
                           isMobile={celticScale < 1}
+                          hideInlineLabel={i < 2}
                         />
                       </div>
                     )
@@ -280,8 +318,16 @@ export default function App() {
                   return (
                     <div
                       key={card.id}
-                      className={`text-center transition-all duration-500 ${isDealt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
+                      className={`text-center relative transition-all duration-500 ${isDealt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
                     >
+                      {/* Position label for Celtic Cross mobile view */}
+                      {isCeltic && (
+                        <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900/90 border border-slate-700 shadow-lg z-10">
+                          <span className="text-xs font-medium text-slate-300 whitespace-nowrap">
+                            {spreadData.positions[i].name}
+                          </span>
+                        </div>
+                      )}
                       <CardSlot
                         card={card}
                         position={spreadData.positions[i]}

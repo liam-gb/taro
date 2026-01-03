@@ -12,7 +12,8 @@ export default function CardSlot({
   size = 'normal',
   variant = 'standard',
   showKeywords = false,
-  isMobile = false
+  isMobile = false,
+  hideInlineLabel = false
 }) {
   const [hovered, setHovered] = useState(false)
 
@@ -55,7 +56,7 @@ export default function CardSlot({
         enableHover={isRevealed}
       />
 
-      {isRevealed && cardInfo}
+      {isRevealed && !hideInlineLabel && cardInfo}
     </div>
   )
 }
