@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Card3D from './components/Card3D'
-import { FULL_DECK, SPREADS } from './data'
+import { FULL_DECK, MAJOR_ARCANA, SPREADS } from './data'
 import { generateReadingPrompt } from './utils/generatePrompt'
 
 const btn = 'py-4 rounded-lg transition-colors'
@@ -16,6 +16,20 @@ function shuffle(arr) {
   return a
 }
 
+// Celtic Cross traditional layout positions (relative to center)
+const celticLayout = [
+  { x: 0, y: 0, rotate: 0 },      // 1: Present (center)
+  { x: 0, y: 0, rotate: 90 },     // 2: Challenge (crossing)
+  { x: -1, y: 0, rotate: 0 },     // 3: Past (left)
+  { x: 1, y: 0, rotate: 0 },      // 4: Future (right)
+  { x: 0, y: -1, rotate: 0 },     // 5: Above (crown)
+  { x: 0, y: 1, rotate: 0 },      // 6: Below (foundation)
+  { x: 2.2, y: 1.5, rotate: 0 },  // 7: Advice (staff bottom)
+  { x: 2.2, y: 0.5, rotate: 0 },  // 8: External (staff)
+  { x: 2.2, y: -0.5, rotate: 0 }, // 9: Hopes/Fears (staff)
+  { x: 2.2, y: -1.5, rotate: 0 }, // 10: Outcome (staff top)
+]
+
 export default function App() {
   const [phase, setPhase] = useState('welcome')
   const [question, setQuestion] = useState('')
@@ -23,27 +37,56 @@ export default function App() {
   const [deck, setDeck] = useState([])
   const [drawn, setDrawn] = useState([])
   const [revealed, setRevealed] = useState([])
-  const [shuffles, setShuffles] = useState(0)
   const [copied, setCopied] = useState(false)
+  const [dealingIndex, setDealingIndex] = useState(-1)
+  const [selectedCards, setSelectedCards] = useState([])
+  const [hoveredPosition, setHoveredPosition] = useState(null)
+
+  // Deck settings
+  const [majorOnly, setMajorOnly] = useState(false)
+  const [useReversals, setUseReversals] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+
+  const getActiveDeck = () => majorOnly ? MAJOR_ARCANA : FULL_DECK
 
   const shuffleDeck = () => {
-    const d = shuffle(FULL_DECK).map(c => ({ ...c, reversed: Math.random() < 0.3 }))
+    const baseDeck = getActiveDeck()
+    const d = shuffle(baseDeck).map(c => ({
+      ...c,
+      reversed: useReversals ? Math.random() < 0.3 : false
+    }))
     setDeck(d)
     return d
   }
 
-  useEffect(() => { shuffleDeck() }, [])
+  useEffect(() => { shuffleDeck() }, [majorOnly, useReversals])
 
   const spreadData = SPREADS[spread]
   const hoverCards = deck.slice(0, 5)
   const allRevealed = drawn.length > 0 && revealed.length === drawn.length
 
-  const draw = () => {
-    const n = spreadData.positions.length
-    setDrawn(deck.slice(0, n))
-    setDeck(deck.slice(n))
-    setRevealed([])
-    setPhase('reading')
+  // Staggered card dealing animation
+  const dealCards = (cards) => {
+    setDrawn(cards)
+    setDealingIndex(-1)
+    cards.forEach((_, i) => {
+      setTimeout(() => setDealingIndex(i), i * 300)
+    })
+  }
+
+  // User picks their own cards from the spread
+  const selectCard = (index) => {
+    if (selectedCards.includes(index)) return
+    const newSelected = [...selectedCards, index]
+    setSelectedCards(newSelected)
+    if (newSelected.length === spreadData.positions.length) {
+      const cards = newSelected.map(i => deck[i])
+      setDeck(deck.filter((_, i) => !newSelected.includes(i)))
+      setRevealed([])
+      setPhase('reading')
+      dealCards(cards)
+      setSelectedCards([])
+    }
   }
 
   const reset = () => {
@@ -51,8 +94,9 @@ export default function App() {
     setQuestion('')
     setDrawn([])
     setRevealed([])
-    setShuffles(0)
     setCopied(false)
+    setDealingIndex(-1)
+    setSelectedCards([])
     shuffleDeck()
   }
 
@@ -89,6 +133,42 @@ export default function App() {
                   </button>
                 ))}
               </div>
+
+              {/* Settings toggle */}
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="text-slate-600 hover:text-slate-400 text-sm transition-colors"
+              >
+                {showSettings ? '▾ Hide options' : '▸ Deck options'}
+              </button>
+
+              {/* Settings panel */}
+              {showSettings && (
+                <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-800 space-y-3">
+                  <label className="flex items-center justify-between cursor-pointer group">
+                    <span className="text-slate-400 text-sm group-hover:text-slate-300">Major Arcana only</span>
+                    <div
+                      onClick={() => setMajorOnly(!majorOnly)}
+                      className={`w-10 h-6 rounded-full transition-colors relative ${majorOnly ? 'bg-violet-600' : 'bg-slate-700'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${majorOnly ? 'left-5' : 'left-1'}`} />
+                    </div>
+                  </label>
+                  <p className="text-xs text-slate-600 -mt-1">Use only the 22 Major Arcana cards</p>
+
+                  <label className="flex items-center justify-between cursor-pointer group">
+                    <span className="text-slate-400 text-sm group-hover:text-slate-300">Reversed cards</span>
+                    <div
+                      onClick={() => setUseReversals(!useReversals)}
+                      className={`w-10 h-6 rounded-full transition-colors relative ${useReversals ? 'bg-violet-600' : 'bg-slate-700'}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${useReversals ? 'left-5' : 'left-1'}`} />
+                    </div>
+                  </label>
+                  <p className="text-xs text-slate-600 -mt-1">Allow cards to appear reversed (inverted meaning)</p>
+                </div>
+              )}
+
               <button onClick={() => setPhase('question')} className={`w-full ${btnPrimary}`}>Begin Reading</button>
             </div>
           </div>
@@ -97,53 +177,161 @@ export default function App() {
         {phase === 'question' && (
           <div className="max-w-md mx-auto text-center">
             <p className="text-slate-500 mb-6">What guidance do you seek?</p>
-            <textarea value={question} onChange={e => setQuestion(e.target.value)} placeholder="Your question (or leave blank)..." rows={3}
-              className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/50 resize-none mb-6" />
-            <button onClick={() => setPhase('shuffle')} className={`w-full ${btnSecondary}`}>Continue</button>
+            <textarea value={question} onChange={e => setQuestion(e.target.value)} placeholder="Your question (or leave blank for general guidance)..." rows={3}
+              className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/50 resize-none mb-4" />
+            <p className="text-slate-600 text-xs mb-6">Tip: Open-ended questions yield richer insights</p>
+            <button onClick={() => { shuffleDeck(); setPhase('select') }} className={`w-full ${btnSecondary}`}>Continue</button>
           </div>
         )}
 
-        {phase === 'shuffle' && (
+        {/* Card Selection Phase */}
+        {phase === 'select' && (
           <div className="text-center">
-            <p className="text-slate-500 mb-8">Focus on your question and click to shuffle</p>
-            <div onClick={() => { shuffleDeck(); setShuffles(s => s + 1) }} className="inline-block cursor-pointer mb-8">
-              <div className="relative" style={{ width: 260, height: 400 }}>
-                {[0,1,2,3,4,5].map(i => (
-                  <div key={i} style={{ position: 'absolute', top: i*-3, left: i*3, transform: shuffles ? `rotate(${(Math.random()-0.5)*8}deg)` : 'none', transition: 'transform 0.3s' }}>
-                    <Card3D size="large" />
-                  </div>
-                ))}
-              </div>
+            <p className="text-slate-400 mb-2">Choose your cards</p>
+            <p className="text-slate-600 text-sm mb-6">
+              {selectedCards.length} of {spreadData.positions.length} selected
+              {selectedCards.length < spreadData.positions.length && (
+                <span className="text-violet-400/70"> — {spreadData.positions[selectedCards.length].name}</span>
+              )}
+            </p>
+            <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-8 max-w-4xl mx-auto">
+              {deck.slice(0, Math.min(21, deck.length)).map((card, i) => (
+                <div
+                  key={i}
+                  onClick={() => selectCard(i)}
+                  className={`transition-all duration-300 ${
+                    selectedCards.includes(i)
+                      ? 'opacity-20 scale-90 pointer-events-none'
+                      : 'hover:scale-110 hover:-translate-y-3 cursor-pointer'
+                  }`}
+                  style={{
+                    transform: `rotate(${(i - 10) * 2}deg)`,
+                    marginLeft: i > 0 ? '-20px' : '0'
+                  }}
+                >
+                  <Card3D size="small" />
+                </div>
+              ))}
             </div>
-            <div className="flex justify-center gap-3 mb-6">
-              {[1,2,3].map(i => <div key={i} className={`w-3 h-3 rounded-full transition-all duration-300 ${shuffles >= i ? 'bg-violet-400 shadow-lg shadow-violet-500/50' : 'bg-slate-700'}`} />)}
-            </div>
-            {shuffles >= 3 && <button onClick={draw} className={`px-8 ${btnPrimary}`}>Draw Cards</button>}
+            <button onClick={reset} className="text-slate-600 hover:text-slate-400 text-sm">
+              Start Over
+            </button>
           </div>
         )}
 
         {phase === 'reading' && (
           <div>
             {question && <p className="text-center text-slate-600 mb-4 md:mb-8 italic text-base md:text-lg px-4">"{question}"</p>}
-            <div className={`flex flex-wrap justify-center mb-6 md:mb-8 ${spread === 'celtic' ? 'gap-2 md:gap-4' : 'gap-3 md:gap-6'}`}>
-              {drawn.map((card, i) => {
-                const isRev = revealed.includes(i)
-                return (
-                  <div key={card.id} className="text-center">
-                    <p className="text-slate-500 text-xs md:text-sm mb-2 md:mb-3 font-medium">{spreadData.positions[i].name}</p>
-                    <Card3D card={card} isRevealed={isRev} onClick={() => !isRev && setRevealed([...revealed, i])}
-                      size={spread === 'celtic' ? 'small' : spread === 'single' ? 'large' : 'normal'} enableHover={isRev} />
-                    {isRev && (
-                      <div className="mt-2 md:mt-3">
-                        <p className="text-slate-300 text-xs md:text-sm font-medium max-w-[120px] md:max-w-none mx-auto">{card.name}</p>
-                        {card.reversed && <p className="text-amber-500/80 text-xs mt-1">Reversed</p>}
+
+            {/* Celtic Cross special layout */}
+            {spread === 'celtic' ? (
+              <div className="relative mx-auto mb-8 overflow-x-auto" style={{ minWidth: 500, height: 450 }}>
+                <div className="relative" style={{ width: 500, height: 450, margin: '0 auto' }}>
+                  {drawn.map((card, i) => {
+                    const isRev = revealed.includes(i)
+                    const isDealt = dealingIndex >= i
+                    const pos = celticLayout[i]
+                    const baseX = 140
+                    const baseY = 180
+                    const spacing = 100
+
+                    return (
+                      <div
+                        key={card.id}
+                        className={`absolute transition-all duration-500 ${isDealt ? 'opacity-100' : 'opacity-0 scale-75'}`}
+                        style={{
+                          left: baseX + pos.x * spacing,
+                          top: baseY + pos.y * spacing,
+                          transform: `rotate(${pos.rotate}deg)`,
+                          zIndex: i === 1 ? 2 : 1
+                        }}
+                      >
+                        <div
+                          className="relative group"
+                          onMouseEnter={() => setHoveredPosition(i)}
+                          onMouseLeave={() => setHoveredPosition(null)}
+                        >
+                          {/* Position tooltip */}
+                          {hoveredPosition === i && (
+                            <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-slate-800 px-3 py-2 rounded-lg text-xs whitespace-nowrap z-20 border border-slate-700">
+                              <div className="text-violet-400 font-medium">{spreadData.positions[i].name}</div>
+                              <div className="text-slate-500">{spreadData.positions[i].description}</div>
+                            </div>
+                          )}
+                          <Card3D
+                            card={card}
+                            isRevealed={isRev}
+                            onClick={() => !isRev && isDealt && setRevealed([...revealed, i])}
+                            size="small"
+                            enableHover={isRev}
+                          />
+                          {isRev && (
+                            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                              <p className="text-slate-400 text-xs">{card.name.split(' ').slice(-2).join(' ')}</p>
+                              {card.reversed && <p className="text-amber-500/80 text-xs">Reversed</p>}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-            {!allRevealed && <p className="text-center text-slate-600">Click each card to reveal</p>}
+                    )
+                  })}
+                </div>
+              </div>
+            ) : (
+              /* Standard horizontal layout for other spreads */
+              <div className={`flex flex-wrap justify-center mb-6 md:mb-8 gap-3 md:gap-6`}>
+                {drawn.map((card, i) => {
+                  const isRev = revealed.includes(i)
+                  const isDealt = dealingIndex >= i
+                  return (
+                    <div
+                      key={card.id}
+                      className={`text-center transition-all duration-500 ${isDealt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
+                      onMouseEnter={() => setHoveredPosition(i)}
+                      onMouseLeave={() => setHoveredPosition(null)}
+                    >
+                      {/* Position name with tooltip */}
+                      <div className="relative">
+                        <p className="text-slate-500 text-xs md:text-sm mb-2 md:mb-3 font-medium cursor-help">
+                          {spreadData.positions[i].name}
+                        </p>
+                        {hoveredPosition === i && (
+                          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-slate-800 px-3 py-2 rounded-lg text-xs whitespace-nowrap z-20 border border-slate-700">
+                            <div className="text-slate-400">{spreadData.positions[i].description}</div>
+                          </div>
+                        )}
+                      </div>
+                      <Card3D
+                        card={card}
+                        isRevealed={isRev}
+                        onClick={() => !isRev && isDealt && setRevealed([...revealed, i])}
+                        size={spread === 'single' ? 'large' : 'normal'}
+                        enableHover={isRev}
+                      />
+                      {isRev && (
+                        <div className="mt-2 md:mt-3">
+                          <p className="text-slate-300 text-xs md:text-sm font-medium max-w-[120px] md:max-w-none mx-auto">{card.name}</p>
+                          {card.reversed && <p className="text-amber-500/80 text-xs mt-1">Reversed</p>}
+                          {/* Card keywords - show on hover */}
+                          <div className={`flex flex-wrap justify-center gap-1 mt-2 max-w-[140px] mx-auto transition-opacity duration-300 ${hoveredPosition === i ? 'opacity-100' : 'opacity-0'}`}>
+                            {card.keywords?.slice(0, 3).map((kw, ki) => (
+                              <span key={ki} className="text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
+                                {kw}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {dealingIndex >= drawn.length - 1 && !allRevealed && (
+              <p className="text-center text-slate-600 animate-pulse">Click each card to reveal</p>
+            )}
+
             {allRevealed && (
               <div className="mt-12 max-w-2xl mx-auto">
                 <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
@@ -152,7 +340,14 @@ export default function App() {
                     {drawn.map((card, i) => (
                       <div key={card.id} className="flex items-start gap-3">
                         <span className="text-violet-400 font-medium min-w-[100px]">{spreadData.positions[i].name}:</span>
-                        <span className="text-slate-300">{card.name}{card.reversed && <span className="text-amber-500/80 ml-2">(Reversed)</span>}</span>
+                        <div>
+                          <span className="text-slate-300">{card.name}{card.reversed && <span className="text-amber-500/80 ml-2">(Reversed)</span>}</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {card.keywords?.map((kw, ki) => (
+                              <span key={ki} className="text-xs text-slate-500">{kw}{ki < card.keywords.length - 1 ? ' ·' : ''}</span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
