@@ -291,7 +291,7 @@ export default function App() {
                           size="small"
                           variant="celtic"
                           isMobile={celticScale < 1}
-                          hideInlineLabel={i < 2}
+                          hideInlineLabel={true}
                         />
                       </div>
                     )
