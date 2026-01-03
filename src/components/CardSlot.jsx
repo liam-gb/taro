@@ -27,12 +27,12 @@ export default function CardSlot({
       )}
     </div>
   ) : (
-    <div className="mt-3 md:mt-4">
-      <p className="text-slate-200/90 text-xs md:text-sm font-light tracking-wide max-w-[120px] md:max-w-none mx-auto">
+    <div className="mt-3 md:mt-4 text-center">
+      <p className="text-slate-200/90 text-xs md:text-sm font-light tracking-wide max-w-[140px] md:max-w-none mx-auto text-center">
         {card.name}
       </p>
       {card.reversed && (
-        <p className="text-amber-400/80 text-xs font-medium mt-1.5 tracking-wide">
+        <p className="text-amber-400/80 text-xs font-medium mt-1.5 tracking-wide text-center">
           Reversed
         </p>
       )}
@@ -48,14 +48,15 @@ export default function CardSlot({
 
   return (
     <div
-      className="relative group"
+      className={`relative group ${hovered ? 'z-[150]' : ''}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Tooltip */}
-      {hovered && (
+      {hovered && isRevealed && (
         <PositionTooltip
           position={position}
+          card={card}
           showName={true}
         />
       )}

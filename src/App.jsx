@@ -129,6 +129,8 @@ export default function App() {
   const [isShuffling, setIsShuffling] = useState(false)
   const [shuffleStep, setShuffleStep] = useState(0)
   const [shuffleInteraction, setShuffleInteraction] = useState({ x: 0, y: 0 })
+  const [shuffleFadeOut, setShuffleFadeOut] = useState(false)
+  const [selectFadeIn, setSelectFadeIn] = useState(false)
   const shuffleContainerRef = useRef(null)
 
   // Card positions for reading layout (used for connections)
@@ -185,6 +187,8 @@ export default function App() {
     setIsShuffling(true)
     setShuffleStep(0)
     setShuffleInteraction({ x: 0, y: 0 })
+    setShuffleFadeOut(false)
+    setSelectFadeIn(false)
     setPhase('shuffle')
 
     // Start with intro animation (step 0 -> 1)
@@ -203,13 +207,22 @@ export default function App() {
           stepIndex++
           setTimeout(animateStep, 500)
         } else {
-          // Final shuffle and transition to select
+          // Final shuffle and smooth transition to select
           shuffleDeck()
+          // Start fade out animation
+          setShuffleStep(6) // Gather cards tightly
           setTimeout(() => {
-            setIsShuffling(false)
-            setShuffleStep(0)
-            setPhase('select')
-          }, 700)
+            setShuffleFadeOut(true)
+            setTimeout(() => {
+              setIsShuffling(false)
+              setShuffleStep(0)
+              setPhase('select')
+              // Trigger fade in for select phase
+              requestAnimationFrame(() => {
+                setSelectFadeIn(true)
+              })
+            }, 500)
+          }, 400)
         }
       }
 
@@ -287,6 +300,8 @@ export default function App() {
     setSelectedCards([])
     setRaisedCenterCard(1)
     setCardPositions([])
+    setShuffleFadeOut(false)
+    setSelectFadeIn(false)
     cardRefs.current = []
     shuffleDeck()
   }
@@ -429,7 +444,7 @@ export default function App() {
 
         {/* Shuffle Phase */}
         {phase === 'shuffle' && (
-          <div className="text-center py-16">
+          <div className={`text-center py-16 transition-all duration-500 ${shuffleFadeOut ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
             <div
               ref={shuffleContainerRef}
               className="relative h-64 flex items-center justify-center mb-8 cursor-pointer"
@@ -485,6 +500,12 @@ export default function App() {
                     xOffset = baseOffset * 0.3
                     yOffset = i * 1.5 + Math.sin(i * 0.5) * 3
                     rotation = (i - 3) * 1
+                  } else if (shuffleStep === 6) {
+                    // Tight stack before transition
+                    xOffset = 0
+                    yOffset = i * 0.5
+                    rotation = 0
+                    scale = 0.95
                   }
 
                   return (
@@ -514,7 +535,7 @@ export default function App() {
 
         {/* Card Selection Phase */}
         {phase === 'select' && (
-          <div className="text-center">
+          <div className={`text-center transition-all duration-700 ease-out ${selectFadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <p className="text-slate-300/90 font-light tracking-wide mb-2">Choose your cards</p>
             <p className="text-slate-500/80 text-sm font-light mb-4">
               <span className="text-violet-400/80">{selectedCards.length}</span>
