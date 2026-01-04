@@ -1,0 +1,324 @@
+{
+  "major": {
+    "The Fool": {
+      "upright": "Pure potential at the cliff's edge. Beginner's mind carrying only trust and possibility. The leap before the landing, the question before the answer. Willingness to step forward without knowing where the path leads. Faith chosen over fear, beginning over certainty. Everything starts here.",
+      "reversed": "Blocked beginnings or reckless leaps. Fear freezing you at the edge, or jumping without looking and learning through impact. The shadow of innocence: naivety. The shadow of trust: foolishness. Something about beginning, risking, or trusting has gone sideways."
+    },
+    "The Magician": {
+      "upright": "All elements at your command. The channel between divine will and material reality. You lack nothing—skill, resources, timing align. Focus intention, take action, trust ability. Manifestation through directed will. The tools on the table are yours to use.",
+      "reversed": "Scattered energy, manipulation, or untapped potential. Talents misused or wasted. Deception of others or self. Doubt where confidence belongs. The tools are there but unused, or used to deceive. Power misdirected or unacknowledged."
+    },
+    "The High Priestess": {
+      "upright": "Guardian of the threshold between conscious and unconscious. Trust intuition over logic, listen to dreams and subtle knowing. Receptivity over action, going inward over outward. Hidden knowledge waiting to surface. The answers exist within, not without.",
+      "reversed": "Disconnection from intuition, secrets causing harm, inner wisdom ignored. Overly rational, dismissing gut feelings. Hidden information that needs surfacing. The inner voice speaks but goes unheard. Something concealed disrupts the situation."
+    },
+    "The Empress": {
+      "upright": "Creative abundance and nurturing love. Fertility in all forms—children, projects, ideas, gardens. Embrace pleasure, beauty, sensory experience. Nature, comfort, organic growth. The mother principle: receiving, nourishing, bringing forth. Abundance flows when you allow it.",
+      "reversed": "Creative blocks, neglected self-care, smothering, dependence. Depleted from over-giving or struggling to birth something new. The nurturing principle wounded or excessive. Growth stunted by force rather than flow."
+    },
+    "The Emperor": {
+      "upright": "Structure, authority, power to create order from chaos. Building lasting foundations, taking responsibility. Boundaries established, command assumed. The father principle: protecting, structuring, providing. Stability through discipline. Leadership earned through competence.",
+      "reversed": "Tyranny, rigidity, abuse of power, absent authority. Overbearing control or inability to claim rightful authority. Structure become prison. The father principle wounded: domineering or missing entirely. Order imposed rather than established."
+    },
+    "The Hierophant": {
+      "upright": "Established wisdom, spiritual traditions, conventional paths. Formal education, religious or spiritual institutions, mentorship. Value in following established methods. The teacher, the tradition, the proven way. Sometimes conformity serves; sometimes tradition holds truth.",
+      "reversed": "Challenging conventions, breaking from tradition, spiritual independence. Forge your own path rather than follow established routes. Question inherited beliefs. The institution fails or constrains. Personal truth diverges from received doctrine."
+    },
+    "The Lovers": {
+      "upright": "Meaningful choice and values alignment. Partnerships where both are fully seen. Decisions reflecting deepest values. Union, harmony, integration of opposites. Beyond romance: the choice that defines who you become. What you choose reveals what you value.",
+      "reversed": "Disharmony, misaligned values, difficult relationship choices, inner conflict. Partnership that doesn't honor your values. Choice between head and heart. Something about union or choice has fractured. Values in conflict with actions."
+    },
+    "The Chariot": {
+      "upright": "Forward movement through sheer will and determination. Harness opposing forces, direct them toward a goal. Victory through focus, confidence, controlled drive. Momentum achieved through mastery of inner conflict. Movement despite obstacles. Willpower as vehicle.",
+      "reversed": "Lack of direction, scattered energy, aggression without purpose. Feeling out of control. Internal conflicts pulling apart rather than driving forward. The vehicle stalls or veers. Willpower without aim. Force without focus."
+    },
+    "Strength": {
+      "upright": "True power through patience, compassion, gentle mastery of instinct. Courage of the heart, emotional resilience, quiet confidence from inner knowing. The lion tamed through love, not force. Soft power outlasts hard power. Mastery through gentleness.",
+      "reversed": "Self-doubt, weakness, raw emotions overwhelming reason. Misuse of power or loss of inner authority. Impulse control failing. The lion either caged too tightly or running wild. Gentleness collapsed into weakness, or abandoned for force."
+    },
+    "The Hermit": {
+      "upright": "Withdrawal from noise to find inner truth. Solitude, reflection, listening to inner wisdom. The wise guide appears, or you become one. Soul-searching by lantern light. Answers found in silence. Sometimes the path requires walking alone.",
+      "reversed": "Isolation become loneliness, withdrawal from necessary engagement, refusing to learn. Solitude soured into exile. Reflection become avoidance. The lantern unlit or hidden. Wisdom sought externally when it exists within, or within when action is needed without."
+    },
+    "Wheel of Fortune": {
+      "upright": "The wheel turns—what was down will rise, what was up will fall. Cyclical nature of life, forces of fate and karma. A turning point at hand. Circumstances will shift. Luck, destiny, the pattern larger than individual will.",
+      "reversed": "Resistance to change, being stuck in a cycle, downturn in fortune. Fighting against natural change. The wheel jammed or spinning without progress. Bad luck or karma coming due. The cycle repeats because the lesson goes unlearned."
+    },
+    "Justice": {
+      "upright": "Cause and effect, truth, fair outcomes. Legal matters, contracts, significant decisions. Act with integrity, accept responsibility. The scales balance eventually. Karma neither punishes nor rewards—it balances. Truth revealed, fairness restored.",
+      "reversed": "Unfairness, dishonesty, lack of accountability, legal complications. Injustice experienced or perpetrated. Avoiding responsibility for consequences. The scales rigged or broken. Truth obscured. What should balance doesn't."
+    },
+    "The Hanged Man": {
+      "upright": "Surrender to gain wisdom. Suspended between worlds, seeing from new angle. Voluntary pause, release of control, willingness to see differently. Sacrifice of position for perspective. What looks like stalling is actually incubation. Let go to gain.",
+      "reversed": "Stalling, resistance to necessary sacrifice, martyrdom without purpose. Stuck in delay, refusing to let go. Playing victim without transformation. The suspension prolonged past purpose. Sacrifice without wisdom, or wisdom refused through unwillingness to pause."
+    },
+    "Death": {
+      "upright": "Transformation through necessary ending. Something must die for something new to be born: identity, relationship, belief, chapter. Metamorphosis, not destruction. No negotiation—what's ending has already begun. Release gracefully or be dragged through.",
+      "reversed": "Resistance to necessary change, stagnation, incomplete transformation. Clinging to what needs to end. Prolonged, painful transition that won't complete. The death that refuses to finish dying. Transformation blocked or partial. The old haunts because it wasn't properly buried."
+    },
+    "Temperance": {
+      "upright": "Balance and the alchemy of integration. Moderation, patience, the middle path. Healing, recovery, slow work of combining opposites. Flow between extremes. What seems contradictory can be blended. Time and patience transform through gentle mixing.",
+      "reversed": "Imbalance, excess, lack of patience, discord. Going to extremes, rushing when patience is needed. Struggling to integrate opposing aspects. The mixture won't combine. Forced synthesis or abandoned effort. Healing disrupted by impatience."
+    },
+    "The Devil": {
+      "upright": "The chains we choose—addictions, unhealthy attachments, shadow patterns, materialism. Examine what binds: substances, relationships, beliefs, fears. The shadow self demanding acknowledgment. Bondage that looks like pleasure. Freedom requires seeing the chains first.",
+      "reversed": "Breaking free, releasing attachments, confronting shadow material. Ready to break unhealthy bonds. Beginning to see enslavement clearly. The chains loosening. Liberation from what controlled you. Shadow work yielding results. The devil you know loses power when named."
+    },
+    "The Tower": {
+      "upright": "Sudden, dramatic change—lightning strike destroying false structures. Terrifying but liberating. Illusions shatter, truths revealed, false foundations fall. The destruction you didn't choose but needed. What was built on lies cannot stand. Collapse precedes rebuilding.",
+      "reversed": "Averting disaster, fear of change, internal rather than external upheaval. Resisting necessary destruction. The tower crumbling slowly rather than falling fast. Anxiety about collapse. The upheaval happens within. Transformation through erosion rather than explosion."
+    },
+    "The Star": {
+      "upright": "Healing hope after darkness or upheaval. Renewal, faith restored, connection to something greater. Trust, heal, be vulnerable. Inspiration flows, universe supports. Calm after storm. Pour yourself out and be replenished. Authenticity brings peace.",
+      "reversed": "Despair, disconnection, loss of faith, blocked inspiration. Struggling to find hope. Cut off from spiritual connection. The light exists but can't be seen. Cynicism where faith once lived. The healing delayed or doubted."
+    },
+    "The Moon": {
+      "upright": "The realm of the unconscious—dreams, fears, illusions, intuition. Things not as they seem. Trust intuition when path is unclear. Face fears emerging from depths. Navigation by reflected light. What you can't see clearly still affects you.",
+      "reversed": "Releasing fear, clarity emerging, denial of intuition. Confusion lifting. Repressing unconscious material that needs surfacing. The shadows retreating or being ignored. Truth emerging from illusion. Fear confronted or avoided—both change the landscape."
+    },
+    "The Sun": {
+      "upright": "Pure, uncomplicated joy. Success, happiness, vitality, clear vision. Everything illuminated, nothing hidden. Energy high, future bright. The inner child playing freely. Warmth, confidence, celebration. What the light touches, it blesses. Clarity without shadow.",
+      "reversed": "Temporary setbacks, dimmed joy, ego inflation. Delayed success, struggling to feel joy. Ego overshadowing genuine happiness. The sun behind clouds—still there, less visible. Optimism tested. Vitality dampened but not extinguished."
+    },
+    "Judgement": {
+      "upright": "The call to awakening. Past reviewed and released. Profound calling, clarity about purpose, making peace with what was. Resurrection—answering the call of the higher self. The trumpet sounds: rise to what you're meant to become.",
+      "reversed": "Self-doubt, ignoring the call, refusing to learn from past. Avoiding necessary self-reflection. Deaf to calling, stuck in self-criticism. The trumpet sounds but goes unanswered. Resurrection delayed by doubt. The reckoning postponed."
+    },
+    "The World": {
+      "upright": "Successful completion of a cycle. All four elements integrated, moving in harmony. Achievement, fulfillment, wholeness. The journey's end that becomes new beginning. You've arrived—and the arrival itself opens new doors.",
+      "reversed": "Incompletion, delays, lack of closure. Struggling to finish, unfulfilled despite apparent success. The cycle incomplete, the integration partial. Almost there but not quite. The world within reach but not grasped. Wholeness delayed."
+    }
+  },
+  "wands": {
+    "Ace of Wands": {
+      "upright": "Burst of creative or passionate energy. New beginnings in career, creativity, ambition. The spark offered—will you fan it to flame? Initiative required. Act while the energy is fresh. The seed of fire waiting to ignite.",
+      "reversed": "Delays, lack of motivation, creative blocks, false starts. The spark there but won't catch. Sitting on inspiration without acting. Energy scattered before it can focus. The fire smothered before it begins."
+    },
+    "Two of Wands": {
+      "upright": "The world in your hands—now what? Planning, weighing options, envisioning future. Strategic thinking before expansion. Personal power ready to deploy. The view from the battlement before the journey. Vision seeking direction.",
+      "reversed": "Fear of the unknown, lack of planning, playing it safe. Afraid to leave comfort zones. Planning without acting, or acting without planning. The world offered but not taken. Paralysis at the point of departure."
+    },
+    "Three of Wands": {
+      "upright": "Plans in motion, ships sent out. Expansion, progress, watching endeavors unfold. Vision becoming reality. Foresight rewarded. The first returns on investment arriving. What was launched now sails toward fruition.",
+      "reversed": "Delays in plans, lack of foresight, obstacles to expansion. Anticipated progress not materializing. Ships delayed or lost. The view from the cliff showing no returning sails. Expansion blocked or premature."
+    },
+    "Four of Wands": {
+      "upright": "Celebration, achievement, joyful community. Weddings, parties, homecomings, milestones reached. Stability in celebration. The harvest festival, the welcome home. Pause to honor what's been built before building more.",
+      "reversed": "Lack of harmony, delayed celebrations, instability at home. Something off in home or community. The party postponed or hollow. Foundation shakier than it appears. Celebration without cause or cause without celebration."
+    },
+    "Five of Wands": {
+      "upright": "Creative tension, competition, conflict. Multiple forces vying for dominance. Stressful but potentially generative. The scrum before the breakthrough. Conflict as catalyst. Chaos that could become creative if channeled.",
+      "reversed": "Avoiding conflict, internal conflict, resolution approaching. Suppressing disagreements, experiencing inner turmoil. The battle moved inward or finally ending. Exhaustion from fighting or relief from ceasefire."
+    },
+    "Six of Wands": {
+      "upright": "Public recognition and victory. Acknowledgment for efforts—promotions, awards, applause. Confidence high and earned. The parade after the battle. Success visible to all. Momentum from recognition. Lead because you've proven you can.",
+      "reversed": "Ego, fall from grace, lack of recognition. Success breeding arrogance. Anticipated recognition not coming. The parade cancelled or revealed as hollow. Victory without honor or honor without victory."
+    },
+    "Seven of Wands": {
+      "upright": "Defending your position against challenges. Courage, conviction, refusal to back down. You've earned your ground—hold it. The high ground advantage against many. Perseverance when surrounded. Your position is worth defending.",
+      "reversed": "Giving up, overwhelm, being overrun. Unable to maintain position. Exhausted from constant defense. The high ground lost or abandoned. Outnumbered and knowing it. Sometimes retreat is wisdom; sometimes it's defeat."
+    },
+    "Eight of Wands": {
+      "upright": "Rapid movement, swift developments. Acceleration—messages fly, travel happens suddenly, projects gain momentum. Strike while moving. Air travel, fast communication, sudden progress. Everything happening at once.",
+      "reversed": "Delays, frustration, waiting. Expected speed not materializing. Messages delayed, travel disrupted, projects stalled. The arrows hanging mid-flight. Impatience with deceleration. Motion arrested."
+    },
+    "Nine of Wands": {
+      "upright": "Battle-weary but still standing. Challenges endured, wounds carried, refusal to give up. One more push may be needed. The veteran's stance: hurt but not defeated. Resilience born from survived difficulty. Almost there.",
+      "reversed": "Stubbornness, paranoia, giving up too soon. Too defensive, seeing threats everywhere. Exhaustion winning over perseverance. The last stand that wasn't necessary, or the surrender that came too early."
+    },
+    "Ten of Wands": {
+      "upright": "Carrying a heavy load. Too much taken on—responsibilities, projects, others' burdens. Success become weight. Delegation needed, some burdens released. The cost of saying yes to everything. What once empowered now encumbers.",
+      "reversed": "Releasing burdens, avoiding responsibility, or collapse. Finally letting go of excess weight. Or shirking what must be carried. The load dropped—in relief or in failure. Burnout's breaking point or wisdom's release."
+    },
+    "Page of Wands": {
+      "upright": "Messenger of creative inspiration. Youthful fire energy—enthusiasm, exploration, discovery. New ideas wanting exploration. The free spirit sensing adventure. Curiosity about passion's possibilities. Good news about creative ventures.",
+      "reversed": "Lack of direction, haste, scattered energy. Ideas abundant but nothing following through. Enthusiasm without focus. The spark that flares and dies. Restlessness mistaken for readiness."
+    },
+    "Knight of Wands": {
+      "upright": "Charging forward with passion and courage. Bold action, adventure, fearless pursuit. Time for movement, travel, passionate engagement. The quest begun at full gallop. Act boldly, worry later. Momentum through audacity.",
+      "reversed": "Haste, recklessness, delays in plans. Passion become destructive impulsiveness. Frustrated stagnation after expected motion. The horse bolting or refusing to move. Speed without direction or direction without speed."
+    },
+    "Queen of Wands": {
+      "upright": "Confident, charismatic leader inspiring others with warmth and determination. Knows her worth, commands respect through presence. Own your power with grace. The bright flame that draws others closer. Courage paired with warmth.",
+      "reversed": "Selfishness, jealousy, insecurity masked as aggression. Confidence become arrogance or crumbled into self-doubt. The flame that burns rather than warms. Queen's power misdirected or undermined from within."
+    },
+    "King of Wands": {
+      "upright": "Natural leader with bold vision and charisma to inspire. Leads through enthusiasm and honor, turning vision to reality. Time to lead, act on vision with confidence. The fire that others rally around. Command through inspiration.",
+      "reversed": "Impulsiveness, tyranny, unrealistic expectations. Leadership become domineering. Vision disconnected from reality. The king who inspires fear instead of loyalty. Power wielded without wisdom. Fire that consumes rather than illuminates."
+    }
+  },
+  "cups": {
+    "Ace of Cups": {
+      "upright": "New emotional beginning overflowing with possibility. New love, deepened compassion, creative inspiration, spiritual awakening. The heart opens—say yes. The cup offered from the divine. Emotional renewal at the source.",
+      "reversed": "Blocked emotions, emptiness, repressed feelings. The cup offered but not received. Emotionally closed, struggling with self-love. The wellspring blocked. Feeling arrives but can't be accepted."
+    },
+    "Two of Cups": {
+      "upright": "Beautiful meeting of hearts. Mutual attraction, partnership, harmonious connection. Two people seeing and honoring each other. Balanced, reciprocal union. The relationship where both are equals. Connection recognized and celebrated.",
+      "reversed": "Imbalance in partnership, breakup, lack of harmony. One gives more than the other. Connection breaking down. The cups uneven. What was mutual becomes one-sided. Harmony disrupted."
+    },
+    "Three of Cups": {
+      "upright": "Joyful celebration with beloved friends. Friendship, community support, shared happiness. Abundance in connection. The gathering that nourishes. Celebrate together—joy multiplies when shared.",
+      "reversed": "Overindulgence, gossip, isolation from friends. Celebration become excess. Friendship soured into drama. The third wheel or the excluded one. Community fractured or community as cage."
+    },
+    "Four of Cups": {
+      "upright": "Emotional withdrawal and contemplation. Bored, discontent, focused on what's missing while missing what's offered. An opportunity overlooked. The cup from the cloud ignored. Apathy or necessary reassessment—context determines which.",
+      "reversed": "Renewed interest, acceptance, moving forward. Beginning to see opportunities missed. Emerging from withdrawal. The extended cup finally noticed. Gratitude returning. Ready to engage again."
+    },
+    "Five of Cups": {
+      "upright": "Grief and disappointment over what's lost. Three cups spilled—loss is real, mourning deserved. Yet two cups remain, bridge still stands. The figure who won't turn around. Honor grief, but don't live there forever.",
+      "reversed": "Acceptance, moving forward, healing. Beginning to turn around, seeing what remains rather than only what's lost. Grief completing its passage. The cups still standing finally noticed."
+    },
+    "Six of Cups": {
+      "upright": "Sweet nostalgia, healing power of innocence. Past connections resurface—childhood friends, old homes, memories. Invitation to reconnect with simpler times and childlike joy. The gift from the past. What was good then still nourishes.",
+      "reversed": "Living in the past, stuck in nostalgia, childhood wounds surfacing. Romanticizing the past at expense of present. The gift that comes with strings. Innocence lost or innocence used as escape."
+    },
+    "Seven of Cups": {
+      "upright": "Many options but which are real? The realm of fantasy, imagination, wishful thinking. Ground fantasies in reality before choosing. The cups in clouds—some hold treasure, some hold air. Discernment needed among dreams.",
+      "reversed": "Clarity, making a choice, illusions dispelled. The fog lifts, what's real becomes clear. Choosing from grounded position. The clouds parting. Decision made after confusion. Fantasy abandoned for reality—or one fantasy finally committed to."
+    },
+    "Eight of Cups": {
+      "upright": "Walking away from what no longer fulfills. Despite having built something, turning toward the unknown seeking deeper meaning. Difficult but necessary journey. The cups left behind weren't empty—just no longer enough.",
+      "reversed": "Fear of leaving, staying in unfulfilling situations, aimless wandering. Knowing you need to leave but unable. The departure that keeps getting postponed. Or wandering without destination—movement without meaning."
+    },
+    "Nine of Cups": {
+      "upright": "The wish card. Emotional satisfaction, dreams coming true. Appreciate what you have—gratitude amplifies joy. Moment of genuine happiness. The cat who got the cream. Satisfaction without apology.",
+      "reversed": "Dissatisfaction despite having much. Materialism, smugness. Wishes granted not bringing expected fulfillment. The feast that doesn't satisfy. Wanting what you have versus having what you want."
+    },
+    "Ten of Cups": {
+      "upright": "Emotional paradise—the happy family under the rainbow. Fulfillment of emotional dreams: loving relationships, family harmony, lasting happiness. The vision of emotional completion. What was hoped for, realized.",
+      "reversed": "Disconnection, dysfunctional family, broken dreams. The ideal not matching reality. Family or relationship problems disrupting harmony. The rainbow visible but the family fractured. Paradise lost or never found."
+    },
+    "Page of Cups": {
+      "upright": "Gentle messenger of emotional or creative opportunity. Pay attention to dreams, intuitions, creative promptings. The inner child speaking. Surprise from the emotional realm. Imagination stirring. The fish in the cup—unexpected feelings surfacing.",
+      "reversed": "Emotional immaturity, creative blocks, ignoring intuition. Avoiding emotional growth. Creativity blocked. The message undelivered or misunderstood. Imagination trapped. The child who won't grow or can't play."
+    },
+    "Knight of Cups": {
+      "upright": "The romantic quester following heart's calling. Pursuing dreams, offering love gracefully, leading with emotion. Follow your heart, pursue what's meaningful. The proposal, the artistic vision, the romantic gesture.",
+      "reversed": "Moodiness, unrealistic expectations, emotional manipulation. Romance become manipulation, imagination become escapism. The beautiful offer with hidden motives. Feelings performed rather than felt. The quest without grounding."
+    },
+    "Queen of Cups": {
+      "upright": "Deep emotional wisdom and compassionate presence. Contains and masters emotions rather than being mastered. Trust your emotional intelligence, offer compassion. The depth that holds without drowning. Feeling fully while remaining self-possessed.",
+      "reversed": "Emotional insecurity, codependency, blocked intuition. Overwhelmed by emotion, giving too much, disconnected from intuition. The depths become murky. Compassion collapsed into enmeshment. The cup that can't hold its own contents."
+    },
+    "King of Cups": {
+      "upright": "Mastery of the emotional realm. Sits stable on turbulent waters—feels deeply without being ruled by feelings. Balance head and heart, respond rather than react. Emotional intelligence in command. The calm in any storm.",
+      "reversed": "Emotional manipulation, volatility, coldness. Composure cracked—explosively moody or coldly suppressed. Feelings weaponized. The king who drowns or the king who's never touched by water. Mastery become control."
+    }
+  },
+  "swords": {
+    "Ace of Swords": {
+      "upright": "Breakthrough of clarity and truth. The sword cutting through confusion, revealing what's real. New idea, clear communication, moment of truth. Speak truth, see clearly. The decisive cut that clarifies everything.",
+      "reversed": "Confusion, miscommunication, clouded thinking. Clarity blocked, truth obscured. The blade dulled or turned inward. Mental fog. The breakthrough that didn't break through."
+    },
+    "Two of Swords": {
+      "upright": "Difficult decision requiring careful balance. Avoiding a choice, blocking emotions to cope, stuck between equally challenging options. Stalemate can't last. The blindfold is chosen—what don't you want to see?",
+      "reversed": "Information revealed, decision made, overwhelming emotions. The blindfold removed—sometimes bringing relief, sometimes overwhelm. Stalemate broken. Seeing clearly after chosen blindness. The decision forced."
+    },
+    "Three of Swords": {
+      "upright": "The pierced heart—grief, heartbreak, painful truth. Something hurts deeply: betrayal, loss, harsh words. Acknowledging pain is necessary for healing. The swords in the heart are already there. Name the wound.",
+      "reversed": "Recovery from grief, releasing pain, or repressed sorrow. Healing from heartbreak. Or refusing to acknowledge pain that needs processing. The swords withdrawing or being pushed deeper by denial."
+    },
+    "Four of Swords": {
+      "upright": "Necessary rest and retreat. After pain, stillness required. Step back, recuperate. Meditation, recovery, simply sleep. The tomb that's actually a bed. Restoration before next engagement. Pause is not defeat.",
+      "reversed": "Restlessness, burnout, returning to activity. Unable to rest despite needing it. Or ready to emerge from recovery. The resting warrior awakened too soon or finally ready. Recovery interrupted or completed."
+    },
+    "Five of Swords": {
+      "upright": "Conflict where someone loses badly. Victor collects swords while others walk away defeated. Was this victory worth its cost? Some battles leave everyone diminished. The win that feels like loss.",
+      "reversed": "Reconciliation, making amends, moving past conflict. Ready to let go of old battles. The swords returned. Hollow victory acknowledged. Or the conflict extending underground. Peace sought after war."
+    },
+    "Six of Swords": {
+      "upright": "Moving away from troubled waters toward calmer shores. Transition—physical or mental/emotional movement away from difficulty. Progress being made. The boat carries more than one. Sometimes you must be ferried, not swim.",
+      "reversed": "Stuck in turbulence, resisting transition, unfinished business. Unable to leave a difficult situation. The boat that won't push off. Or the shore that follows you. Transition stalled or incomplete."
+    },
+    "Seven of Swords": {
+      "upright": "Acting alone, possibly deceptively. Someone getting away with something—clever strategy or outright theft. Check motives carefully. Not all is as it seems. The swords taken aren't always your own. Stealth has its reasons.",
+      "reversed": "Coming clean, getting caught, conscience emerging. Deception revealed, secrets coming out. The thief discovered. Or choosing honesty after considering deception. The swords returned or the escape blocked."
+    },
+    "Eight of Swords": {
+      "upright": "Feeling trapped—but look: bindings aren't tight. Imprisonment largely mental. Feels powerless but more options exist than perceived. Fear creates the cage. The blindfold and bindings are escapable if you believe you can move.",
+      "reversed": "Freedom, new perspective, releasing limitations. Beginning to see your power, walking away from self-imposed restrictions. The blindfold removed by choice. The cage door was never locked. Or deeper resignation—no longer trying."
+    },
+    "Nine of Swords": {
+      "upright": "The nightmare card—sleepless worry, anxiety, mental torment. Suffering real but often disproportionate to actual threat. The mind tortures itself in dark hours. The fears that come at 3am. What you're dreading may not be what comes.",
+      "reversed": "Hope emerging, releasing anxiety, facing fears. The long night ending, worries put in perspective. Or despair deepened beyond waking. The nightmares losing power. Dawn approaching. What was catastrophized, now contextualized."
+    },
+    "Ten of Swords": {
+      "upright": "Rock bottom—ultimate defeat, betrayal, ending. Ten swords in the back is overkill—this is dramatic and final. Yet the sun rises. This ending allows something new. The worst has happened. What follows can only be different.",
+      "reversed": "Recovery beginning, surviving the worst, refusing to accept endings. Rising from defeat. Or unable to accept that it's over. The dawn acknowledged or denied. What was destroyed, tentatively rebuilt. The refusal to stay down."
+    },
+    "Page of Swords": {
+      "upright": "Curious, alert mind eager for truth. News, new ideas, someone mentally sharp and inquisitive. Stay alert, speak truthfully, pursue knowledge. The vigilant watcher. Quick thinking, quick speaking. The message that cuts through.",
+      "reversed": "Gossip, deception, hasty words. Communication become harmful—lies, words spoken carelessly. The spy rather than the scout. Cunning without ethics. The blade that cuts the wrong things."
+    },
+    "Knight of Swords": {
+      "upright": "Charging forward with mental force and determination. Fast action, direct speech, no hesitation. Take decisive action—but consider consequences. The charge has begun. Intellect as weapon. Speed of thought made speed of action.",
+      "reversed": "Impulsiveness, aggression, scattered thinking. Speed become recklessness, brilliance become cruelty. The charge that should have been considered. Force without direction. The sword swung at everything or nothing."
+    },
+    "Queen of Swords": {
+      "upright": "Clear perception and honest communication. Sees through pretense, speaks truth directly, maintains strong boundaries. Think clearly, communicate honestly, honor independence. The clear gaze that misses nothing. Truth served without cruelty.",
+      "reversed": "Cold, bitter, overly critical. Clarity become harshness, independence become isolation. The queen alone on her throne, cutting what should be embraced. Truth as weapon. The clear gaze become cold stare."
+    },
+    "King of Swords": {
+      "upright": "Mastery of the intellectual realm. Clear thinking, fair judgment, authority based on truth. Lead with clarity and fairness, let truth guide decisions. The just ruler who judges without passion. Mind commanding mind.",
+      "reversed": "Manipulation, tyranny, cold cruelty. Intellect become weapon, authority become abuse. The king who makes himself right by decree. Mind dominating rather than guiding. Truth twisted to serve power."
+    }
+  },
+  "pentacles": {
+    "Ace of Pentacles": {
+      "upright": "Golden opportunity in the material realm. New job, financial gift, business idea, health improvement. Seed of prosperity that, well-tended, grows to lasting wealth. The coin offered from above. Manifestation begins with this.",
+      "reversed": "Missed opportunity, lack of planning, financial loss. Poor planning undermines material potential. The coin dropped or refused. Wealth within reach but not grasped. The seed not planted."
+    },
+    "Two of Pentacles": {
+      "upright": "Juggling multiple priorities with skill. Finances need balancing, work-life harmony requires attention. Stay flexible, keep moving. The dance of competing demands. Balance as dynamic act, not static state.",
+      "reversed": "Overwhelm, imbalance, dropping the balls. Too much juggling become unsustainable. One priority crushing others. The dance stumbling. Flexibility become chaos. Something must be put down."
+    },
+    "Three of Pentacles": {
+      "upright": "Skilled work recognized, collaboration bearing fruit. Learning, apprenticeship, building something of lasting value. Your skills needed and appreciated. The craftsman showing the patrons. Mastery earned through demonstrated work.",
+      "reversed": "Lack of teamwork, mediocrity, disorganization. Collaboration broken down, quality suffering. Working alone when help is needed. The plan misread, the skill unrecognized. Building without foundation."
+    },
+    "Four of Pentacles": {
+      "upright": "Holding tightly to what you have. Financial security but potential miserliness. Security matters—but at what cost? The figure clutching coins in a way that prevents receiving more. Possession become prison.",
+      "reversed": "Generosity, releasing control, or financial insecurity. Learning to let go. Or experiencing the insecurity you feared. The coins falling or finally flowing. Grip loosened by choice or by force."
+    },
+    "Five of Pentacles": {
+      "upright": "Material hardship, feeling left out in the cold. Help available but not perceived or accepted. Genuine difficulty: financial loss, health problems, exclusion. The lit window passed without entering. Isolation in hardship.",
+      "reversed": "Recovery, help accepted, ending isolation. Beginning to find support or recover from hardship. The door finally noticed, the help finally accepted. The cold night ending. Reaching for what was always there."
+    },
+    "Six of Pentacles": {
+      "upright": "The flow of giving and receiving. Giving help, receiving it, witnessing fair distribution. Questions about generosity dynamics. The scales measure what's given. Charity, sharing, redistribution. Which hand is yours?",
+      "reversed": "Power imbalance in giving, strings attached, unpaid debts. Generosity with conditions. One-way giving. The scales tipped by manipulation. Gift become leverage. Debt accumulated or collected ruthlessly."
+    },
+    "Seven of Pentacles": {
+      "upright": "Pausing to assess what's been cultivated. Patience required for long-term investment. How is your garden growing? The farmer waiting for harvest. Evaluation before continuation. What needs tending, what needs pruning?",
+      "reversed": "Lack of reward, impatience, poor investment. Frustrated with slow progress. Invested in the wrong crop. The harvest that doesn't come. Patience exhausted before fruition. Questioning whether to continue."
+    },
+    "Eight of Pentacles": {
+      "upright": "Diligent skill-building and dedicated work. Celebrating hard work and mastery development. Keep practicing—expertise comes through dedication. The apprentice at the bench, coin after coin. Quality through repetition.",
+      "reversed": "Perfectionism, lack of focus, dead-end work. Working hard at the wrong things. Skill without purpose or purpose without skill. The endless practice without progress. Mediocrity accepted or excellence paralyzed."
+    },
+    "Nine of Pentacles": {
+      "upright": "Fruits of labor enjoyed in elegant independence. Financial security, self-sufficiency, surrounded by beauty. Enjoy what you've earned. The garden of your own making. Luxury earned through effort. Independence worn gracefully.",
+      "reversed": "Over-dependence, hustling without enjoyment, financial setbacks. Unable to enjoy achievements. Security threatened. The garden someone else tends. Independence compromised or lonely. Success without satisfaction."
+    },
+    "Ten of Pentacles": {
+      "upright": "Generational wealth and established family. Culmination of material success—legacy, inheritance, traditions passed down. What you build outlasts you. The family in the archway. Prosperity as heritage, not just possession.",
+      "reversed": "Family financial disputes, loss of inheritance, unstable foundations. Family money become source of conflict. Legacy contested. Traditions broken. The family fractured by what should bind. What was built, now divided."
+    },
+    "Page of Pentacles": {
+      "upright": "Student of the material world. Learning practical skills, studying what works, discovering how to manifest dreams into reality. Learn the craft, study what succeeds. The focused study of earthly matters. Ambition taking first steps.",
+      "reversed": "Lack of progress, procrastination, short-term thinking. Stuck in planning without acting. Learning without applying. The student who won't graduate. Dreams without work. Good intentions unpracticed."
+    },
+    "Knight of Pentacles": {
+      "upright": "The most grounded Knight—steady, reliable, persistent. Moves methodically rather than charging. Embrace routine, work diligently, trust slow progress. The plodding horse that arrives. Reliability as strength.",
+      "reversed": "Stubbornness, laziness, boredom. Steadiness become immobility. Stuck in ruts worn too deep. The horse that won't move. Routine become trap. Persistence without reflection. Slow become stopped."
+    },
+    "Queen of Pentacles": {
+      "upright": "The warm, abundant provider. Creates nurturing, secure, beautiful environment. Practical but not cold. Nurture yourself and others with tangible care. The home that nourishes. Abundance shared generously.",
+      "reversed": "Self-neglect, possessiveness, work-home imbalance. Nurturing become smothering. Neglecting self while caring for others. The abundance guarded too tightly or given away entirely. The garden untended or over-cultivated."
+    },
+    "King of Pentacles": {
+      "upright": "Mastery of the material realm. Built lasting wealth and security through discipline and practical wisdom. Take charge of material matters with steady wisdom. The throne among the vines. Prosperity as earned responsibility.",
+      "reversed": "Greed, materialism, stubbornness. Abundance become greed, security become obsession. Control tightened past wisdom. The king who counts coins instead of what counts. Material mastery without human wisdom."
+    }
+  }
+}
