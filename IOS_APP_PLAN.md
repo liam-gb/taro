@@ -323,43 +323,200 @@ Expand from current 18 combinations to ~200 meaningful pairings:
 
 ---
 
-## Development Phases
+## Development Phases (PR Tracking)
 
-### Phase 0: Pre-Calculation Sprint (1-2 weeks)
-- [ ] Script to generate card-in-position snippets via Claude API
-- [ ] Expand combination database
+Each phase maps to a separate Pull Request for incremental progress tracking.
+
+---
+
+### PR #1: iOS Foundation & Data Models
+**Status:** `COMPLETE`
+**Branch:** `claude/plan-ios-migration-3Pnze`
+**Dependencies:** None (starting point)
+
+- [x] Pre-calculated data exists (`ios-precalc/`)
+- [x] Xcode project structure created
+- [x] Swift data models: `Card.swift`, `Spread.swift`, `Position.swift`, `Reading.swift`
+- [x] Static data ported to Swift (`CardDeck.swift` with all 78 cards)
+- [x] Basic SwiftUI app entry point (`TaroApp.swift`)
+- [x] Navigation placeholder views (Home, Question, Shuffle, CardSelection, Generating, Reading)
+
+**Deliverable:** Compiles, shows basic navigation between placeholder screens.
+
+---
+
+### PR #2: Pre-calculated Data Integration
+**Status:** `PENDING`
+**Dependencies:** PR #1
+
+- [ ] JSON data loading service (`DataService.swift`)
+- [ ] Import `base-meanings.json` into app bundle
+- [ ] Import `position-modifiers.json` into app bundle
+- [ ] Import `combinations.json` into app bundle
+- [ ] Unit tests for data loading
+- [ ] Swift models for interpretation data
+
+**Deliverable:** All pre-calculated tarot data accessible in Swift.
+
+---
+
+### PR #3: Core UI Framework
+**Status:** `PENDING`
+**Dependencies:** PR #1
+
+- [ ] Theme system (colors, typography, spacing)
+- [ ] Aurora gradient background component
+- [ ] Glass panel/card component
+- [ ] Custom button styles
+- [ ] Dark mode support
+
+**Deliverable:** Consistent visual language matching web app aesthetic.
+
+---
+
+### PR #4: Card UI & Animations
+**Status:** `PENDING`
+**Dependencies:** PR #3
+
+- [ ] 3D card component (`Card3DView.swift`)
+- [ ] Card flip animation
+- [ ] Card back design
+- [ ] Hover/selection states
+- [ ] Shuffle animation
+- [ ] Fan-out card selection interaction
+
+**Deliverable:** Interactive, animated tarot cards.
+
+---
+
+### PR #5: Spread Selection & Layout
+**Status:** `PENDING`
+**Dependencies:** PR #4
+
+- [ ] Spread selection view with all 5 spread types
+- [ ] Spread layout engine (positions for each spread)
+- [ ] Celtic Cross layout (overlapping cards)
+- [ ] Card placement animations
+- [ ] Question input modal
+
+**Deliverable:** User can select spread, optionally enter question, draw cards.
+
+---
+
+### PR #6: LLM Integration
+**Status:** `PENDING`
+**Dependencies:** PR #2
+
+- [ ] Integrate llama.cpp or MLX Swift
+- [ ] Model download/management system
+- [ ] `LLMService.swift` - load model, run inference
+- [ ] Streaming token output
+- [ ] Generation parameters (temperature, top-p)
+- [ ] Memory management for model
+
+**Deliverable:** Can run local LLM inference on device.
+
+---
+
+### PR #7: Prompt Assembly & Reading Flow
+**Status:** `PENDING`
+**Dependencies:** PR #5, PR #6
+
+- [ ] `PromptAssembler.swift` - build prompts from pre-calc data
+- [ ] Combination detection (find notable pairings in spread)
+- [ ] Elemental flow calculation
+- [ ] Reading display view with streaming text
+- [ ] Reading state management
+
+**Deliverable:** Complete end-to-end reading experience.
+
+---
+
+### PR #8: History & Persistence
+**Status:** `PENDING`
+**Dependencies:** PR #7
+
+- [ ] Core Data schema for readings
+- [ ] `HistoryService.swift` - save/load readings
+- [ ] History list view
+- [ ] Reading detail view (view past readings)
+- [ ] Delete/manage readings
+- [ ] Optional iCloud sync
+
+**Deliverable:** Readings persist across app launches.
+
+---
+
+### PR #9: Polish & App Store
+**Status:** `PENDING`
+**Dependencies:** PR #8
+
+- [ ] App icon (all sizes)
+- [ ] Launch screen
+- [ ] App Store screenshots
+- [ ] App Store description
+- [ ] Privacy policy (no data collection!)
+- [ ] TestFlight distribution
+- [ ] Final App Store submission
+
+**Deliverable:** Published app in App Store.
+
+---
+
+## Pre-Calculation Status
+
+The pre-calculated data generation is **COMPLETE**:
+
+| Layer | Status | File |
+|-------|--------|------|
+| Card Meanings | COMPLETE | `ios-precalc/base-meanings.json` (40KB) |
+| Position Modifiers | COMPLETE | `ios-precalc/position-modifiers.json` (431KB) |
+| Card Combinations | COMPLETE | `ios-precalc/combinations.json` (19KB) |
+| Elemental Dynamics | PENDING | Needs generation |
+| Spread Templates | PENDING | Needs generation |
+| Thematic Connectors | PENDING | Needs generation |
+
+---
+
+## Legacy Development Phases (Reference)
+
+### Phase 0: Pre-Calculation Sprint
+- [x] Generate card-in-position snippets via Claude API
+- [x] Base meanings for all 78 cards
+- [x] Position modifiers for all positions
+- [x] Card combinations database
 - [ ] Generate elemental dynamics content
 - [ ] Create spread narrative templates
-- [ ] Export all to JSON format
+- [ ] Generate thematic connectors
 
-### Phase 1: iOS Foundation (2-3 weeks)
+### Phase 1: iOS Foundation
 - [ ] Xcode project setup
 - [ ] SwiftUI app structure
 - [ ] Port card data models
 - [ ] Port spread configurations
 - [ ] Basic navigation flow
 
-### Phase 2: Card UI (2-3 weeks)
+### Phase 2: Card UI
 - [ ] 3D card component in SwiftUI
 - [ ] Card flip animations
 - [ ] Shuffle animation
 - [ ] Fan-out card selection
 - [ ] Spread layout views
 
-### Phase 3: LLM Integration (2-3 weeks)
+### Phase 3: LLM Integration
 - [ ] Integrate llama.cpp or MLX Swift
 - [ ] Model loading/management
 - [ ] Prompt assembly engine
 - [ ] Streaming text display
 - [ ] Generation settings (temperature, etc.)
 
-### Phase 4: Reading Flow (1-2 weeks)
+### Phase 4: Reading Flow
 - [ ] Complete reading experience
 - [ ] Question input
 - [ ] Reading display
 - [ ] Copy/share functionality
 
-### Phase 5: Polish & Submit (1-2 weeks)
+### Phase 5: Polish & Submit
 - [ ] Reading history (Core Data)
 - [ ] App icons & launch screen
 - [ ] App Store assets
