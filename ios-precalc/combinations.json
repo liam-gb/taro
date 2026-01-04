@@ -1,0 +1,376 @@
+{
+  "combinations": [
+    {
+      "cards": ["The Fool", "The World"],
+      "meaning": "One journey completes as another begins. The spiral of growth—you'll walk a similar path as a different person. Ending and beginning share the same threshold."
+    },
+    {
+      "cards": ["The Fool", "Death"],
+      "meaning": "Transformation births new beginning. The old self dies and the new self takes its first naive, trusting steps. Rebirth into innocence."
+    },
+    {
+      "cards": ["The Fool", "The Tower"],
+      "meaning": "Destruction clears ground for fresh start. What collapses creates space for an entirely new path. Liberation through demolition into openness."
+    },
+    {
+      "cards": ["The Fool", "The Star"],
+      "meaning": "Hope leads to new beginning. Faith rewarded with fresh start. The healing journey opens a door you're finally ready to walk through."
+    },
+    {
+      "cards": ["The Fool", "Ace of Wands"],
+      "meaning": "Bold new creative beginning. The leap and the spark combine—passionate initiative, fearless start. Energy to begin meets courage to act."
+    },
+    {
+      "cards": ["The Magician", "The World"],
+      "meaning": "Manifestation complete. Your skills and will have created something whole. What you intended now exists fully formed."
+    },
+    {
+      "cards": ["The Magician", "The High Priestess"],
+      "meaning": "Active will meets receptive wisdom. Manifestation balanced by intuition. Knowing when to act and when to wait. Doing and being in dialogue."
+    },
+    {
+      "cards": ["The Magician", "Ace of Wands"],
+      "meaning": "Powerful new initiative. You have all the tools and the spark ignites. Creative force meets skillful will. Begin with everything needed."
+    },
+    {
+      "cards": ["The Magician", "The Fool"],
+      "meaning": "Skill meeting fresh start. Beginner's mind holding master's tools. New beginning with full capacity. Power ready for new direction."
+    },
+    {
+      "cards": ["The High Priestess", "The Hermit"],
+      "meaning": "Deep inner wisdom doubled. Trust intuition and take time for introspection. The answers lie within—go in and stay there until they surface."
+    },
+    {
+      "cards": ["The High Priestess", "The Moon"],
+      "meaning": "Hidden knowledge emerging through dreams and intuition. Pay attention to what surfaces from depths. The unconscious speaks loudly here."
+    },
+    {
+      "cards": ["The High Priestess", "The Magician"],
+      "meaning": "Intuition balanced with action. Know when to wait and when to manifest. Wisdom guiding will. The synthesis of inner knowing and outer doing."
+    },
+    {
+      "cards": ["The Empress", "The Emperor"],
+      "meaning": "Feminine and masculine in balance. Nurturing meets structure. A complete partnership or complete self—both principles honored and working together."
+    },
+    {
+      "cards": ["The Empress", "Ace of Cups"],
+      "meaning": "Creative and emotional abundance overflow. Fertility doubled—birth, creation, love all flourishing. The cup overflows in the garden."
+    },
+    {
+      "cards": ["The Empress", "The Star"],
+      "meaning": "Abundant nurturing meets healing hope. Creative renewal flows. Fertility and faith combine for deep generative healing."
+    },
+    {
+      "cards": ["The Emperor", "The Hierophant"],
+      "meaning": "Authority and tradition aligned. Structure upon structure—establishment, institution, the proven way. Significant conventional power at work."
+    },
+    {
+      "cards": ["The Emperor", "The Chariot"],
+      "meaning": "Authority driving forward with will. Structure meets momentum. Leadership in motion. Command and control moving decisively toward goals."
+    },
+    {
+      "cards": ["The Lovers", "Two of Cups"],
+      "meaning": "Profound love connection. Soulmate energy, partnership blessed at every level. Choice aligned with heart's truth. Deep romantic harmony."
+    },
+    {
+      "cards": ["The Lovers", "The Devil"],
+      "meaning": "Passion with complications. Examine whether desire is healthy or obsessive. Love and bondage intertwined—which serves, which enslaves?"
+    },
+    {
+      "cards": ["The Lovers", "Ace of Cups"],
+      "meaning": "New love aligned with deep values. Heart opening to a choice that feels right. Emotional beginning with soul resonance."
+    },
+    {
+      "cards": ["The Chariot", "The Sun"],
+      "meaning": "Victory brings joy. Willpower rewarded with genuine happiness. Triumph through drive leads to celebration. Success that actually fulfills."
+    },
+    {
+      "cards": ["The Chariot", "Eight of Wands"],
+      "meaning": "Rapid powerful movement. Momentum doubled—swift progress through forceful will. Everything accelerating toward the goal."
+    },
+    {
+      "cards": ["Strength", "The Chariot"],
+      "meaning": "Two forms of power in dialogue. Soft strength and hard will both present. Knowing when to push and when to gentle. Mastery through both modes."
+    },
+    {
+      "cards": ["Strength", "The Star"],
+      "meaning": "Gentle courage meets hope. Inner resilience supporting healing. Patient power enabling renewal. Soft light, strong foundation."
+    },
+    {
+      "cards": ["The Hermit", "The High Priestess"],
+      "meaning": "Wisdom from within, doubled. Go inward and stay there. Trust the guidance that comes from solitude and silence. Deep inner work required."
+    },
+    {
+      "cards": ["The Hermit", "Four of Swords"],
+      "meaning": "Retreat upon retreat. Time to withdraw completely. Rest, solitude, and inner journeying essential. The world must wait."
+    },
+    {
+      "cards": ["Wheel of Fortune", "The World"],
+      "meaning": "Destined cycle completing. Karma fulfilled. One great turn of the wheel finishing as new chapter begins. Fate and fulfillment meet."
+    },
+    {
+      "cards": ["Wheel of Fortune", "Death"],
+      "meaning": "Fated transformation. Change you didn't choose but were always heading toward. Karma and metamorphosis intertwined."
+    },
+    {
+      "cards": ["Justice", "Judgement"],
+      "meaning": "Reckoning upon reckoning. Truth, karma, and awakening all present. What's judged is judged. Final accounting underway."
+    },
+    {
+      "cards": ["Justice", "The Emperor"],
+      "meaning": "Fair authority. Power wielded with integrity. Structure that serves truth. Leadership accountable to higher law."
+    },
+    {
+      "cards": ["The Hanged Man", "Death"],
+      "meaning": "Surrender leads to transformation. Letting go enables rebirth. What you release becomes what you become."
+    },
+    {
+      "cards": ["The Hanged Man", "The Star"],
+      "meaning": "Surrender brings hope. Pause leads to healing. What you let go of makes space for light to enter."
+    },
+    {
+      "cards": ["Death", "The Star"],
+      "meaning": "Hope rising from ashes. The particular healing that follows necessary endings. Renewal earned through transformation. The sequence matters: ending first, then light."
+    },
+    {
+      "cards": ["Death", "The Tower"],
+      "meaning": "Complete destruction and transformation. Major life upheaval unavoidable. Everything must fall; everything must change. Liberation through total collapse."
+    },
+    {
+      "cards": ["Death", "Judgement"],
+      "meaning": "Profound rebirth. Old self dies, higher self answers the call. Transformation so complete it's resurrection. An old chapter ends as a new calling begins."
+    },
+    {
+      "cards": ["Death", "The Sun"],
+      "meaning": "Joy after transformation. The brightness that follows necessary endings. What died makes room for celebration."
+    },
+    {
+      "cards": ["Death", "The World"],
+      "meaning": "Transformation completing a cycle. Something ends so wholeness can emerge. Death as final integration."
+    },
+    {
+      "cards": ["Temperance", "The Star"],
+      "meaning": "Healing through patient balance. Integration and hope working together. Slow alchemy of renewal. Moderation enables hope to take root."
+    },
+    {
+      "cards": ["Temperance", "Two of Cups"],
+      "meaning": "Balanced partnership. Harmonious blending in relationship. Two becoming one without either losing themselves."
+    },
+    {
+      "cards": ["The Devil", "The Tower"],
+      "meaning": "Bondage broken through destruction. Chains shattered by collapse. What imprisoned is blown apart. Liberation through upheaval."
+    },
+    {
+      "cards": ["The Devil", "The Star"],
+      "meaning": "Hope for release from bondage. Healing the shadow. Light showing the way out of chains. Faith that freedom is possible."
+    },
+    {
+      "cards": ["The Devil", "The Moon"],
+      "meaning": "Shadow and illusion combined. Deeper unconscious work needed. What binds may not be what you think. Hidden fears driving visible chains."
+    },
+    {
+      "cards": ["The Tower", "The Star"],
+      "meaning": "Destruction leading to hope. From chaos comes clarity and healing. What falls creates space for light. Crisis preceding renewal."
+    },
+    {
+      "cards": ["The Tower", "The Sun"],
+      "meaning": "Breakthrough to clarity and joy. Destruction giving way to brightness. The morning after the lightning strike—damage visible, sun rising anyway."
+    },
+    {
+      "cards": ["The Tower", "Death"],
+      "meaning": "Complete upheaval and transformation. Nothing survives unchanged. The most dramatic combination—total destruction of what was, total rebirth of what comes."
+    },
+    {
+      "cards": ["The Tower", "Ten of Swords"],
+      "meaning": "Rock bottom. Complete destruction, thorough defeat. Everything that could fall has fallen. The only direction from here is up."
+    },
+    {
+      "cards": ["The Tower", "Ace of Wands"],
+      "meaning": "Destruction clearing ground for new creative beginning. The spark emerging from rubble. Fresh start made possible by collapse."
+    },
+    {
+      "cards": ["The Star", "The Sun"],
+      "meaning": "Hope fulfilled by joy. Healing completing in celebration. The faith was justified—light leads to brighter light."
+    },
+    {
+      "cards": ["The Star", "The Moon"],
+      "meaning": "Hope in darkness. Light navigating shadow. Healing happening in mysterious ways. Trust the process even when you can't see clearly."
+    },
+    {
+      "cards": ["The Moon", "The High Priestess"],
+      "meaning": "Deep unconscious wisdom. Hidden knowledge doubled. Dreams, intuition, and mystery all speaking. Listen to what can't be seen."
+    },
+    {
+      "cards": ["The Moon", "Nine of Swords"],
+      "meaning": "Fears manifesting as anxiety. Nightmares from unconscious depths. What you fear may not be real, but the fear is. Shine light on shadow."
+    },
+    {
+      "cards": ["The Moon", "Seven of Cups"],
+      "meaning": "Illusions upon illusions. Fantasy and unconscious projection combined. Nothing is as it seems. Discernment essential before choosing."
+    },
+    {
+      "cards": ["The Sun", "The World"],
+      "meaning": "Ultimate success and fulfillment. Joy and completion together. The brightest possible outcome—everything achieved, happiness real."
+    },
+    {
+      "cards": ["The Sun", "Ace of Wands"],
+      "meaning": "Joyful new beginning. Creative spark blessed by brightness. Starting something with energy and happiness abundant."
+    },
+    {
+      "cards": ["The Sun", "Six of Wands"],
+      "meaning": "Victory celebrated joyfully. Success recognized and enjoyed. Triumph bringing real happiness, not just achievement."
+    },
+    {
+      "cards": ["Judgement", "The World"],
+      "meaning": "Awakening leading to completion. Answering the call enables wholeness. The resurrection that integrates everything."
+    },
+    {
+      "cards": ["Judgement", "Death"],
+      "meaning": "Rebirth through answering the call. Old self dies, new purpose emerges. Transformation as resurrection."
+    },
+    {
+      "cards": ["The World", "Ace of Wands"],
+      "meaning": "Completion sparking new beginning. One cycle ending as creative initiative begins. Achievement creating platform for next venture."
+    },
+    {
+      "cards": ["Three of Swords", "Five of Cups"],
+      "meaning": "Deep grief and heartbreak. Mourning upon mourning. Allow the sorrow before seeking silver linings. Loss is real—honor it."
+    },
+    {
+      "cards": ["Three of Swords", "The Star"],
+      "meaning": "Healing heartbreak. Hope for the wounded heart. Pain that leads to renewal. The pierced heart finding light."
+    },
+    {
+      "cards": ["Five of Cups", "Six of Cups"],
+      "meaning": "Mourning meeting memory. Past joys illuminating present loss. What was lost recalls what was loved. Grief and nostalgia intertwined."
+    },
+    {
+      "cards": ["Eight of Cups", "The Hermit"],
+      "meaning": "Walking away to go within. Leaving what doesn't fulfill to seek inner wisdom. The journey away is a journey inward."
+    },
+    {
+      "cards": ["Ten of Cups", "The Lovers"],
+      "meaning": "Complete emotional fulfillment through love. The choice that leads to lasting happiness. Partnership creating paradise."
+    },
+    {
+      "cards": ["Two of Cups", "Ten of Cups"],
+      "meaning": "Love leading to lasting happiness. The meeting of hearts growing into emotional fulfillment. Partnership becoming paradise."
+    },
+    {
+      "cards": ["Queen of Cups", "King of Cups"],
+      "meaning": "Emotional mastery and maturity together. Deep intuitive partnership. Two who have learned to contain their depths, meeting."
+    },
+    {
+      "cards": ["Queen of Swords", "King of Swords"],
+      "meaning": "Sharp minds together. Clear communication, intellectual partnership. Two who see truth clearly, comparing notes."
+    },
+    {
+      "cards": ["Queen of Wands", "King of Wands"],
+      "meaning": "Passionate leadership partnered. Two flames burning bright together. Charisma and vision doubled."
+    },
+    {
+      "cards": ["Queen of Pentacles", "King of Pentacles"],
+      "meaning": "Material mastery combined. Abundance and provision partnered. Two who have built well, building together."
+    },
+    {
+      "cards": ["Four of Wands", "Ten of Cups"],
+      "meaning": "Celebration and emotional fulfillment together. The milestone that brings genuine happiness. Home and heart aligned."
+    },
+    {
+      "cards": ["Ace of Wands", "Ace of Cups"],
+      "meaning": "Passionate new beginning with emotional depth. Creative spark meeting heart's opening. Fresh start on fire and in love."
+    },
+    {
+      "cards": ["Ace of Wands", "Ace of Swords"],
+      "meaning": "Creative and mental breakthroughs together. New idea with passion to pursue it. Fire and air combining—inspiration ignited."
+    },
+    {
+      "cards": ["Ace of Cups", "Ace of Pentacles"],
+      "meaning": "Emotional and material new beginnings. Heart opening as resources appear. Love and prosperity starting together."
+    },
+    {
+      "cards": ["Ace of Swords", "Ace of Pentacles"],
+      "meaning": "Mental breakthrough with practical opportunity. Clear thinking meeting material chance. Idea and means to manifest it arriving together."
+    },
+    {
+      "cards": ["Eight of Wands", "The Chariot"],
+      "meaning": "Rapid forward movement. Momentum doubled—swift progress through sheer drive. Everything accelerating toward the goal."
+    },
+    {
+      "cards": ["Ten of Wands", "Nine of Wands"],
+      "meaning": "Burden upon exhaustion. Carrying too much while already battle-weary. Something must be put down before you fall down."
+    },
+    {
+      "cards": ["Ten of Swords", "Death"],
+      "meaning": "Absolute ending. Rock bottom meeting transformation. Everything ends here—and everything begins. The most final of finales."
+    },
+    {
+      "cards": ["Ten of Swords", "The Star"],
+      "meaning": "Hope after complete defeat. The light that appears when you've hit rock bottom. Rising from the worst toward healing."
+    },
+    {
+      "cards": ["Nine of Swords", "The Moon"],
+      "meaning": "Nightmares from unconscious depths. Anxiety meeting illusion—the fears that grow in darkness. What terrifies may not be what's real."
+    },
+    {
+      "cards": ["Nine of Pentacles", "Ten of Pentacles"],
+      "meaning": "Personal achievement meeting generational wealth. Self-sufficiency becoming legacy. What you've built extends beyond you."
+    },
+    {
+      "cards": ["Three of Pentacles", "Eight of Pentacles"],
+      "meaning": "Collaboration and skill development together. Learning in community. Craft honored through both practice and partnership."
+    },
+    {
+      "cards": ["Five of Pentacles", "Six of Pentacles"],
+      "meaning": "Hardship and help together. The hand reaching down to the one in the cold. Charity and need meeting."
+    },
+    {
+      "cards": ["Seven of Swords", "The Moon"],
+      "meaning": "Deception in darkness. Things not as they seem, multiplied. Someone isn't telling the truth—possibly yourself. Look carefully at what's hidden."
+    },
+    {
+      "cards": ["Two of Swords", "Seven of Cups"],
+      "meaning": "Blocked decision among illusions. Can't choose because can't see clearly. Clarity needed before decision is possible."
+    },
+    {
+      "cards": ["Four of Swords", "The Hermit"],
+      "meaning": "Deep rest and solitude. Retreat upon retreat. Complete withdrawal for recovery and wisdom. The world waits while you restore."
+    },
+    {
+      "cards": ["Six of Swords", "Eight of Cups"],
+      "meaning": "Double departure. Moving away from what no longer serves on every level. The journey away is thorough."
+    },
+    {
+      "cards": ["Page of Cups", "Page of Wands"],
+      "meaning": "Creative and emotional messages arriving. Youthful energy in both heart and passion. New beginnings in feeling and doing."
+    },
+    {
+      "cards": ["Knight of Swords", "Knight of Wands"],
+      "meaning": "Charging forward on two fronts. Mental and passionate pursuit at full speed. Action doubled—consider where you're heading."
+    },
+    {
+      "cards": ["The Empress", "Three of Cups"],
+      "meaning": "Abundance and celebration. Nurturing community, joyful creativity. Fertility shared in friendship. What grows is celebrated together."
+    },
+    {
+      "cards": ["The Emperor", "Four of Pentacles"],
+      "meaning": "Control meeting grip. Structure and security, but at what cost? Authority protecting—or authority hoarding?"
+    },
+    {
+      "cards": ["The Hierophant", "Three of Pentacles"],
+      "meaning": "Traditional wisdom meeting skillful work. Learning through established methods. Apprenticeship, mentorship, craft passed down properly."
+    },
+    {
+      "cards": ["Strength", "Nine of Wands"],
+      "meaning": "Gentle endurance meeting battle-weariness. Soft courage sustaining through exhaustion. Keep going, but not through force."
+    },
+    {
+      "cards": ["The Hanged Man", "Four of Swords"],
+      "meaning": "Surrender meeting rest. Double pause—the suspension is necessary. Restoration through complete letting go."
+    },
+    {
+      "cards": ["Temperance", "Justice"],
+      "meaning": "Balance meeting fairness. Moderation and truth aligned. The middle path is the right path. Integration through integrity."
+    }
+  ]
+}

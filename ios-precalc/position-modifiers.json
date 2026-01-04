@@ -1,0 +1,260 @@
+{
+  "positions": {
+    "todays_guidance": {
+      "name": "Today's Guidance",
+      "description": "Your guidance for today"
+    },
+    "past": {
+      "name": "Past",
+      "description": "What has shaped this moment"
+    },
+    "present": {
+      "name": "Present",
+      "description": "Where you are now"
+    },
+    "future": {
+      "name": "Future",
+      "description": "Where this path leads"
+    },
+    "situation": {
+      "name": "Situation",
+      "description": "The nature of what you face"
+    },
+    "action": {
+      "name": "Action",
+      "description": "The approach advised"
+    },
+    "outcome": {
+      "name": "Outcome",
+      "description": "The likely result"
+    },
+    "challenge": {
+      "name": "Challenge",
+      "description": "The obstacle you face"
+    },
+    "above": {
+      "name": "Above",
+      "description": "Best possible outcome, conscious goals"
+    },
+    "below": {
+      "name": "Below",
+      "description": "Subconscious influences, hidden foundation"
+    },
+    "advice": {
+      "name": "Advice",
+      "description": "Guidance for moving forward"
+    },
+    "external": {
+      "name": "External",
+      "description": "Outside influences affecting you"
+    },
+    "hopes_fears": {
+      "name": "Hopes/Fears",
+      "description": "What you hope for or fear"
+    },
+    "hidden_influences": {
+      "name": "Hidden Influences",
+      "description": "Factors not immediately apparent"
+    },
+    "obstacles": {
+      "name": "Obstacles",
+      "description": "Challenges to overcome"
+    },
+    "external_influences": {
+      "name": "External Influences",
+      "description": "People or events affecting you"
+    }
+  },
+  "modifiers": {
+    "The Fool": {
+      "upright": {
+        "todays_guidance": "Today invites a leap of faith. Approach whatever arises with beginner's mind—fresh eyes, open heart. Don't overthink; trust the impulse toward something new. The day favors starting over planning.",
+        "past": "You already took this leap. Something began with trust rather than certainty—that choice shaped where you now stand. The seeds of your present were planted when you stepped into the unknown.",
+        "present": "You stand at a threshold now. The edge is exactly where you're meant to be. This moment asks for trust in the question, not answers. You carry everything you need.",
+        "future": "A new beginning approaches. The path ahead invites fresh starts and open-hearted ventures. What's coming requires trust in the unknown. Prepare to leap.",
+        "situation": "The situation calls for beginner's mind. Fresh perspective matters more than experience here. What looks like naivety may be exactly the openness required.",
+        "action": "Take the leap. Act with trust rather than certainty. Overthinking will paralyze—move before you're ready. The action required is beginning, not perfecting.",
+        "outcome": "This leads to new beginnings. Whatever happens, a fresh chapter opens. The outcome is a threshold, not a conclusion. One journey ends as another starts.",
+        "challenge": "The leap itself blocks you. Fear of the unknown, or fear of appearing foolish, creates the obstacle. Beginner's vulnerability is what you're avoiding.",
+        "above": "Your highest possibility here is pure new beginning. The best outcome involves stepping into the unknown with trust. Aim for the leap, not the landing.",
+        "below": "Beneath this situation lies a deep yearning to begin again. Unconsciously, you want to wipe the slate clean and start fresh. This hidden desire shapes everything above it.",
+        "advice": "Be the Fool. Trust more than you plan. Step before you're ready. The guidance here is to embrace not-knowing as a gift rather than a problem.",
+        "external": "Someone or something in your environment embodies this energy—a catalyst for new beginnings, an invitation to leap. Or external circumstances are pushing you toward fresh starts.",
+        "hopes_fears": "You hope for the freedom of new beginnings—and fear the vulnerability it requires. The open road both calls and terrifies. You want to leap but fear the fall.",
+        "hidden_influences": "A hidden factor is the opportunity to begin again. Something not yet visible offers a fresh start. Or unconscious naivety shapes the situation more than you realize.",
+        "obstacles": "The obstacle is taking the first step. Fear of beginning, of looking foolish, of not knowing enough—this blocks progress. The leap you're avoiding is the way forward.",
+        "external_influences": "Forces outside your control push toward new beginnings. Others may see you as ready to leap before you feel it. The world invites fresh starts."
+      },
+      "reversed": {
+        "todays_guidance": "Today asks you to examine blocked beginnings. Are you frozen at the edge or leaping without looking? Notice which shadow is active—fear or recklessness.",
+        "past": "The Fool's shadow shaped your path—recklessness that left bruises, or paralysis that let opportunities pass. Understanding this pattern illuminates your present.",
+        "present": "Right now you're caught between recklessness and paralysis. Either leaping without wisdom or frozen when movement is required. Which shadow is active?",
+        "future": "Ahead lies a blocked beginning or a reckless leap. The path forward requires healing your relationship with risk—finding the ground between frozen and foolish.",
+        "situation": "The situation involves false starts or fear-based inaction. Something about beginning has gone sideways. Either too much caution or not enough.",
+        "action": "Don't leap blindly, but don't stay frozen either. The action needed is examining why beginning feels impossible or why you're rushing without looking.",
+        "outcome": "This leads to incomplete beginnings or consequences of recklessness. The result involves learning—possibly through failure—about how to start wisely.",
+        "challenge": "A broken relationship with risk blocks you. Past burns made you either too cautious or too reckless. Healthy trust in yourself is what you're missing.",
+        "above": "Your best hope involves healing blocked beginnings. The highest outcome requires moving past fear without falling into recklessness. Wise beginning, not paralysis or impulsiveness.",
+        "below": "Beneath this situation lies fear of beginning—or unconscious recklessness. Hidden patterns around risk and trust shape everything. Past leaps or frozen moments echo here.",
+        "advice": "Examine your relationship with beginning. Why are you stuck or rushing? The guidance is neither 'just leap' nor 'stay safe' but 'understand your pattern.'",
+        "external": "Outside influences reflect blocked beginnings or recklessness. Someone in your environment fears change or acts without thinking. This mirrors something in you.",
+        "hopes_fears": "You fear both the leap and the staying. Recklessness terrifies; paralysis terrifies. The hope is finding the middle ground you can't quite see.",
+        "hidden_influences": "A hidden factor is fear disguised as wisdom, or recklessness disguised as courage. Something not visible involves false starts or frozen potential.",
+        "obstacles": "The obstacle is your wounded relationship with risk. Either you can't start or you can't stop starting over. Past experiences with beginning block the way.",
+        "external_influences": "External forces reflect blocked or reckless energy. Others may be urging action you're not ready for, or their caution reinforces your paralysis."
+      }
+    },
+    "The Magician": {
+      "upright": {
+        "todays_guidance": "Today you have everything needed to manifest your intentions. Focus energy, take action, trust your skills. The tools are on the table—use them.",
+        "past": "You once channeled your will effectively. A time when skills, resources, and timing aligned. That manifestation, successful or not, taught you what's possible.",
+        "present": "Right now you possess all necessary elements. The channel between intention and reality is open. What you focus on, you can create. Act on this.",
+        "future": "Coming: a time when everything aligns for manifestation. Skills sharpen, resources appear, opportunity opens. Prepare to act with focused will.",
+        "situation": "The situation calls for directed will and skillful action. All elements are present—the question is how you'll channel them. This is about manifestation.",
+        "action": "Focus your intention and act with confidence. Use the skills you have. The action required is deliberate creation—channeling will into form.",
+        "outcome": "This leads to manifestation of intention. What you've focused on takes form. The outcome depends on what you've been channeling your energy toward.",
+        "challenge": "The challenge is focusing scattered energy. All elements exist but you're not bringing them together. Directed will is what's lacking.",
+        "above": "Your highest possibility is masterful manifestation. The best outcome involves channeling all your gifts toward a clear intention. Aim for skillful creation.",
+        "below": "Beneath this situation lies untapped power to create. Unconsciously you know you could manifest what you want—this potential shapes everything.",
+        "advice": "Channel your energy deliberately. You have the skills—focus them. The guidance is to recognize your power and use it consciously.",
+        "external": "Someone with Magician energy influences the situation—a skilled manifester, a catalyst. Or external circumstances provide all the tools you need.",
+        "hopes_fears": "You hope to manifest your will fully—and fear having the power to do so. Or fear that you lack what's needed when you actually don't.",
+        "hidden_influences": "A hidden factor is latent power to create. Something not visible involves untapped skill or resources waiting to be channeled.",
+        "obstacles": "The obstacle is scattered focus or unused tools. Everything needed exists but isn't being directed. The blockage is in the channeling, not the capacity.",
+        "external_influences": "External forces offer all the elements for manifestation. The world provides what's needed—the question is whether you'll use it."
+      },
+      "reversed": {
+        "todays_guidance": "Today notice where energy scatters or power gets misused. Are you doubting real abilities or using skills to manipulate? Ground your intention.",
+        "past": "You once scattered your power or used it poorly. Manipulation, self-deception, or wasted potential—this history shapes your current relationship with your abilities.",
+        "present": "Right now energy scatters or power misdirects. Either doubting what you can do, or using skills in shadow ways. The tools exist but aren't serving well.",
+        "future": "Ahead lies a need to address scattered energy or misused power. What's coming requires honest reckoning with how you channel your abilities.",
+        "situation": "The situation involves scattered or misused power. Talents wasted, energy diffused, or skill serving manipulation. Something about manifestation has gone sideways.",
+        "action": "Stop scattering energy or manipulating. The action needed is honest assessment of how you're using your power. Focus or come clean.",
+        "outcome": "This leads to consequences of scattered focus or manipulation. The result shows what happens when power isn't channeled cleanly.",
+        "challenge": "The challenge is your relationship with your own power—doubting it, scattering it, or using it to deceive. Honest self-assessment is needed.",
+        "above": "Your best hope involves reclaiming and focusing your power honestly. The highest outcome requires addressing manipulation or self-doubt.",
+        "below": "Beneath this situation lies fear of your own power or shadow uses of it. Unconscious manipulation or self-sabotage shapes what's visible.",
+        "advice": "Examine how you use your gifts. Stop scattering or deceiving. The guidance is to get honest about your power—claim it cleanly or not at all.",
+        "external": "Outside influences involve manipulation or wasted potential. Someone may be deceiving you, or external chaos scatters your focus.",
+        "hopes_fears": "You fear your power—either having it or not having it. The shadow Magician in you worries about manipulation or inadequacy.",
+        "hidden_influences": "A hidden factor is deception or untapped potential. Something not visible involves either manipulation at play or gifts you're not using.",
+        "obstacles": "The obstacle is self-deception, manipulation, or scattered focus. The blockage isn't lacking power—it's how that power is being (mis)used.",
+        "external_influences": "External forces scatter your energy or introduce deception. The world reflects your shadow relationship with power back to you."
+      }
+    },
+    "The High Priestess": {
+      "upright": {
+        "todays_guidance": "Today trust intuition over logic. Listen to dreams, hunches, subtle knowing. Receptivity over action. The answers aren't in analysis—they're in stillness.",
+        "past": "You once knew something without knowing how. That intuition—trusted or ignored—shaped the path to here. The inner voice spoke; what did you do with it?",
+        "present": "Right now intuition offers guidance that logic can't. The conscious mind doesn't have these answers—the unconscious does. Listen inward.",
+        "future": "Coming: a time when inner wisdom becomes essential. Intuition will guide where analysis fails. Prepare to trust what you can't fully explain.",
+        "situation": "The situation holds hidden dimensions that only intuition can access. There's more beneath the surface than appears. Mystery is involved—honor it.",
+        "action": "Go inward, not outward. The action needed is listening, not doing. Sit with the question rather than forcing answers. Let knowing emerge.",
+        "outcome": "This leads to revelation of hidden truth. What was unconscious surfaces. The outcome involves finally knowing what you've sensed all along.",
+        "challenge": "The challenge is trusting what you can't prove. Intuition speaks but you struggle to follow it without rational justification. The veil blocks because you won't part it.",
+        "above": "Your highest possibility is deep intuitive wisdom. The best outcome involves trusting inner knowing completely. Aim for the priestess's certainty.",
+        "below": "Beneath this situation lies vast unconscious knowledge. You already know more than you realize. This hidden wisdom shapes everything above it.",
+        "advice": "Trust your intuition. The guidance is to honor inner knowing even when it can't be explained. Go still. Listen to what whispers.",
+        "external": "Someone with deep intuitive wisdom influences the situation. Or external circumstances require tuning into what's hidden rather than obvious.",
+        "hopes_fears": "You hope for clear inner knowing—and fear the mystery it requires. Trusting intuition means releasing control; that's both desired and frightening.",
+        "hidden_influences": "A hidden factor is intuitive truth waiting to be acknowledged. Something not visible involves the unconscious wisdom you're not yet accessing.",
+        "obstacles": "The obstacle is ignoring or overriding intuition. Inner wisdom speaks but gets dismissed for rational analysis. The mystery blocks because you won't enter it.",
+        "external_influences": "External forces call you toward inner wisdom. The world asks you to access what you know beneath the surface."
+      },
+      "reversed": {
+        "todays_guidance": "Today notice where you're disconnected from intuition or where secrets cause harm. Are you ignoring inner wisdom or is something hidden that shouldn't be?",
+        "past": "You once lost connection to intuition, or secrets caused damage. That disconnection from inner knowing shaped your path. Hidden things had power because they stayed hidden.",
+        "present": "Right now intuition is blocked or secrets disrupt. Either you're too rational, dismissing gut feelings, or something concealed needs surfacing.",
+        "future": "Ahead lies reckoning with blocked intuition or damaging secrets. What's coming requires either reconnecting to inner wisdom or revealing what's hidden.",
+        "situation": "The situation involves disconnection from intuition or secrets causing harm. Something hidden distorts things, or inner wisdom goes unheard.",
+        "action": "Either reconnect to intuition or bring secrets to light. The action needed addresses whatever is blocked or hidden. Stop ignoring what you know.",
+        "outcome": "This leads to consequences of ignored intuition or revealed secrets. The result shows what happens when inner wisdom goes unheeded or when hidden things surface.",
+        "challenge": "The challenge is blocked intuition or harmful secrets. Either you can't access inner knowing or something concealed creates the obstacle.",
+        "above": "Your best hope involves reconnecting to intuition or clearing secrets. The highest outcome requires addressing what's blocked or hidden.",
+        "below": "Beneath this situation lies repressed intuition or buried secrets. Unconscious disconnection from inner wisdom shapes everything visible.",
+        "advice": "Address the disconnection. Reconnect to intuition or bring hidden things to light. The guidance is to stop ignoring what you know or hiding what should be known.",
+        "external": "Outside influences involve blocked intuition or hidden information. Someone may be keeping secrets, or external noise drowns out inner wisdom.",
+        "hopes_fears": "You fear losing connection to inner wisdom—and fear what might surface if you truly listen. The secrets and the knowing both frighten.",
+        "hidden_influences": "A hidden factor is repressed intuition or secrets affecting the situation invisibly. Something not conscious plays a larger role than you realize.",
+        "obstacles": "The obstacle is disconnection from inner knowing or something deliberately concealed. The blockage involves what you can't or won't access.",
+        "external_influences": "External forces block intuitive access or involve secrets. The world reflects your disconnection from inner wisdom back to you."
+      }
+    },
+    "Death": {
+      "upright": {
+        "todays_guidance": "Today something ends so something else can begin. Don't resist the transformation—release what's passing. The day asks for surrender to necessary change.",
+        "past": "A necessary ending shaped your journey. Something died—identity, relationship, belief, chapter—and that transformation brought you here. The old had to pass.",
+        "present": "You're mid-transformation now. Something actively ends while something else prepares to be born. This moment is the chrysalis, not the butterfly yet.",
+        "future": "Transformation approaches. What needs to end will end. The path ahead includes necessary death of something—prepare to release rather than grip.",
+        "situation": "The situation involves fundamental transformation. Something must end for something new to live. Metamorphosis, not mere change—deep restructuring.",
+        "action": "Let go. Release what's ending rather than fighting to preserve it. The action required is conscious surrender to transformation already underway.",
+        "outcome": "This leads to complete transformation. What exists now will not exist in the same form. The outcome is rebirth through necessary ending.",
+        "challenge": "The transformation itself is your obstacle. Resistance to necessary ending blocks progress. What you're gripping is what you need to release.",
+        "above": "Your highest possibility is complete transformation. The best outcome involves fully releasing the old so the new can emerge. Aim for total metamorphosis.",
+        "below": "Beneath this situation lies the truth that something must die. Unconsciously you know what needs ending—this hidden knowing shapes everything.",
+        "advice": "Surrender to the transformation. Stop bargaining with the inevitable. The guidance is to release gracefully rather than be dragged through.",
+        "external": "External forces demand transformation. Something or someone outside you insists on ending what's no longer viable. The environment won't let the old survive.",
+        "hopes_fears": "You hope transformation brings rebirth—and fear the death it requires. The ending is both what you need and what terrifies you.",
+        "hidden_influences": "A hidden factor is transformation already underway. Something not visible is ending or preparing to end. The metamorphosis has begun beneath the surface.",
+        "obstacles": "The obstacle is the ending you're resisting. What blocks you is your grip on what's already dying. Transformation stalls because you won't let go.",
+        "external_influences": "External forces insist on transformation. The world demands ending and rebirth, whether you feel ready or not."
+      },
+      "reversed": {
+        "todays_guidance": "Today notice where transformation stalls. Something won't die, or you won't let it. The day asks for honest look at what you're keeping alive past its time.",
+        "past": "A transformation that didn't complete shapes your present. Something should have ended but lingered. That incomplete death still haunts.",
+        "present": "Right now transformation stalls. Something dying won't die, or you're blocking change that needs to happen. The chrysalis isn't dissolving.",
+        "future": "Ahead lies stalled transformation or prolonged endings. What's coming involves finally completing what wouldn't finish, or continuing to stagnate.",
+        "situation": "The situation involves blocked or incomplete transformation. Something should have ended but hasn't. Stagnation from resisted change.",
+        "action": "Complete the ending or stop resisting it. The action needed addresses whatever transformation you've blocked. Let what's dying finally die.",
+        "outcome": "This leads to consequences of blocked transformation. The result shows what happens when necessary endings don't complete—stagnation or forced eventual change.",
+        "challenge": "The challenge is completing transformation you've resisted. What blocks you is the ending you keep postponing. The half-death prevents rebirth.",
+        "above": "Your best hope involves finally completing the transformation. The highest outcome requires letting what should have ended finally end.",
+        "below": "Beneath this situation lies fear of completing the transformation. Unconsciously you're holding onto what needs to die. This resistance shapes everything.",
+        "advice": "Finish it. Let the ending complete. The guidance is to stop prolonging what should have already passed. The half-alive must become fully dead to become fully alive again.",
+        "external": "Outside influences reflect stalled transformation. Someone or something in your environment models incomplete endings or blocks necessary change.",
+        "hopes_fears": "You fear both the ending and the endless dying. You hope to avoid transformation—but also fear staying stuck in its incomplete form.",
+        "hidden_influences": "A hidden factor is blocked transformation. Something not visible involves stalled change or resistance to necessary endings that shapes the situation.",
+        "obstacles": "The obstacle is the transformation you won't complete. What blocks you is your refusal to let something finally die. Partial change stagnates.",
+        "external_influences": "External forces reflect or reinforce blocked transformation. The world mirrors your resistance back to you, or actively prevents needed endings."
+      }
+    },
+    "The Star": {
+      "upright": {
+        "todays_guidance": "Today brings healing and hope. Trust that renewal is possible. Pour yourself out without fearing depletion—you'll be replenished. The day invites faith.",
+        "past": "Hope and healing shaped your journey. A time when renewal seemed possible, when faith was restored. That light, however brief, left its mark.",
+        "present": "Right now hope is available if you'll receive it. Healing energy surrounds this moment. Renewal and faith are present—not just coming, but here.",
+        "future": "Healing approaches. After darkness or upheaval, light returns. What's coming brings renewed faith, inspiration, authentic connection to meaning.",
+        "situation": "The situation holds hope and potential for healing. Renewal is possible here. Despite whatever darkness preceded, light exists in this.",
+        "action": "Pour yourself out in faith. Trust the process of healing. The action needed is vulnerable openness—giving without fearing depletion.",
+        "outcome": "This leads to renewal and restored faith. The outcome is healing—not just surviving the dark but finding light beyond it.",
+        "challenge": "The challenge is accepting hope. Healing is available but you struggle to believe in it. Cynicism or past wounds block renewal.",
+        "above": "Your highest possibility is complete renewal. The best outcome involves fully embracing hope and healing. Aim for the Star's serene faith.",
+        "below": "Beneath this situation lies deep need for hope and healing. Unconsciously you're seeking renewal—this hidden longing shapes everything.",
+        "advice": "Trust the light. Accept healing. The guidance is to believe in renewal even when it seems fragile. Pour yourself out and trust replenishment.",
+        "external": "Outside influences offer hope and healing. Someone or something in your environment carries the Star's energy—a source of renewal.",
+        "hopes_fears": "You hope for healing and renewed faith—and fear it won't come, or won't last. Hope itself feels vulnerable.",
+        "hidden_influences": "A hidden factor is healing already underway. Something not visible involves renewal working beneath the surface. Hope exists where you don't see it.",
+        "obstacles": "The obstacle is blocked hope. What blocks you is difficulty believing in healing or receiving it. The light is there; you're not looking at it.",
+        "external_influences": "External forces offer renewal and hope. The world provides healing if you'll accept it."
+      },
+      "reversed": {
+        "todays_guidance": "Today notice where hope feels blocked. Despair, disconnection, or lost faith—name it honestly. The day asks where you've stopped believing in renewal.",
+        "past": "Lost hope or blocked healing shaped your path. A time when faith collapsed or renewal felt impossible. That darkness left its mark.",
+        "present": "Right now hope is hard to access. Despair, disconnection from meaning, or lost faith characterizes this moment. The light exists but you can't see it.",
+        "future": "Ahead lies reckoning with lost hope. What's coming involves either finding faith again or sinking deeper into disconnection. The choice approaches.",
+        "situation": "The situation involves blocked hope or lost faith. Healing available but not received. Despair or cynicism shapes the landscape.",
+        "action": "Address the despair. Seek what's blocking hope. The action needed is honest acknowledgment of lost faith—not false positivity, but real reckoning.",
+        "outcome": "This leads to consequences of blocked hope. The result shows what happens when healing is refused or faith collapses.",
+        "challenge": "The challenge is lost hope blocking everything else. Despair or cynicism is the obstacle. What you've stopped believing in is what you need.",
+        "above": "Your best hope is recovering hope. The highest outcome involves finding your way back to faith and healing. Aim for renewed belief.",
+        "below": "Beneath this situation lies buried despair. Unconsciously, you've lost hope—this hidden loss of faith shapes everything visible.",
+        "advice": "Acknowledge the despair, then look for light anyway. The guidance is neither denial nor wallowing—honest reckoning followed by renewed search for hope.",
+        "external": "Outside influences reflect or reinforce lost hope. Someone or something in your environment models despair or blocks access to healing.",
+        "hopes_fears": "You fear hope is lost forever—and fear finding it only to lose it again. Faith feels too dangerous to reach for.",
+        "hidden_influences": "A hidden factor is despair affecting the situation. Something not visible involves lost faith or blocked healing shaping outcomes.",
+        "obstacles": "The obstacle is despair itself. What blocks you is lost hope or inability to believe in renewal. The light exists; you've turned away from it.",
+        "external_influences": "External forces reflect or reinforce disconnection from hope. The world mirrors your despair or actively blocks healing."
+      }
+    }
+  }
+}
