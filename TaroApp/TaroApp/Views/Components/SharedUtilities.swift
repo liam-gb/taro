@@ -1,7 +1,6 @@
 import SwiftUI
 
-// MARK: - Haptic Feedback Utility
-/// Centralized haptic feedback to avoid code duplication
+// MARK: - Haptics
 
 struct Haptics {
     static func impact(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
@@ -12,17 +11,15 @@ struct Haptics {
         UINotificationFeedbackGenerator().notificationOccurred(type)
     }
 
-    // Convenience methods
     static func light() { impact(.light) }
     static func medium() { impact(.medium) }
     static func soft() { impact(.soft) }
     static func success() { notification(.success) }
 }
 
-// MARK: - Card Name Abbreviation
+// MARK: - String Extensions
 
 extension String {
-    /// Abbreviates a card name to first two words for smaller card sizes
     func abbreviatedCardName(forSmallSize: Bool) -> String {
         guard forSmallSize else { return self }
         let words = self.split(separator: " ")

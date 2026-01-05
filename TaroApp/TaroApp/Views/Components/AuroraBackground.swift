@@ -1,14 +1,11 @@
 import SwiftUI
 
 // MARK: - Aurora Background
-// Animated gradient background with slow-moving orbs
-// Creates the mystical "Liquid Glass" atmosphere
 
 struct AuroraBackground: View {
     var showRibbons: Bool = false
     @State private var animateOrbs = false
 
-    // Orb configuration to avoid duplication
     private struct OrbConfig {
         let color: Color
         let sizeMultiplier: CGFloat
@@ -34,14 +31,12 @@ struct AuroraBackground: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Base gradient background
                 LinearGradient(
                     colors: [.deepSpace, .deepSpaceLight, .deepSpace],
                     startPoint: .top,
                     endPoint: .bottom
                 )
 
-                // Aurora orbs (generated from config)
                 ForEach(0..<orbConfigs.count, id: \.self) { index in
                     let config = orbConfigs[index]
                     AuroraOrb(
@@ -56,7 +51,6 @@ struct AuroraBackground: View {
                     )
                 }
 
-                // Optional ribbons
                 if showRibbons {
                     auroraRibbons(in: geometry)
                 }
@@ -79,7 +73,8 @@ struct AuroraBackground: View {
     }
 }
 
-// MARK: - Aurora Orb Component
+// MARK: - Aurora Orb
+
 struct AuroraOrb: View {
     let color: Color
     let size: CGFloat
@@ -118,10 +113,7 @@ struct AuroraOrb: View {
                 if newValue {
                     startAnimationIfNeeded()
                 } else {
-                    // Stop animation by resetting phase without animation
-                    withAnimation(.linear(duration: 0.1)) {
-                        phase = 0
-                    }
+                    withAnimation(.linear(duration: 0.1)) { phase = 0 }
                 }
             }
     }
@@ -156,7 +148,7 @@ struct AuroraOrb: View {
 }
 
 // MARK: - Aurora Ribbon
-// Optional: Horizontal flowing aurora ribbons for additional effect
+
 struct AuroraRibbon: View {
     let yPosition: CGFloat
     let rotation: Double
@@ -218,8 +210,8 @@ struct AuroraRibbon: View {
     }
 }
 
-// MARK: - EnhancedAuroraBackground (Deprecated - use AuroraBackground(showRibbons: true))
-/// @available(*, deprecated, message: "Use AuroraBackground(showRibbons: true) instead")
+// MARK: - Legacy Alias
+
 typealias EnhancedAuroraBackground = AuroraBackground
 
 // MARK: - Preview
