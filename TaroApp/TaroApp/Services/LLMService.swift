@@ -23,6 +23,7 @@ final class LLMService: ObservableObject {
 
     private var currentTask: Task<Void, Never>?
     private let inferenceQueue = DispatchQueue(label: "com.taro.llm.inference", qos: .userInitiated)
+    private var llamaContext: LlamaContext?
 
     // MARK: - Errors
 
@@ -71,11 +72,34 @@ final class LLMService: ObservableObject {
 
         do {
             try await modelManager.loadModel()
+
+            // Initialize LlamaContext with the loaded model
+            if let modelURL = modelManager.getLoadedModelURL() {
+                try await initializeLlamaContext(modelPath: modelURL.path)
+            }
+
             isModelReady = true
         } catch {
             print("LLMService: Failed to load model: \(error)")
             currentError = .generationFailed(error.localizedDescription)
         }
+    }
+
+    /// Initialize the llama.cpp context with the model file
+    private func initializeLlamaContext(modelPath: String) async throws {
+        // Run context initialization off main thread
+        llamaContext = try await Task.detached(priority: .userInitiated) {
+            try LlamaContext(modelPath: modelPath, config: .mobile)
+        }.value
+        print("LLMService: LlamaContext initialized successfully")
+    }
+
+    /// Unload the model and clean up resources
+    func unloadModel() {
+        llamaContext?.cleanup()
+        llamaContext = nil
+        isModelReady = false
+        print("LLMService: Model unloaded")
     }
 
     /// Generate a tarot reading interpretation
@@ -125,6 +149,7 @@ final class LLMService: ObservableObject {
     func cancelGeneration() {
         currentTask?.cancel()
         currentTask = nil
+        llamaContext?.cancel()
         isGenerating = false
     }
 
@@ -168,13 +193,22 @@ final class LLMService: ObservableObject {
             style: style
         )
 
-        // For now, simulate streaming generation
-        // In actual implementation, this would use llama.cpp inference
-        try await simulateGeneration(
-            prompt: prompt,
-            config: style.config,
-            continuation: continuation
-        )
+        // Use real llama.cpp inference if context is available, otherwise fallback to simulation
+        if let context = llamaContext {
+            try await performLlamaGeneration(
+                context: context,
+                prompt: prompt,
+                config: style.config,
+                continuation: continuation
+            )
+        } else {
+            // Fallback to simulated generation for development/testing
+            try await simulateGeneration(
+                prompt: prompt,
+                config: style.config,
+                continuation: continuation
+            )
+        }
     }
 
     // MARK: - Prompt Building
@@ -290,6 +324,37 @@ final class LLMService: ObservableObject {
 
         *This reading was generated locally on your device, ensuring your personal reflections remain private.*
         """
+    }
+
+    // MARK: - Real Llama Generation
+
+    /// Perform actual llama.cpp inference
+    private func performLlamaGeneration(
+        context: LlamaContext,
+        prompt: String,
+        config: GenerationConfig,
+        continuation: AsyncThrowingStream<String, Error>.Continuation
+    ) async throws {
+        // Convert GenerationConfig to GenerationParameters
+        let params = GenerationParameters(
+            temperature: config.temperature,
+            topP: config.topP,
+            topK: 40,
+            repeatPenalty: config.repetitionPenalty,
+            maxTokens: Int32(config.maxTokens)
+        )
+
+        do {
+            try await context.generate(prompt: prompt, params: params) { token in
+                continuation.yield(token)
+            }
+        } catch LlamaError.cancelled {
+            throw LLMError.cancelled
+        } catch LlamaError.contextOverflow {
+            throw LLMError.contextOverflow
+        } catch {
+            throw LLMError.generationFailed(error.localizedDescription)
+        }
     }
 }
 

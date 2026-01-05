@@ -148,10 +148,30 @@ struct ReadingInterpretation {
 struct ElementalFlow {
     let elements: [Element]
     let summary: String
+    let dominantElement: Element?
 
     init(from drawnCards: [DrawnCard]) {
         self.elements = drawnCards.map { $0.card.element }
+        self.dominantElement = Self.findDominantElement(elements: elements)
         self.summary = Self.generateSummary(elements: elements)
+    }
+
+    private static func findDominantElement(elements: [Element]) -> Element? {
+        guard !elements.isEmpty else { return nil }
+
+        var counts: [Element: Int] = [:]
+        for element in elements {
+            counts[element, default: 0] += 1
+        }
+
+        if let dominant = counts.max(by: { $0.value < $1.value }) {
+            // Only return dominant if it's more than half the elements
+            if dominant.value > elements.count / 2 {
+                return dominant.key
+            }
+        }
+
+        return nil
     }
 
     private static func generateSummary(elements: [Element]) -> String {

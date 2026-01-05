@@ -11,6 +11,8 @@ struct GeneratingView: View {
     @State private var streamedText: String = ""
     @State private var generationError: String?
     @State private var showDeviceUnsupported = false
+    @State private var showCopyPromptSheet = false
+    @State private var externalPrompt: String = ""
 
     var body: some View {
         ZStack {
@@ -89,17 +91,9 @@ struct GeneratingView: View {
                     }
                     .padding(.bottom, TaroSpacing.xl)
                 } else if !DeviceCapability.supportsLocalLLM {
-                    VStack(spacing: TaroSpacing.sm) {
-                        CompactModelStatusView(modelManager: modelManager)
-
-                        GlassButton("Continue", style: .primary) {
-                            // Use template-based reading for unsupported devices
-                            let interpretation = generateFallbackInterpretation()
-                            readingSession.setInterpretation(interpretation)
-                        }
-                    }
-                    .padding(.horizontal, TaroSpacing.xl)
-                    .padding(.bottom, TaroSpacing.xl)
+                    unsupportedDeviceActions
+                        .padding(.horizontal, TaroSpacing.xl)
+                        .padding(.bottom, TaroSpacing.xl)
                 }
             }
         }
@@ -110,6 +104,9 @@ struct GeneratingView: View {
         }
         .sheet(isPresented: $showDeviceUnsupported) {
             DeviceUnsupportedView()
+        }
+        .sheet(isPresented: $showCopyPromptSheet) {
+            CopyPromptSheet(prompt: externalPrompt, isPresented: $showCopyPromptSheet)
         }
     }
 
@@ -206,6 +203,38 @@ struct GeneratingView: View {
         .padding(.horizontal, TaroSpacing.lg)
     }
 
+    // MARK: - Unsupported Device Actions
+
+    private var unsupportedDeviceActions: some View {
+        VStack(spacing: TaroSpacing.md) {
+            // Device status
+            GlassPanel(style: .card, cornerRadius: TaroRadius.lg, padding: TaroSpacing.md) {
+                VStack(spacing: TaroSpacing.sm) {
+                    HStack(spacing: TaroSpacing.xs) {
+                        Image(systemName: "iphone.slash")
+                            .font(.system(size: 16))
+                            .foregroundColor(.mysticPink)
+
+                        Text("On-Device AI Unavailable")
+                            .font(TaroTypography.caption)
+                            .foregroundColor(.textSecondary)
+                    }
+
+                    Text("Your device doesn't support on-device AI readings. Copy the prompt below to use with your preferred AI assistant.")
+                        .font(TaroTypography.caption2)
+                        .foregroundColor(.textMuted)
+                        .multilineTextAlignment(.center)
+                }
+            }
+
+            // Copy prompt button
+            GlowingButton("Copy Prompt for AI Chat", icon: "doc.on.doc") {
+                externalPrompt = generateExternalAIPrompt()
+                showCopyPromptSheet = true
+            }
+        }
+    }
+
     private func errorView(_ error: String) -> some View {
         GlassPanel(
             style: .card,
@@ -246,22 +275,18 @@ struct GeneratingView: View {
                 await generateWithLLM()
             }
         } else if !DeviceCapability.supportsLocalLLM {
-            // Device not supported - use fallback after brief delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                let interpretation = generateFallbackInterpretation()
-                readingSession.setInterpretation(interpretation)
-            }
+            // Device not supported - don't auto-generate, let user choose action
+            // The unsupportedDeviceActions UI will be shown automatically
+            return
         } else {
-            // Model not ready - wait and retry or use fallback
+            // Model not ready - wait and retry
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 if modelManager.state.isReady {
                     Task {
                         await generateWithLLM()
                     }
-                } else {
-                    let interpretation = generateFallbackInterpretation()
-                    readingSession.setInterpretation(interpretation)
                 }
+                // If model still not ready, user can see status and take action
             }
         }
     }
@@ -334,6 +359,70 @@ struct GeneratingView: View {
         text += "*Take time to reflect on these messages. The cards offer guidance, but your intuition is the key to unlocking their deeper meaning.*"
 
         return text
+    }
+
+    // MARK: - External AI Prompt Generation
+
+    /// Generates a comprehensive prompt for external AI services
+    /// Includes all card details, positions, meanings, combinations, and elemental balance
+    private func generateExternalAIPrompt() -> String {
+        let dataService = DataService.shared
+        let reading = dataService.interpretation(for: readingSession.drawnCards)
+
+        var prompt = "I'm seeking guidance from a tarot reading. "
+
+        // Add user's question if provided
+        if !readingSession.question.isEmpty {
+            prompt += "My question is: \"\(readingSession.question)\"\n\n"
+        } else {
+            prompt += "Please interpret the following cards for me.\n\n"
+        }
+
+        prompt += "Here are the cards I drew:\n\n"
+
+        // Card details with positions, names, orientation, keywords, and meanings
+        for (index, interpretation) in reading.cardInterpretations.enumerated() {
+            let card = interpretation.drawnCard
+            let orientation = card.isReversed ? "Reversed" : "Upright"
+
+            prompt += "\(index + 1). \(card.position.name): \(card.card.name) (\(orientation))\n"
+            prompt += "   Keywords: \(card.card.keywords.joined(separator: ", "))\n"
+            prompt += "   Base meaning: \(interpretation.baseMeaning)\n"
+
+            if let modifier = interpretation.positionModifier {
+                prompt += "   In this position: \(modifier)\n"
+            }
+            prompt += "\n"
+        }
+
+        // Card combinations if any
+        if !reading.combinations.isEmpty {
+            prompt += "Notable Card Combinations:\n"
+            for combo in reading.combinations {
+                let cards = combo.cards.joined(separator: " & ")
+                prompt += "- \(cards): \(combo.meaning)\n"
+            }
+            prompt += "\n"
+        }
+
+        // Elemental balance
+        let elements = readingSession.drawnCards.map { $0.card.element.rawValue.capitalized }
+        let elementFlow = elements.joined(separator: " -> ")
+        prompt += "Elemental Flow: \(elementFlow)\n"
+        prompt += "\(reading.elementalFlow.summary)\n\n"
+
+        // Request for interpretation
+        prompt += """
+        Please provide a cohesive interpretation of this tarot reading. Weave together the individual card meanings into a narrative that addresses my question or situation. Consider:
+        - How each card's position influences its meaning
+        - The relationships between the cards
+        - The elemental energies present
+        - Practical guidance I can apply
+
+        Be insightful, warm, and accessible in your interpretation.
+        """
+
+        return prompt
     }
 
     // MARK: - Animations
