@@ -79,21 +79,24 @@ final class PromptAssembler {
 
     // MARK: - Private Helpers
 
+    /// Returns the best available snippet for a drawn card
+    private func snippet(for card: DrawnCard, fallback: String = "") -> String {
+        dataService.positionModifier(
+            for: card.card.name,
+            position: card.position.slug,
+            isReversed: card.isReversed
+        ) ?? dataService.baseMeaning(
+            for: card.card.name,
+            isReversed: card.isReversed
+        ) ?? fallback
+    }
+
     /// Builds card context using pre-calculated position-specific snippets
     private func buildCardContext(for drawnCards: [DrawnCard]) -> String {
         drawnCards.map { card in
-            let snippet = dataService.positionModifier(
-                for: card.card.name,
-                position: card.position.slug,
-                isReversed: card.isReversed
-            ) ?? dataService.baseMeaning(
-                for: card.card.name,
-                isReversed: card.isReversed
-            ) ?? "A card of significance in your reading."
-
-            return """
+            """
             \(card.position.name.uppercased()) - \(card.card.name) (\(card.orientationText)):
-            "\(snippet)"
+            "\(snippet(for: card, fallback: "A card of significance in your reading."))"
 
             """
         }.joined()
@@ -196,12 +199,6 @@ final class PromptAssembler {
 extension PromptAssembler {
     /// Generates a minimal prompt for quick readings (single card)
     func assembleQuickPrompt(for card: DrawnCard, question: String?) -> String {
-        let snippet = dataService.positionModifier(
-            for: card.card.name,
-            position: card.position.slug,
-            isReversed: card.isReversed
-        ) ?? dataService.baseMeaning(for: card.card.name, isReversed: card.isReversed) ?? ""
-
         let questionText = question.map { "Question: \"\($0)\"\n" } ?? ""
 
         return """
@@ -209,7 +206,7 @@ extension PromptAssembler {
         You are giving a brief tarot insight. Be warm and direct.<|end|>
         <|user|>
         \(questionText)\(card.card.name) (\(card.orientationText)) as \(card.position.name):
-        \(snippet)
+        \(snippet(for: card))
 
         Give a concise 2-3 sentence interpretation.<|end|>
         <|assistant|>

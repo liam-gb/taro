@@ -24,24 +24,15 @@ enum MoonPhaseCalculator {
 
     private static let synodicMonth: Double = 29.53058867
 
-    private static let referenceNewMoon: Date = {
-        var components = DateComponents()
-        components.year = 2024
-        components.month = 12
-        components.day = 30
-        components.hour = 22
-        components.minute = 27
-        components.timeZone = TimeZone(identifier: "UTC")
-        return Calendar.current.date(from: components)!
-    }()
+    // Reference new moon: December 30, 2024 22:27 UTC (Unix timestamp)
+    private static let referenceNewMoon = Date(timeIntervalSince1970: 1735594020)
 
     static func current(for date: Date = Date()) -> MoonPhase {
         let daysSinceReference = date.timeIntervalSince(referenceNewMoon) / 86400
-        let phaseWidth = synodicMonth / 8
         var lunarAge = daysSinceReference.truncatingRemainder(dividingBy: synodicMonth)
         if lunarAge < 0 { lunarAge += synodicMonth }
-        let centeredAge = lunarAge + (phaseWidth / 2)
-        let phaseIndex = Int((centeredAge / synodicMonth) * 8) % 8
+        // Center each phase window so transitions occur at phase midpoints
+        let phaseIndex = Int((lunarAge + synodicMonth / 16) / synodicMonth * 8) % 8
         return phases[phaseIndex]
     }
 }
