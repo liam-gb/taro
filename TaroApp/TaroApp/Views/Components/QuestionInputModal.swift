@@ -410,31 +410,23 @@ struct QuestionInputModal: View {
     // MARK: - Animations
 
     private func animateIn() {
-        // Start shimmer animation
-        withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) {
-            shimmerPhase = 1
-        }
-
-        // Background fade
-        withAnimation(.easeOut(duration: 0.3)) {
-            backgroundOpacity = 1
-        }
-
-        // Modal entrance
+        withAnimation(.linear(duration: 4).repeatForever(autoreverses: false)) { shimmerPhase = 1 }
+        withAnimation(.easeOut(duration: 0.3)) { backgroundOpacity = 1 }
         withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) {
             modalScale = 1
             modalOpacity = 1
             contentOffset = 0
         }
 
-        // Start orb animations after modal appears
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
             orbsAnimating = true
         }
     }
 
     private func animateOut(completion: @escaping () -> Void) {
-        // Modal exit
+        orbsAnimating = false
         withAnimation(.easeIn(duration: 0.25)) {
             modalScale = 0.9
             modalOpacity = 0
@@ -442,7 +434,8 @@ struct QuestionInputModal: View {
             backgroundOpacity = 0
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(250))
             isPresented = false
             completion()
         }

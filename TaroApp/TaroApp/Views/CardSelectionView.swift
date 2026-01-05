@@ -63,10 +63,11 @@ struct CardSelectionView: View {
         .navigationBarHidden(true)
         .onAppear {
             initializeCardStates()
-            // Auto-expand fan after a short delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                expandFan()
-            }
+        }
+        .task {
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
+            expandFan()
         }
     }
 
@@ -218,27 +219,22 @@ struct CardSelectionView: View {
             cardStates[index].zIndex = 100
         }
 
-        // After lift, fly away
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // Sequential animation using Task - will be cancelled if view disappears
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
+
             withAnimation(.easeIn(duration: 0.4)) {
                 flyAwayCards.insert(index)
             }
-
             selectedIndices.insert(index)
+            readingSession.drawCard(deck[index % deck.count], at: position, reversed: Bool.random())
 
-            // Get the card and add to reading
-            let card = deck[index % deck.count]
-            let isReversed = Bool.random()
-            readingSession.drawCard(card, at: position, reversed: isReversed)
+            try? await Task.sleep(for: .milliseconds(400))
+            guard !Task.isCancelled else { return }
 
-            // Reset animation state
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                selectedCardAnimating = nil
-
-                // Success haptic
-                let notificationGenerator = UINotificationFeedbackGenerator()
-                notificationGenerator.notificationOccurred(.success)
-            }
+            selectedCardAnimating = nil
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
         }
     }
 }

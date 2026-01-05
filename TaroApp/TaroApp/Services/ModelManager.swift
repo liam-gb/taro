@@ -97,10 +97,17 @@ final class ModelManager: ObservableObject {
     private var modelURL: URL?
     private var isModelLoaded = false
     private let loadQueue = DispatchQueue(label: "com.taro.modelmanager", qos: .userInitiated)
+    private var memoryWarningObserver: NSObjectProtocol?
 
     // MARK: - Initialization
 
     private init() {}
+
+    deinit {
+        if let observer = memoryWarningObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+    }
 
     // MARK: - Public API
 
@@ -315,7 +322,12 @@ final class ModelManager: ObservableObject {
 extension ModelManager {
     /// Register for memory pressure notifications
     func registerForMemoryWarnings() {
-        NotificationCenter.default.addObserver(
+        // Remove existing observer if any to prevent duplicates
+        if let existingObserver = memoryWarningObserver {
+            NotificationCenter.default.removeObserver(existingObserver)
+        }
+
+        memoryWarningObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.didReceiveMemoryWarningNotification,
             object: nil,
             queue: .main
