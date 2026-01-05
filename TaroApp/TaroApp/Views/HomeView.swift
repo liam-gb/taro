@@ -10,7 +10,6 @@ struct HomeView: View {
     @State private var subtitleOpacity: Double = 0
     @State private var cardsAppeared: Bool = false
     @State private var headerGlowPulse: Bool = false
-    @State private var entranceTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -33,12 +32,8 @@ struct HomeView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear {
-            animateEntrance()
-        }
-        .onDisappear {
-            entranceTask?.cancel()
-            headerGlowPulse = false
+        .task {
+            await animateEntrance()
         }
         .questionInputModal(
             isPresented: $showQuestionModal,
@@ -252,30 +247,17 @@ struct HomeView: View {
 
     // MARK: - Animations
 
-    private func animateEntrance() {
-        entranceTask?.cancel()
+    private func animateEntrance() async {
+        withAnimation(.easeOut(duration: 0.6)) { titleOpacity = 1 }
+        withAnimation(.easeOut(duration: 0.5).delay(0.2)) { subtitleOpacity = 1 }
 
-        // Title fade in
-        withAnimation(.easeOut(duration: 0.6)) {
-            titleOpacity = 1
-        }
+        try? await Task.sleep(for: .milliseconds(100))
+        guard !Task.isCancelled else { return }
+        cardsAppeared = true
 
-        // Subtitle and elements
-        withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
-            subtitleOpacity = 1
-        }
-
-        entranceTask = Task { @MainActor in
-            // Cards appear after 0.1s
-            try? await Task.sleep(nanoseconds: 100_000_000)
-            guard !Task.isCancelled else { return }
-            cardsAppeared = true
-
-            // Start glow pulse after 0.4s more
-            try? await Task.sleep(nanoseconds: 400_000_000)
-            guard !Task.isCancelled else { return }
-            headerGlowPulse = true
-        }
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !Task.isCancelled else { return }
+        headerGlowPulse = true
     }
 }
 

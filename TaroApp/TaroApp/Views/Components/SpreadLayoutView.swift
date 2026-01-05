@@ -14,7 +14,6 @@ struct SpreadLayoutView: View {
 
     @State private var cardStates: [CardAnimationState] = []
     @State private var hasAnimated: Bool = false
-    @State private var animationTask: Task<Void, Never>?
 
     var body: some View {
         GeometryReader { geometry in
@@ -36,13 +35,10 @@ struct SpreadLayoutView: View {
         }
         .onAppear {
             initializeCardStates()
-            if animateIn && !hasAnimated {
-                animateCardsSequentially()
-            }
         }
-        .onDisappear {
-            animationTask?.cancel()
-            animationTask = nil
+        .task(id: animateIn) {
+            guard animateIn && !hasAnimated else { return }
+            await animateCardsSequentially()
         }
     }
 
@@ -352,64 +348,52 @@ struct SpreadLayoutView: View {
         }
     }
 
-    private func animateCardsSequentially() {
+    private func animateCardsSequentially() async {
         hasAnimated = true
-        animationTask?.cancel()
 
-        animationTask = Task { @MainActor in
-            for index in 0..<drawnCards.count {
-                guard !Task.isCancelled else { return }
+        for index in 0..<drawnCards.count {
+            try? await Task.sleep(for: .milliseconds(150 * index))
+            guard !Task.isCancelled else { return }
 
-                let delayNanos = UInt64(Double(index) * 0.15 * 1_000_000_000)
-                try? await Task.sleep(nanoseconds: delayNanos)
-                guard !Task.isCancelled else { return }
-
-                // Card appears
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].isVisible = true
-                        cardStates[index].opacity = 1
-                        cardStates[index].scale = 1
-                        cardStates[index].offset = .zero
-                    }
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].isVisible = true
+                    cardStates[index].opacity = 1
+                    cardStates[index].scale = 1
+                    cardStates[index].offset = .zero
                 }
+            }
 
-                // Glow pulses in after 0.2s
-                try? await Task.sleep(nanoseconds: 200_000_000)
-                guard !Task.isCancelled else { return }
-                withAnimation(.easeIn(duration: 0.3)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].glowOpacity = 0.8
-                    }
+            try? await Task.sleep(for: .milliseconds(200))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeIn(duration: 0.3)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].glowOpacity = 0.8
                 }
+            }
 
-                // Card flips after 0.2s more
-                try? await Task.sleep(nanoseconds: 200_000_000)
-                guard !Task.isCancelled else { return }
-                withAnimation(.easeInOut(duration: 0.4)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].isFlipped = true
-                    }
+            try? await Task.sleep(for: .milliseconds(200))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.4)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].isFlipped = true
                 }
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred()
+            }
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
-                // Glow settles after 0.3s
-                try? await Task.sleep(nanoseconds: 300_000_000)
-                guard !Task.isCancelled else { return }
-                withAnimation(.easeOut(duration: 0.5)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].glowOpacity = 0.3
-                    }
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.5)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].glowOpacity = 0.3
                 }
+            }
 
-                // Label fades in after 0.1s
-                try? await Task.sleep(nanoseconds: 100_000_000)
-                guard !Task.isCancelled else { return }
-                withAnimation(.easeIn(duration: 0.3)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].labelOpacity = 1
-                    }
+            try? await Task.sleep(for: .milliseconds(100))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeIn(duration: 0.3)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].labelOpacity = 1
                 }
             }
         }

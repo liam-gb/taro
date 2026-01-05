@@ -13,7 +13,6 @@ struct GeneratingView: View {
     @State private var showDeviceUnsupported = false
     @State private var showCopyPromptSheet = false
     @State private var externalPrompt: String = ""
-    @State private var generationTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -101,10 +100,9 @@ struct GeneratingView: View {
         .navigationBarHidden(true)
         .onAppear {
             startAnimations()
-            startGeneration()
         }
-        .onDisappear {
-            generationTask?.cancel()
+        .task {
+            await startGeneration()
         }
         .sheet(isPresented: $showDeviceUnsupported) {
             DeviceUnsupportedView()
@@ -272,28 +270,16 @@ struct GeneratingView: View {
 
     // MARK: - Generation
 
-    private func startGeneration() {
-        generationTask?.cancel()
+    private func startGeneration() async {
+        guard DeviceCapability.supportsLocalLLM else { return }
 
-        // Check if LLM is available
-        if DeviceCapability.supportsLocalLLM && modelManager.state.isReady {
-            generationTask = Task { @MainActor in
-                await generateWithLLM()
-            }
-        } else if !DeviceCapability.supportsLocalLLM {
-            // Device not supported - don't auto-generate, let user choose action
-            // The unsupportedDeviceActions UI will be shown automatically
-            return
+        if modelManager.state.isReady {
+            await generateWithLLM()
         } else {
-            // Model not ready - wait and retry using Task
-            generationTask = Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
-                guard !Task.isCancelled else { return }
-                if modelManager.state.isReady {
-                    await generateWithLLM()
-                }
-                // If model still not ready, user can see status and take action
-            }
+            // Model not ready - wait and retry
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled, modelManager.state.isReady else { return }
+            await generateWithLLM()
         }
     }
 

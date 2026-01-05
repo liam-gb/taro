@@ -8,8 +8,6 @@ struct CardSelectionView: View {
     @State private var isFanExpanded = false
     @State private var selectedCardAnimating: Int? = nil
     @State private var flyAwayCards: Set<Int> = []
-    @State private var expandFanTask: Task<Void, Never>?
-    @State private var selectionTask: Task<Void, Never>?
 
     // Fan configuration
     private let visibleCardCount = 15
@@ -65,16 +63,11 @@ struct CardSelectionView: View {
         .navigationBarHidden(true)
         .onAppear {
             initializeCardStates()
-            // Auto-expand fan after a short delay
-            expandFanTask = Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 500_000_000)
-                guard !Task.isCancelled else { return }
-                expandFan()
-            }
         }
-        .onDisappear {
-            expandFanTask?.cancel()
-            selectionTask?.cancel()
+        .task {
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
+            expandFan()
         }
     }
 
@@ -226,33 +219,22 @@ struct CardSelectionView: View {
             cardStates[index].zIndex = 100
         }
 
-        // Use Task for sequential animations instead of nested DispatchQueue
-        selectionTask?.cancel()
-        selectionTask = Task { @MainActor in
-            // Wait for lift animation
-            try? await Task.sleep(nanoseconds: 300_000_000)
+        // Sequential animation using Task - will be cancelled if view disappears
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
 
             withAnimation(.easeIn(duration: 0.4)) {
                 flyAwayCards.insert(index)
             }
-
             selectedIndices.insert(index)
+            readingSession.drawCard(deck[index % deck.count], at: position, reversed: Bool.random())
 
-            // Get the card and add to reading
-            let card = deck[index % deck.count]
-            let isReversed = Bool.random()
-            readingSession.drawCard(card, at: position, reversed: isReversed)
-
-            // Wait for fly away animation
-            try? await Task.sleep(nanoseconds: 400_000_000)
+            try? await Task.sleep(for: .milliseconds(400))
             guard !Task.isCancelled else { return }
 
             selectedCardAnimating = nil
-
-            // Success haptic
-            let notificationGenerator = UINotificationFeedbackGenerator()
-            notificationGenerator.notificationOccurred(.success)
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
         }
     }
 }
