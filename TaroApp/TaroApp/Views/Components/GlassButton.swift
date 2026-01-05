@@ -262,21 +262,16 @@ struct GlassButton: View {
     // MARK: - Actions
     private func handleTap() {
         // Haptic feedback
-        let impact = UIImpactFeedbackGenerator(style: hapticStyle)
-        impact.impactOccurred()
-
-        action()
-    }
-
-    private var hapticStyle: UIImpactFeedbackGenerator.FeedbackStyle {
         switch style {
         case .primary:
-            return .medium
+            Haptics.medium()
         case .secondary, .pill:
-            return .light
+            Haptics.light()
         case .text, .icon:
-            return .soft
+            Haptics.soft()
         }
+
+        action()
     }
 }
 
@@ -384,8 +379,7 @@ struct GlowingButton: View {
     }
 
     private func handleTap() {
-        let impact = UIImpactFeedbackGenerator(style: .medium)
-        impact.impactOccurred()
+        Haptics.medium()
         action()
     }
 }
@@ -470,8 +464,7 @@ struct TogglePillButton: View {
     }
 
     private func handleTap() {
-        let impact = UIImpactFeedbackGenerator(style: .light)
-        impact.impactOccurred()
+        Haptics.light()
         isSelected.toggle()
     }
 }
@@ -529,8 +522,7 @@ struct IconButton: View {
     }
 
     private func handleTap() {
-        let impact = UIImpactFeedbackGenerator(style: .soft)
-        impact.impactOccurred()
+        Haptics.soft()
         action()
     }
 }

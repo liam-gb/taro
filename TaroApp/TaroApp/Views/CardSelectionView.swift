@@ -168,8 +168,7 @@ struct CardSelectionView: View {
         guard !isFanExpanded else { return }
 
         isFanExpanded = true
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        Haptics.medium()
 
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
             for index in cardStates.indices {
@@ -207,8 +206,7 @@ struct CardSelectionView: View {
         guard selectedCardAnimating == nil else { return }
 
         // Haptic feedback
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        Haptics.medium()
 
         // Mark as animating
         selectedCardAnimating = index
@@ -234,7 +232,7 @@ struct CardSelectionView: View {
             guard !Task.isCancelled else { return }
 
             selectedCardAnimating = nil
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            Haptics.success()
         }
     }
 }
@@ -320,15 +318,13 @@ struct DrawnCardMini: View {
     let drawnCard: DrawnCard
 
     var body: some View {
+        let color = drawnCard.card.element.color
         VStack(spacing: TaroSpacing.xxs) {
             ZStack {
                 RoundedRectangle(cornerRadius: TaroRadius.xs)
                     .fill(
                         LinearGradient(
-                            colors: [
-                                elementColor.opacity(0.3),
-                                elementColor.opacity(0.15)
-                            ],
+                            colors: [color.opacity(0.3), color.opacity(0.15)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -342,22 +338,13 @@ struct DrawnCardMini: View {
             }
             .overlay(
                 RoundedRectangle(cornerRadius: TaroRadius.xs)
-                    .stroke(elementColor.opacity(0.5), lineWidth: 1)
+                    .stroke(color.opacity(0.5), lineWidth: 1)
             )
 
             Text(drawnCard.position.name)
                 .font(TaroTypography.caption2)
                 .foregroundColor(.textMuted)
                 .lineLimit(1)
-        }
-    }
-
-    private var elementColor: Color {
-        switch drawnCard.card.element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return Color.mysticCyan
-        case .air: return Color.mysticTeal
-        case .earth: return Color.mysticEmerald
         }
     }
 }

@@ -1,16 +1,13 @@
 import Foundation
 
-// MARK: - Card Model
+// MARK: - Card
 
-/// Represents a single tarot card from the 78-card deck
 struct Card: Identifiable, Codable, Hashable {
     let id: Int
     let name: String
     let arcana: Arcana
     let element: Element
     let keywords: [String]
-
-    // Optional properties for minor arcana
     let suit: Suit?
     let rank: String?
     let numeral: String?
@@ -61,6 +58,20 @@ enum Element: String, Codable, CaseIterable {
     }
 }
 
+// MARK: - Element Color
+import SwiftUI
+
+extension Element {
+    var color: Color {
+        switch self {
+        case .fire: return Color(hex: "F97316")
+        case .water: return .mysticCyan
+        case .air: return .mysticTeal
+        case .earth: return .mysticEmerald
+        }
+    }
+}
+
 // MARK: - Suit
 
 enum Suit: String, Codable, CaseIterable {
@@ -81,7 +92,6 @@ enum Suit: String, Codable, CaseIterable {
 
 // MARK: - Drawn Card
 
-/// A card that has been drawn in a reading, with position and orientation
 struct DrawnCard: Identifiable, Hashable {
     let id = UUID()
     let card: Card
@@ -96,7 +106,6 @@ struct DrawnCard: Identifiable, Hashable {
 // MARK: - Card Extensions
 
 extension Card {
-    /// Slug for looking up interpretations
     var slug: String {
         name.lowercased().replacingOccurrences(of: " ", with: "-")
     }

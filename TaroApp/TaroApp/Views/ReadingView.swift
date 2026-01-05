@@ -304,7 +304,7 @@ struct ReadingView: View {
                 // Large card display
                 SpreadCardFront(drawnCard: drawnCard, size: .large)
                     .rotationEffect(.degrees(drawnCard.isReversed ? 180 : 0))
-                    .shadow(color: elementColor(for: drawnCard.card.element).opacity(0.4), radius: 30)
+                    .shadow(color: drawnCard.card.element.color.opacity(0.4), radius: 30)
 
                 // Card info panel
                 GlassPanel(style: .summary, cornerRadius: TaroRadius.xl, padding: TaroSpacing.lg) {
@@ -341,7 +341,7 @@ struct ReadingView: View {
                             detailItem(
                                 label: "Element",
                                 value: drawnCard.card.element.rawValue.capitalized,
-                                color: elementColor(for: drawnCard.card.element)
+                                color: drawnCard.card.element.color
                             )
                         }
 
@@ -404,8 +404,7 @@ struct ReadingView: View {
     // MARK: - Helpers
 
     private func selectCard(_ card: DrawnCard) {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
+        Haptics.light()
 
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             selectedCard = card
@@ -417,15 +416,6 @@ struct ReadingView: View {
         withAnimation(.easeOut(duration: 0.25)) {
             showCardDetail = false
             selectedCard = nil
-        }
-    }
-
-    private func elementColor(for element: Element) -> Color {
-        switch element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return .mysticCyan
-        case .air: return .mysticTeal
-        case .earth: return .mysticEmerald
         }
     }
 
@@ -446,6 +436,7 @@ struct DrawnCardTile: View {
     let drawnCard: DrawnCard
 
     var body: some View {
+        let color = drawnCard.card.element.color
         VStack(spacing: TaroSpacing.xs) {
             // Card visual
             ActiveGlassPanel(
@@ -455,10 +446,7 @@ struct DrawnCardTile: View {
             ) {
                 ZStack {
                     LinearGradient(
-                        colors: [
-                            elementColor.opacity(0.3),
-                            elementColor.opacity(0.1)
-                        ],
+                        colors: [color.opacity(0.3), color.opacity(0.1)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -486,7 +474,7 @@ struct DrawnCardTile: View {
             }
             .overlay(
                 RoundedRectangle(cornerRadius: TaroRadius.sm)
-                    .stroke(elementColor.opacity(0.5), lineWidth: 1)
+                    .stroke(color.opacity(0.5), lineWidth: 1)
             )
             .rotationEffect(.degrees(drawnCard.isReversed ? 180 : 0))
 
@@ -510,21 +498,9 @@ struct DrawnCardTile: View {
         }
     }
 
-    private var elementColor: Color {
-        switch drawnCard.card.element {
-        case .fire: return .orange
-        case .water: return .mysticCyan
-        case .air: return .mysticTeal
-        case .earth: return .mysticEmerald
-        }
-    }
-
     private var cardInitials: String {
         let words = drawnCard.card.name.split(separator: " ")
-        if words.count == 1 {
-            return String(words[0].prefix(3))
-        }
-        return words.map { String($0.prefix(1)) }.joined()
+        return words.count == 1 ? String(words[0].prefix(3)) : words.map { String($0.prefix(1)) }.joined()
     }
 }
 

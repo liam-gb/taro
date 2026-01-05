@@ -12,7 +12,7 @@ struct SpreadLayoutView: View {
     var animateIn: Bool = true
     var onCardTap: ((DrawnCard) -> Void)? = nil
 
-    @State private var cardStates: [CardAnimationState] = []
+    @State private var cardStates: [CardAnimationState] = []  // Uses shared CardAnimationState from SharedUtilities
     @State private var hasAnimated: Bool = false
 
     var body: some View {
@@ -66,7 +66,7 @@ struct SpreadLayoutView: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    elementColor(for: drawnCard.card.element).opacity(0.2),
+                                    drawnCard.card.element.color.opacity(0.2),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -379,7 +379,7 @@ struct SpreadLayoutView: View {
                     cardStates[index].isFlipped = true
                 }
             }
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            Haptics.medium()
 
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
@@ -399,16 +399,6 @@ struct SpreadLayoutView: View {
         }
     }
 
-    // MARK: - Helpers
-
-    private func elementColor(for element: Element) -> Color {
-        switch element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return .mysticCyan
-        case .air: return .mysticTeal
-        case .earth: return .mysticEmerald
-        }
-    }
 }
 
 // MARK: - Supporting Types
@@ -417,16 +407,6 @@ private struct CardLayout {
     let position: CGPoint
     let rotation: Double
     let zIndex: Double
-}
-
-private struct CardAnimationState {
-    var isVisible: Bool = false
-    var isFlipped: Bool = false
-    var opacity: Double = 0
-    var scale: CGFloat = 0.5
-    var offset: CGSize = CGSize(width: 0, height: 50)
-    var glowOpacity: Double = 0
-    var labelOpacity: Double = 0
 }
 
 // MARK: - SpreadCardView
@@ -510,15 +490,14 @@ struct SpreadCardFront: View {
     var size: Card3DView.CardSize = .standard
 
     var body: some View {
+        let color = drawnCard.card.element.color
+        let isSmall = size == .small || size == .standard
         ZStack {
             // Background
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color.deepSpaceLight,
-                            Color.deepSpace
-                        ],
+                        colors: [Color.deepSpaceLight, Color.deepSpace],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -533,11 +512,7 @@ struct SpreadCardFront: View {
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            elementColor.opacity(0.15),
-                            elementColor.opacity(0.05),
-                            Color.clear
-                        ],
+                        colors: [color.opacity(0.15), color.opacity(0.05), Color.clear],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -547,12 +522,9 @@ struct SpreadCardFront: View {
             VStack(spacing: TaroSpacing.xxs) {
                 // Element badge
                 Circle()
-                    .fill(elementColor.opacity(0.3))
+                    .fill(color.opacity(0.3))
                     .frame(width: size == .large ? 24 : 16, height: size == .large ? 24 : 16)
-                    .overlay(
-                        Circle()
-                            .stroke(elementColor.opacity(0.5), lineWidth: 1)
-                    )
+                    .overlay(Circle().stroke(color.opacity(0.5), lineWidth: 1))
 
                 Spacer()
 
@@ -568,7 +540,7 @@ struct SpreadCardFront: View {
                 }
 
                 // Card name
-                Text(abbreviatedName)
+                Text(drawnCard.card.name.abbreviatedCardName(forSmallSize: isSmall))
                     .font(TaroTypography.mystical(size == .large ? 14 : 10, weight: .regular))
                     .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)
@@ -599,10 +571,7 @@ struct SpreadCardFront: View {
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .stroke(
                     LinearGradient(
-                        colors: [
-                            elementColor.opacity(0.5),
-                            elementColor.opacity(0.2)
-                        ],
+                        colors: [color.opacity(0.5), color.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -611,26 +580,7 @@ struct SpreadCardFront: View {
         }
         .frame(width: size.width, height: size.height)
         .shadow(color: Color.black.opacity(0.4), radius: 10, y: 5)
-        .shadow(color: elementColor.opacity(0.2), radius: 12)
-    }
-
-    private var elementColor: Color {
-        switch drawnCard.card.element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return .mysticCyan
-        case .air: return .mysticTeal
-        case .earth: return .mysticEmerald
-        }
-    }
-
-    private var abbreviatedName: String {
-        if size == .small || size == .standard {
-            let words = drawnCard.card.name.split(separator: " ")
-            if words.count > 2 {
-                return words.prefix(2).joined(separator: " ")
-            }
-        }
-        return drawnCard.card.name
+        .shadow(color: color.opacity(0.2), radius: 12)
     }
 }
 

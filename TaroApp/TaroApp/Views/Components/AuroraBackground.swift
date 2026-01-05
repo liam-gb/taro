@@ -1,61 +1,59 @@
 import SwiftUI
 
 // MARK: - Aurora Background
-// Animated gradient background with slow-moving orbs
-// Creates the mystical "Liquid Glass" atmosphere
 
 struct AuroraBackground: View {
+    var showRibbons: Bool = false
     @State private var animateOrbs = false
+
+    private struct OrbConfig {
+        let color: Color
+        let sizeMultiplier: CGFloat
+        let xMultiplier: CGFloat
+        let yMultiplier: CGFloat
+        let opacity: CGFloat
+        let duration: Double
+        let reverse: Bool
+        let delay: Double
+
+        func position(for size: CGSize) -> CGPoint {
+            CGPoint(x: size.width * xMultiplier, y: size.height * yMultiplier)
+        }
+    }
+
+    private let orbConfigs: [OrbConfig] = [
+        OrbConfig(color: .mysticViolet, sizeMultiplier: 1.5, xMultiplier: -0.2, yMultiplier: -0.15, opacity: 0.4, duration: 15, reverse: false, delay: 0),
+        OrbConfig(color: .mysticCyan, sizeMultiplier: 1.25, xMultiplier: 1.1, yMultiplier: 0.4, opacity: 0.3, duration: 20, reverse: true, delay: 0),
+        OrbConfig(color: .mysticPink, sizeMultiplier: 1.0, xMultiplier: 0.3, yMultiplier: 1.1, opacity: 0.25, duration: 18, reverse: false, delay: 5),
+        OrbConfig(color: .mysticTeal, sizeMultiplier: 0.9, xMultiplier: -0.15, yMultiplier: 0.6, opacity: 0.2, duration: 22, reverse: false, delay: 3)
+    ]
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Base gradient background
                 LinearGradient(
                     colors: [.deepSpace, .deepSpaceLight, .deepSpace],
                     startPoint: .top,
                     endPoint: .bottom
                 )
 
-                // Aurora orbs
-                AuroraOrb(
-                    color: .mysticViolet,
-                    size: geometry.size.width * 1.5,
-                    position: CGPoint(x: -geometry.size.width * 0.2, y: -geometry.size.height * 0.15),
-                    opacity: 0.4,
-                    animationDuration: 15,
-                    animateOrbs: animateOrbs
-                )
+                ForEach(0..<orbConfigs.count, id: \.self) { index in
+                    let config = orbConfigs[index]
+                    AuroraOrb(
+                        color: config.color,
+                        size: geometry.size.width * config.sizeMultiplier,
+                        position: config.position(for: geometry.size),
+                        opacity: config.opacity,
+                        animationDuration: config.duration,
+                        animateOrbs: animateOrbs,
+                        reverse: config.reverse,
+                        delay: config.delay
+                    )
+                }
 
-                AuroraOrb(
-                    color: .mysticCyan,
-                    size: geometry.size.width * 1.25,
-                    position: CGPoint(x: geometry.size.width * 1.1, y: geometry.size.height * 0.4),
-                    opacity: 0.3,
-                    animationDuration: 20,
-                    animateOrbs: animateOrbs,
-                    reverse: true
-                )
-
-                AuroraOrb(
-                    color: .mysticPink,
-                    size: geometry.size.width,
-                    position: CGPoint(x: geometry.size.width * 0.3, y: geometry.size.height * 1.1),
-                    opacity: 0.25,
-                    animationDuration: 18,
-                    animateOrbs: animateOrbs,
-                    delay: 5
-                )
-
-                AuroraOrb(
-                    color: .mysticTeal,
-                    size: geometry.size.width * 0.9,
-                    position: CGPoint(x: -geometry.size.width * 0.15, y: geometry.size.height * 0.6),
-                    opacity: 0.2,
-                    animationDuration: 22,
-                    animateOrbs: animateOrbs,
-                    delay: 3
-                )
+                if showRibbons {
+                    auroraRibbons(in: geometry)
+                }
             }
         }
         .ignoresSafeArea()
@@ -66,9 +64,17 @@ struct AuroraBackground: View {
             animateOrbs = false
         }
     }
+
+    @ViewBuilder
+    private func auroraRibbons(in geometry: GeometryProxy) -> some View {
+        AuroraRibbon(yPosition: geometry.size.height * 0.1, rotation: -5, duration: 20, delay: 0)
+        AuroraRibbon(yPosition: geometry.size.height * 0.5, rotation: 3, duration: 25, delay: 5)
+        AuroraRibbon(yPosition: geometry.size.height * 0.75, rotation: -2, duration: 22, delay: 10)
+    }
 }
 
-// MARK: - Aurora Orb Component
+// MARK: - Aurora Orb
+
 struct AuroraOrb: View {
     let color: Color
     let size: CGFloat
@@ -101,33 +107,27 @@ struct AuroraOrb: View {
             .position(animatedPosition)
             .scaleEffect(animatedScale)
             .onAppear {
-                guard animateOrbs else { return }
-                withAnimation(
-                    Animation
-                        .easeInOut(duration: animationDuration)
-                        .repeatForever(autoreverses: true)
-                        .delay(delay)
-                ) {
-                    phase = 1
-                }
+                startAnimationIfNeeded()
             }
             .onChange(of: animateOrbs) { _, newValue in
                 if newValue {
-                    withAnimation(
-                        Animation
-                            .easeInOut(duration: animationDuration)
-                            .repeatForever(autoreverses: true)
-                            .delay(delay)
-                    ) {
-                        phase = 1
-                    }
+                    startAnimationIfNeeded()
                 } else {
-                    // Stop animation by resetting phase without animation
-                    withAnimation(.linear(duration: 0.1)) {
-                        phase = 0
-                    }
+                    withAnimation(.linear(duration: 0.1)) { phase = 0 }
                 }
             }
+    }
+
+    private func startAnimationIfNeeded() {
+        guard animateOrbs else { return }
+        withAnimation(
+            Animation
+                .easeInOut(duration: animationDuration)
+                .repeatForever(autoreverses: true)
+                .delay(delay)
+        ) {
+            phase = 1
+        }
     }
 
     private var animatedPosition: CGPoint {
@@ -148,7 +148,7 @@ struct AuroraOrb: View {
 }
 
 // MARK: - Aurora Ribbon
-// Optional: Horizontal flowing aurora ribbons for additional effect
+
 struct AuroraRibbon: View {
     let yPosition: CGFloat
     let rotation: Double
@@ -210,129 +210,9 @@ struct AuroraRibbon: View {
     }
 }
 
-// MARK: - Enhanced Aurora Background
-// Combines orbs with optional ribbons for maximum mystical effect
-struct EnhancedAuroraBackground: View {
-    @State private var animateOrbs = false
-    var showRibbons: Bool = false
+// MARK: - Legacy Alias
 
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Base background
-                Color.deepSpace
-
-                // Subtle gradient overlay
-                LinearGradient(
-                    colors: [
-                        .deepSpace,
-                        .deepSpaceLight,
-                        .deepSpace
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-
-                // Aurora orbs
-                auroraOrbs(in: geometry)
-
-                // Optional ribbons
-                if showRibbons {
-                    auroraRibbons(in: geometry)
-                }
-            }
-        }
-        .ignoresSafeArea()
-        .onAppear {
-            animateOrbs = true
-        }
-        .onDisappear {
-            animateOrbs = false
-        }
-    }
-
-    @ViewBuilder
-    private func auroraOrbs(in geometry: GeometryProxy) -> some View {
-        // Violet orb - top left
-        AuroraOrb(
-            color: .mysticViolet,
-            size: geometry.size.width * 1.5,
-            position: CGPoint(
-                x: -geometry.size.width * 0.2,
-                y: -geometry.size.height * 0.15
-            ),
-            opacity: 0.4,
-            animationDuration: 15,
-            animateOrbs: animateOrbs
-        )
-
-        // Cyan orb - right middle
-        AuroraOrb(
-            color: .mysticCyan,
-            size: geometry.size.width * 1.25,
-            position: CGPoint(
-                x: geometry.size.width * 1.1,
-                y: geometry.size.height * 0.4
-            ),
-            opacity: 0.3,
-            animationDuration: 20,
-            animateOrbs: animateOrbs,
-            reverse: true
-        )
-
-        // Pink orb - bottom center
-        AuroraOrb(
-            color: .mysticPink,
-            size: geometry.size.width,
-            position: CGPoint(
-                x: geometry.size.width * 0.3,
-                y: geometry.size.height * 1.1
-            ),
-            opacity: 0.25,
-            animationDuration: 18,
-            animateOrbs: animateOrbs,
-            delay: 5
-        )
-
-        // Teal orb - left middle
-        AuroraOrb(
-            color: .mysticTeal,
-            size: geometry.size.width * 0.9,
-            position: CGPoint(
-                x: -geometry.size.width * 0.15,
-                y: geometry.size.height * 0.6
-            ),
-            opacity: 0.2,
-            animationDuration: 22,
-            animateOrbs: animateOrbs,
-            delay: 3
-        )
-    }
-
-    @ViewBuilder
-    private func auroraRibbons(in geometry: GeometryProxy) -> some View {
-        AuroraRibbon(
-            yPosition: geometry.size.height * 0.1,
-            rotation: -5,
-            duration: 20,
-            delay: 0
-        )
-
-        AuroraRibbon(
-            yPosition: geometry.size.height * 0.5,
-            rotation: 3,
-            duration: 25,
-            delay: 5
-        )
-
-        AuroraRibbon(
-            yPosition: geometry.size.height * 0.75,
-            rotation: -2,
-            duration: 22,
-            delay: 10
-        )
-    }
-}
+typealias EnhancedAuroraBackground = AuroraBackground
 
 // MARK: - Preview
 #Preview("Aurora Background") {
@@ -352,11 +232,11 @@ struct EnhancedAuroraBackground: View {
     .preferredColorScheme(.dark)
 }
 
-#Preview("Enhanced Aurora") {
+#Preview("Aurora with Ribbons") {
     ZStack {
-        EnhancedAuroraBackground(showRibbons: true)
+        AuroraBackground(showRibbons: true)
 
-        Text("Enhanced Aurora")
+        Text("Aurora with Ribbons")
             .font(TaroTypography.largeTitle)
             .foregroundColor(.textPrimary)
     }
