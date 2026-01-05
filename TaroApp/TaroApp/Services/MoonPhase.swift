@@ -1,0 +1,47 @@
+import Foundation
+
+struct MoonPhase {
+    let name: String
+    let icon: String
+    let meaning: String
+
+    var promptContext: String {
+        "\(name) \(icon) — \(meaning)"
+    }
+}
+
+enum MoonPhaseCalculator {
+    private static let phases: [MoonPhase] = [
+        MoonPhase(name: "New Moon", icon: "🌑", meaning: "New beginnings, setting intentions, planting seeds"),
+        MoonPhase(name: "Waxing Crescent", icon: "🌒", meaning: "Taking action, building momentum, hope emerges"),
+        MoonPhase(name: "First Quarter", icon: "🌓", meaning: "Challenges arise, decisions needed, commitment tested"),
+        MoonPhase(name: "Waxing Gibbous", icon: "🌔", meaning: "Refining plans, patience required, trust the process"),
+        MoonPhase(name: "Full Moon", icon: "🌕", meaning: "Culmination, clarity, emotions heightened, harvest results"),
+        MoonPhase(name: "Waning Gibbous", icon: "🌖", meaning: "Gratitude, sharing wisdom, integration"),
+        MoonPhase(name: "Last Quarter", icon: "🌗", meaning: "Release, forgiveness, letting go of what no longer serves"),
+        MoonPhase(name: "Waning Crescent", icon: "🌘", meaning: "Rest, reflection, preparing for renewal")
+    ]
+
+    private static let synodicMonth: Double = 29.53058867
+
+    private static let referenceNewMoon: Date = {
+        var components = DateComponents()
+        components.year = 2024
+        components.month = 12
+        components.day = 30
+        components.hour = 22
+        components.minute = 27
+        components.timeZone = TimeZone(identifier: "UTC")
+        return Calendar.current.date(from: components)!
+    }()
+
+    static func current(for date: Date = Date()) -> MoonPhase {
+        let daysSinceReference = date.timeIntervalSince(referenceNewMoon) / 86400
+        let phaseWidth = synodicMonth / 8
+        var lunarAge = daysSinceReference.truncatingRemainder(dividingBy: synodicMonth)
+        if lunarAge < 0 { lunarAge += synodicMonth }
+        let centeredAge = lunarAge + (phaseWidth / 2)
+        let phaseIndex = Int((centeredAge / synodicMonth) * 8) % 8
+        return phases[phaseIndex]
+    }
+}
