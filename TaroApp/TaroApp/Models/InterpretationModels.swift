@@ -127,71 +127,31 @@ struct ReadingInterpretation {
         in drawnCards: [DrawnCard],
         from allCombinations: [CardCombination]
     ) -> [CardCombination] {
-        var found: [CardCombination] = []
-        let cardNames = drawnCards.map { $0.card.name }
-
-        for i in 0..<cardNames.count {
-            for j in (i+1)..<cardNames.count {
-                for combo in allCombinations {
-                    if combo.matches(card1: cardNames[i], card2: cardNames[j]) {
-                        found.append(combo)
-                    }
-                }
-            }
+        let cardNames = Set(drawnCards.map { $0.card.name })
+        return allCombinations.filter { combo in
+            combo.cards.allSatisfy { cardNames.contains($0) }
         }
-
-        return found
     }
 }
 
 /// Elemental flow analysis for a reading
 struct ElementalFlow {
     let elements: [Element]
-    let summary: String
-    let dominantElement: Element?
 
     init(from drawnCards: [DrawnCard]) {
         self.elements = drawnCards.map { $0.card.element }
-        self.dominantElement = Self.findDominantElement(elements: elements)
-        self.summary = Self.generateSummary(elements: elements)
     }
 
-    private static func findDominantElement(elements: [Element]) -> Element? {
-        guard !elements.isEmpty else { return nil }
-
-        var counts: [Element: Int] = [:]
-        for element in elements {
-            counts[element, default: 0] += 1
-        }
-
-        if let dominant = counts.max(by: { $0.value < $1.value }) {
-            // Only return dominant if it's more than half the elements
-            if dominant.value > elements.count / 2 {
-                return dominant.key
-            }
-        }
-
-        return nil
+    var dominantElement: Element? {
+        let counts = elements.reduce(into: [:]) { $0[$1, default: 0] += 1 }
+        guard let dominant = counts.max(by: { $0.value < $1.value }),
+              dominant.value > elements.count / 2 else { return nil }
+        return dominant.key
     }
 
-    private static func generateSummary(elements: [Element]) -> String {
-        guard !elements.isEmpty else { return "" }
-
-        let elementNames = elements.map { $0.rawValue }
-        let flow = elementNames.joined(separator: " → ")
-
-        // Count dominant element
-        var counts: [Element: Int] = [:]
-        for element in elements {
-            counts[element, default: 0] += 1
-        }
-
-        if let dominant = counts.max(by: { $0.value < $1.value }) {
-            if dominant.value > elements.count / 2 {
-                return "\(flow)\nDominant: \(dominant.key.rawValue) energy"
-            }
-        }
-
-        return flow
+    var summary: String {
+        let flow = elements.map(\.rawValue).joined(separator: " → ")
+        guard let dominant = dominantElement else { return flow }
+        return "\(flow)\nDominant: \(dominant.rawValue) energy"
     }
 }

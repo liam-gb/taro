@@ -32,81 +32,45 @@ enum CardDeck {
         Card(id: 21, name: "The World", arcana: .major, element: .earth, keywords: ["completion", "achievement", "wholeness", "fulfillment"], numeral: "XXI")
     ]
 
-    // MARK: - Minor Arcana (Wands)
+    // MARK: - Minor Arcana
 
-    static let wands: [Card] = [
-        Card(id: 22, name: "Ace of Wands", arcana: .minor, element: .fire, keywords: ["new beginning", "potential", "opportunity"], suit: .wands, rank: "Ace"),
-        Card(id: 23, name: "Two of Wands", arcana: .minor, element: .fire, keywords: ["balance", "partnership", "duality"], suit: .wands, rank: "Two"),
-        Card(id: 24, name: "Three of Wands", arcana: .minor, element: .fire, keywords: ["growth", "creativity", "collaboration"], suit: .wands, rank: "Three"),
-        Card(id: 25, name: "Four of Wands", arcana: .minor, element: .fire, keywords: ["stability", "foundation", "structure"], suit: .wands, rank: "Four"),
-        Card(id: 26, name: "Five of Wands", arcana: .minor, element: .fire, keywords: ["conflict", "challenge", "change"], suit: .wands, rank: "Five"),
-        Card(id: 27, name: "Six of Wands", arcana: .minor, element: .fire, keywords: ["harmony", "communication", "transition"], suit: .wands, rank: "Six"),
-        Card(id: 28, name: "Seven of Wands", arcana: .minor, element: .fire, keywords: ["reflection", "assessment", "perseverance"], suit: .wands, rank: "Seven"),
-        Card(id: 29, name: "Eight of Wands", arcana: .minor, element: .fire, keywords: ["movement", "speed", "progress"], suit: .wands, rank: "Eight"),
-        Card(id: 30, name: "Nine of Wands", arcana: .minor, element: .fire, keywords: ["fruition", "attainment", "wisdom"], suit: .wands, rank: "Nine"),
-        Card(id: 31, name: "Ten of Wands", arcana: .minor, element: .fire, keywords: ["completion", "ending", "fulfillment"], suit: .wands, rank: "Ten"),
-        Card(id: 32, name: "Page of Wands", arcana: .minor, element: .fire, keywords: ["messenger", "student", "new energy"], suit: .wands, rank: "Page"),
-        Card(id: 33, name: "Knight of Wands", arcana: .minor, element: .fire, keywords: ["action", "adventure", "movement"], suit: .wands, rank: "Knight"),
-        Card(id: 34, name: "Queen of Wands", arcana: .minor, element: .fire, keywords: ["nurturing", "intuitive", "mastery"], suit: .wands, rank: "Queen"),
-        Card(id: 35, name: "King of Wands", arcana: .minor, element: .fire, keywords: ["authority", "control", "leadership"], suit: .wands, rank: "King")
+    /// Rank definitions with shared keywords (same meaning across all suits)
+    private static let ranks: [(rank: String, keywords: [String])] = [
+        ("Ace", ["new beginning", "potential", "opportunity"]),
+        ("Two", ["balance", "partnership", "duality"]),
+        ("Three", ["growth", "creativity", "collaboration"]),
+        ("Four", ["stability", "foundation", "structure"]),
+        ("Five", ["conflict", "challenge", "change"]),
+        ("Six", ["harmony", "communication", "transition"]),
+        ("Seven", ["reflection", "assessment", "perseverance"]),
+        ("Eight", ["movement", "speed", "progress"]),
+        ("Nine", ["fruition", "attainment", "wisdom"]),
+        ("Ten", ["completion", "ending", "fulfillment"]),
+        ("Page", ["messenger", "student", "new energy"]),
+        ("Knight", ["action", "adventure", "movement"]),
+        ("Queen", ["nurturing", "intuitive", "mastery"]),
+        ("King", ["authority", "control", "leadership"])
     ]
 
-    // MARK: - Minor Arcana (Cups)
+    /// Generate all 14 cards for a suit
+    private static func generateSuit(_ suit: Suit, startingId: Int) -> [Card] {
+        ranks.enumerated().map { index, rankInfo in
+            Card(
+                id: startingId + index,
+                name: "\(rankInfo.rank) of \(suit.rawValue)",
+                arcana: .minor,
+                element: suit.element,
+                keywords: rankInfo.keywords,
+                suit: suit,
+                rank: rankInfo.rank
+            )
+        }
+    }
 
-    static let cups: [Card] = [
-        Card(id: 36, name: "Ace of Cups", arcana: .minor, element: .water, keywords: ["new beginning", "potential", "opportunity"], suit: .cups, rank: "Ace"),
-        Card(id: 37, name: "Two of Cups", arcana: .minor, element: .water, keywords: ["balance", "partnership", "duality"], suit: .cups, rank: "Two"),
-        Card(id: 38, name: "Three of Cups", arcana: .minor, element: .water, keywords: ["growth", "creativity", "collaboration"], suit: .cups, rank: "Three"),
-        Card(id: 39, name: "Four of Cups", arcana: .minor, element: .water, keywords: ["stability", "foundation", "structure"], suit: .cups, rank: "Four"),
-        Card(id: 40, name: "Five of Cups", arcana: .minor, element: .water, keywords: ["conflict", "challenge", "change"], suit: .cups, rank: "Five"),
-        Card(id: 41, name: "Six of Cups", arcana: .minor, element: .water, keywords: ["harmony", "communication", "transition"], suit: .cups, rank: "Six"),
-        Card(id: 42, name: "Seven of Cups", arcana: .minor, element: .water, keywords: ["reflection", "assessment", "perseverance"], suit: .cups, rank: "Seven"),
-        Card(id: 43, name: "Eight of Cups", arcana: .minor, element: .water, keywords: ["movement", "speed", "progress"], suit: .cups, rank: "Eight"),
-        Card(id: 44, name: "Nine of Cups", arcana: .minor, element: .water, keywords: ["fruition", "attainment", "wisdom"], suit: .cups, rank: "Nine"),
-        Card(id: 45, name: "Ten of Cups", arcana: .minor, element: .water, keywords: ["completion", "ending", "fulfillment"], suit: .cups, rank: "Ten"),
-        Card(id: 46, name: "Page of Cups", arcana: .minor, element: .water, keywords: ["messenger", "student", "new energy"], suit: .cups, rank: "Page"),
-        Card(id: 47, name: "Knight of Cups", arcana: .minor, element: .water, keywords: ["action", "adventure", "movement"], suit: .cups, rank: "Knight"),
-        Card(id: 48, name: "Queen of Cups", arcana: .minor, element: .water, keywords: ["nurturing", "intuitive", "mastery"], suit: .cups, rank: "Queen"),
-        Card(id: 49, name: "King of Cups", arcana: .minor, element: .water, keywords: ["authority", "control", "leadership"], suit: .cups, rank: "King")
-    ]
-
-    // MARK: - Minor Arcana (Swords)
-
-    static let swords: [Card] = [
-        Card(id: 50, name: "Ace of Swords", arcana: .minor, element: .air, keywords: ["new beginning", "potential", "opportunity"], suit: .swords, rank: "Ace"),
-        Card(id: 51, name: "Two of Swords", arcana: .minor, element: .air, keywords: ["balance", "partnership", "duality"], suit: .swords, rank: "Two"),
-        Card(id: 52, name: "Three of Swords", arcana: .minor, element: .air, keywords: ["growth", "creativity", "collaboration"], suit: .swords, rank: "Three"),
-        Card(id: 53, name: "Four of Swords", arcana: .minor, element: .air, keywords: ["stability", "foundation", "structure"], suit: .swords, rank: "Four"),
-        Card(id: 54, name: "Five of Swords", arcana: .minor, element: .air, keywords: ["conflict", "challenge", "change"], suit: .swords, rank: "Five"),
-        Card(id: 55, name: "Six of Swords", arcana: .minor, element: .air, keywords: ["harmony", "communication", "transition"], suit: .swords, rank: "Six"),
-        Card(id: 56, name: "Seven of Swords", arcana: .minor, element: .air, keywords: ["reflection", "assessment", "perseverance"], suit: .swords, rank: "Seven"),
-        Card(id: 57, name: "Eight of Swords", arcana: .minor, element: .air, keywords: ["movement", "speed", "progress"], suit: .swords, rank: "Eight"),
-        Card(id: 58, name: "Nine of Swords", arcana: .minor, element: .air, keywords: ["fruition", "attainment", "wisdom"], suit: .swords, rank: "Nine"),
-        Card(id: 59, name: "Ten of Swords", arcana: .minor, element: .air, keywords: ["completion", "ending", "fulfillment"], suit: .swords, rank: "Ten"),
-        Card(id: 60, name: "Page of Swords", arcana: .minor, element: .air, keywords: ["messenger", "student", "new energy"], suit: .swords, rank: "Page"),
-        Card(id: 61, name: "Knight of Swords", arcana: .minor, element: .air, keywords: ["action", "adventure", "movement"], suit: .swords, rank: "Knight"),
-        Card(id: 62, name: "Queen of Swords", arcana: .minor, element: .air, keywords: ["nurturing", "intuitive", "mastery"], suit: .swords, rank: "Queen"),
-        Card(id: 63, name: "King of Swords", arcana: .minor, element: .air, keywords: ["authority", "control", "leadership"], suit: .swords, rank: "King")
-    ]
-
-    // MARK: - Minor Arcana (Pentacles)
-
-    static let pentacles: [Card] = [
-        Card(id: 64, name: "Ace of Pentacles", arcana: .minor, element: .earth, keywords: ["new beginning", "potential", "opportunity"], suit: .pentacles, rank: "Ace"),
-        Card(id: 65, name: "Two of Pentacles", arcana: .minor, element: .earth, keywords: ["balance", "partnership", "duality"], suit: .pentacles, rank: "Two"),
-        Card(id: 66, name: "Three of Pentacles", arcana: .minor, element: .earth, keywords: ["growth", "creativity", "collaboration"], suit: .pentacles, rank: "Three"),
-        Card(id: 67, name: "Four of Pentacles", arcana: .minor, element: .earth, keywords: ["stability", "foundation", "structure"], suit: .pentacles, rank: "Four"),
-        Card(id: 68, name: "Five of Pentacles", arcana: .minor, element: .earth, keywords: ["conflict", "challenge", "change"], suit: .pentacles, rank: "Five"),
-        Card(id: 69, name: "Six of Pentacles", arcana: .minor, element: .earth, keywords: ["harmony", "communication", "transition"], suit: .pentacles, rank: "Six"),
-        Card(id: 70, name: "Seven of Pentacles", arcana: .minor, element: .earth, keywords: ["reflection", "assessment", "perseverance"], suit: .pentacles, rank: "Seven"),
-        Card(id: 71, name: "Eight of Pentacles", arcana: .minor, element: .earth, keywords: ["movement", "speed", "progress"], suit: .pentacles, rank: "Eight"),
-        Card(id: 72, name: "Nine of Pentacles", arcana: .minor, element: .earth, keywords: ["fruition", "attainment", "wisdom"], suit: .pentacles, rank: "Nine"),
-        Card(id: 73, name: "Ten of Pentacles", arcana: .minor, element: .earth, keywords: ["completion", "ending", "fulfillment"], suit: .pentacles, rank: "Ten"),
-        Card(id: 74, name: "Page of Pentacles", arcana: .minor, element: .earth, keywords: ["messenger", "student", "new energy"], suit: .pentacles, rank: "Page"),
-        Card(id: 75, name: "Knight of Pentacles", arcana: .minor, element: .earth, keywords: ["action", "adventure", "movement"], suit: .pentacles, rank: "Knight"),
-        Card(id: 76, name: "Queen of Pentacles", arcana: .minor, element: .earth, keywords: ["nurturing", "intuitive", "mastery"], suit: .pentacles, rank: "Queen"),
-        Card(id: 77, name: "King of Pentacles", arcana: .minor, element: .earth, keywords: ["authority", "control", "leadership"], suit: .pentacles, rank: "King")
-    ]
+    static let wands: [Card] = generateSuit(.wands, startingId: 22)
+    static let cups: [Card] = generateSuit(.cups, startingId: 36)
+    static let swords: [Card] = generateSuit(.swords, startingId: 50)
+    static let pentacles: [Card] = generateSuit(.pentacles, startingId: 64)
 
     // MARK: - Full Deck
 

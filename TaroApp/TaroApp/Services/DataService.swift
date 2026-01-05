@@ -82,21 +82,11 @@ final class DataService {
         )
     }
 
-    /// Find combinations present in a set of cards
+    /// Find combinations present in a set of card names
     func findCombinations(in cardNames: [String]) -> [CardCombination] {
-        var found: [CardCombination] = []
-
-        for i in 0..<cardNames.count {
-            for j in (i+1)..<cardNames.count {
-                for combo in combinations {
-                    if combo.matches(card1: cardNames[i], card2: cardNames[j]) {
-                        found.append(combo)
-                    }
-                }
-            }
+        combinations.filter { combo in
+            cardNames.contains(combo.cards[0]) && cardNames.contains(combo.cards[1])
         }
-
-        return found
     }
 
     // MARK: - Private Loading

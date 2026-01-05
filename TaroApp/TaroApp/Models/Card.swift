@@ -15,12 +15,6 @@ struct Card: Identifiable, Codable, Hashable {
     let rank: String?
     let numeral: String?
 
-    var isReversed: Bool = false
-
-    enum CodingKeys: String, CodingKey {
-        case id, name, arcana, element, keywords, suit, rank, numeral
-    }
-
     init(id: Int, name: String, arcana: Arcana, element: Element, keywords: [String], suit: Suit? = nil, rank: String? = nil, numeral: String? = nil) {
         self.id = id
         self.name = name
@@ -83,15 +77,6 @@ enum Suit: String, Codable, CaseIterable {
         case .pentacles: return .earth
         }
     }
-
-    var domain: String {
-        switch self {
-        case .wands: return "passion, creativity, action"
-        case .cups: return "emotions, relationships, intuition"
-        case .swords: return "thoughts, conflict, truth"
-        case .pentacles: return "finances, career, material"
-        }
-    }
 }
 
 // MARK: - Drawn Card
@@ -111,20 +96,8 @@ struct DrawnCard: Identifiable, Hashable {
 // MARK: - Card Extensions
 
 extension Card {
-    /// Display name including suit for minor arcana
-    var displayName: String {
-        name
-    }
-
     /// Slug for looking up interpretations
     var slug: String {
         name.lowercased().replacingOccurrences(of: " ", with: "-")
-    }
-
-    /// Returns a copy with reversed state toggled
-    func withOrientation(reversed: Bool) -> Card {
-        var copy = self
-        copy.isReversed = reversed
-        return copy
     }
 }

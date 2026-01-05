@@ -133,49 +133,16 @@ struct TaroGradients {
         endPoint: .trailing
     )
 
-    // Violet glow
-    static let violetGlow = RadialGradient(
-        colors: [
-            Color.mysticViolet.opacity(0.4),
-            Color.clear
-        ],
-        center: .center,
-        startRadius: 0,
-        endRadius: 300
-    )
+    // Radial glow helper
+    static func radialGlow(_ color: Color, opacity: Double, radius: CGFloat) -> RadialGradient {
+        RadialGradient(colors: [color.opacity(opacity), .clear], center: .center, startRadius: 0, endRadius: radius)
+    }
 
-    // Cyan glow
-    static let cyanGlow = RadialGradient(
-        colors: [
-            Color.mysticCyan.opacity(0.3),
-            Color.clear
-        ],
-        center: .center,
-        startRadius: 0,
-        endRadius: 250
-    )
-
-    // Pink glow
-    static let pinkGlow = RadialGradient(
-        colors: [
-            Color.mysticPink.opacity(0.25),
-            Color.clear
-        ],
-        center: .center,
-        startRadius: 0,
-        endRadius: 200
-    )
-
-    // Teal glow
-    static let tealGlow = RadialGradient(
-        colors: [
-            Color.mysticTeal.opacity(0.2),
-            Color.clear
-        ],
-        center: .center,
-        startRadius: 0,
-        endRadius: 175
-    )
+    // Preset glows
+    static let violetGlow = radialGlow(.mysticViolet, opacity: 0.4, radius: 300)
+    static let cyanGlow = radialGlow(.mysticCyan, opacity: 0.3, radius: 250)
+    static let pinkGlow = radialGlow(.mysticPink, opacity: 0.25, radius: 200)
+    static let tealGlow = radialGlow(.mysticTeal, opacity: 0.2, radius: 175)
 }
 
 // MARK: - Typography
@@ -233,28 +200,18 @@ struct TaroRadius {
 struct TaroShadows {
     // Soft glass shadow
     static func glass() -> some View {
-        Color.black.opacity(0.3)
-            .blur(radius: 16)
-            .offset(y: 8)
+        Color.black.opacity(0.3).blur(radius: 16).offset(y: 8)
     }
 
-    // Violet glow shadow
-    static func violetGlow() -> some View {
-        Color.mysticViolet.opacity(0.3)
-            .blur(radius: 30)
+    // Glow shadow helper
+    static func glow(_ color: Color, opacity: Double = 0.3, radius: CGFloat = 30) -> some View {
+        color.opacity(opacity).blur(radius: radius)
     }
 
-    // Cyan glow shadow
-    static func cyanGlow() -> some View {
-        Color.mysticCyan.opacity(0.3)
-            .blur(radius: 30)
-    }
-
-    // Pink glow shadow
-    static func pinkGlow() -> some View {
-        Color.mysticPink.opacity(0.3)
-            .blur(radius: 30)
-    }
+    // Preset glows
+    static func violetGlow() -> some View { glow(.mysticViolet) }
+    static func cyanGlow() -> some View { glow(.mysticCyan) }
+    static func pinkGlow() -> some View { glow(.mysticPink) }
 }
 
 // MARK: - Animation Durations
