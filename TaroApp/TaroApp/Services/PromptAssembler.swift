@@ -30,6 +30,10 @@ final class PromptAssembler {
         question: String?,
         style: ReadingStyle = .balanced
     ) -> String {
+        // TODO: Add moon phase context (~20 tokens, high value)
+        // Web app includes: "Full Moon — Culmination, clarity, emotions heightened"
+        // See: src/utils/moonPhase.js for implementation reference
+
         // Build the card context using pre-calculated snippets
         let cardContext = buildCardContext(for: drawnCards)
 
