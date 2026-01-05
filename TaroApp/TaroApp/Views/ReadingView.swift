@@ -10,6 +10,8 @@ struct ReadingView: View {
     @State private var layoutAppeared: Bool = false
     @State private var interpretationOpacity: Double = 0
     @State private var showCopiedFeedback = false
+    @State private var isSaved = false
+    @State private var isSaving = false
 
     enum ViewMode {
         case spread
@@ -290,11 +292,16 @@ struct ReadingView: View {
                 .frame(maxWidth: .infinity)
             }
 
-            GlassButton("Save Reading", icon: "square.and.arrow.down", style: .primary) {
-                // TODO: Save reading
-                Haptics.success()
+            GlassButton(
+                isSaved ? "Saved" : (isSaving ? "Saving..." : "Save Reading"),
+                icon: isSaved ? "checkmark" : "square.and.arrow.down",
+                style: .primary,
+                isLoading: isSaving
+            ) {
+                saveReading()
             }
             .frame(maxWidth: .infinity)
+            .disabled(isSaved || isSaving)
 
             GlowingButton("New Reading") {
                 readingSession.reset()
@@ -477,6 +484,29 @@ struct ReadingView: View {
     }
 
     // MARK: - Helpers
+
+    private func saveReading() {
+        guard !isSaved && !isSaving else { return }
+
+        isSaving = true
+        let reading = readingSession.toReading()
+
+        Task {
+            do {
+                try await HistoryService.shared.saveReading(reading)
+                await MainActor.run {
+                    isSaving = false
+                    isSaved = true
+                    Haptics.success()
+                }
+            } catch {
+                await MainActor.run {
+                    isSaving = false
+                    print("ReadingView: Failed to save reading: \(error)")
+                }
+            }
+        }
+    }
 
     private func selectCard(_ card: DrawnCard) {
         Haptics.light()
