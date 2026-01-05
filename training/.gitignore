@@ -1,0 +1,16 @@
+# Generated data (large files)
+data/prompts.json
+data/batches/
+data/responses/
+data/sft/
+
+# Keep a sample for reference
+!data/batches/batch_0000.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Checkpoints
+checkpoints/
+adapters/
