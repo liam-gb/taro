@@ -2,9 +2,15 @@ import SwiftUI
 
 struct GeneratingView: View {
     @EnvironmentObject var readingSession: ReadingSession
+    @EnvironmentObject var modelManager: ModelManager
+    @EnvironmentObject var llmService: LLMService
+
     @State private var animationPhase = 0.0
     @State private var breathingScale: CGFloat = 1.0
     @State private var pulseOpacity: Double = 0.3
+    @State private var streamedText: String = ""
+    @State private var generationError: String?
+    @State private var showDeviceUnsupported = false
 
     var body: some View {
         ZStack {
@@ -62,105 +68,295 @@ struct GeneratingView: View {
 
                 Spacer()
 
-                // Loading indicator with breathing animation
-                GlassPanel(
-                    style: .summary,
-                    cornerRadius: TaroRadius.xl,
-                    padding: TaroSpacing.xl,
-                    glowColor: .mysticViolet,
-                    glowRadius: 20
-                ) {
-                    VStack(spacing: TaroSpacing.md) {
-                        // Animated loading indicator
-                        ZStack {
-                            Circle()
-                                .stroke(Color.mysticViolet.opacity(0.2), lineWidth: 3)
-                                .frame(width: 60, height: 60)
-
-                            Circle()
-                                .trim(from: 0, to: 0.7)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [.mysticViolet, .mysticCyan],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    ),
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                                )
-                                .frame(width: 60, height: 60)
-                                .rotationEffect(.degrees(animationPhase))
-                        }
-                        .scaleEffect(breathingScale)
-                        .opacity(pulseOpacity + 0.5)
-
-                        Text("Weaving your reading...")
-                            .font(TaroTypography.mystical(16, weight: .light))
-                            .foregroundColor(.textSecondary)
-
-                        Text("The cards speak through the local oracle")
-                            .font(TaroTypography.caption)
-                            .foregroundColor(.textMuted)
-                    }
+                // Loading/Generation indicator
+                if let error = generationError {
+                    errorView(error)
+                } else if !streamedText.isEmpty {
+                    streamingPreview
+                } else {
+                    loadingIndicator
                 }
-                .padding(.horizontal, TaroSpacing.xl)
 
                 Spacer()
 
-                // Placeholder: Skip button for development
-                GlassButton("Skip (Dev Only)", style: .text) {
-                    // Simulate interpretation generation
-                    let mockInterpretation = generateMockInterpretation()
-                    readingSession.setInterpretation(mockInterpretation)
+                // Model status or cancel button
+                if llmService.isGenerating {
+                    GlassButton("Cancel", icon: "xmark", style: .secondary) {
+                        llmService.cancelGeneration()
+                        // Fall back to template-based reading
+                        let fallbackInterpretation = generateFallbackInterpretation()
+                        readingSession.setInterpretation(fallbackInterpretation)
+                    }
+                    .padding(.bottom, TaroSpacing.xl)
+                } else if !DeviceCapability.supportsLocalLLM {
+                    VStack(spacing: TaroSpacing.sm) {
+                        CompactModelStatusView(modelManager: modelManager)
+
+                        GlassButton("Continue", style: .primary) {
+                            // Use template-based reading for unsupported devices
+                            let interpretation = generateFallbackInterpretation()
+                            readingSession.setInterpretation(interpretation)
+                        }
+                    }
+                    .padding(.horizontal, TaroSpacing.xl)
+                    .padding(.bottom, TaroSpacing.xl)
                 }
-                .padding(.bottom, TaroSpacing.xl)
             }
         }
         .navigationBarHidden(true)
         .onAppear {
-            // Rotation animation
-            withAnimation(
-                Animation
-                    .linear(duration: 1.5)
-                    .repeatForever(autoreverses: false)
-            ) {
-                animationPhase = 360
-            }
+            startAnimations()
+            startGeneration()
+        }
+        .sheet(isPresented: $showDeviceUnsupported) {
+            DeviceUnsupportedView()
+        }
+    }
 
-            // Breathing animation
-            withAnimation(
-                Animation
-                    .easeInOut(duration: 2)
-                    .repeatForever(autoreverses: true)
-            ) {
-                breathingScale = 1.1
-                pulseOpacity = 0.6
-            }
+    // MARK: - Subviews
 
-            // Auto-advance after delay
+    private var loadingIndicator: some View {
+        GlassPanel(
+            style: .summary,
+            cornerRadius: TaroRadius.xl,
+            padding: TaroSpacing.xl,
+            glowColor: .mysticViolet,
+            glowRadius: 20
+        ) {
+            VStack(spacing: TaroSpacing.md) {
+                // Animated loading indicator
+                ZStack {
+                    Circle()
+                        .stroke(Color.mysticViolet.opacity(0.2), lineWidth: 3)
+                        .frame(width: 60, height: 60)
+
+                    Circle()
+                        .trim(from: 0, to: 0.7)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.mysticViolet, .mysticCyan],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                        )
+                        .frame(width: 60, height: 60)
+                        .rotationEffect(.degrees(animationPhase))
+                }
+                .scaleEffect(breathingScale)
+                .opacity(pulseOpacity + 0.5)
+
+                Text("Weaving your reading...")
+                    .font(TaroTypography.mystical(16, weight: .light))
+                    .foregroundColor(.textSecondary)
+
+                if DeviceCapability.supportsLocalLLM {
+                    Text("The cards speak through the local oracle")
+                        .font(TaroTypography.caption)
+                        .foregroundColor(.textMuted)
+                } else {
+                    Text("Using traditional interpretation")
+                        .font(TaroTypography.caption)
+                        .foregroundColor(.textMuted)
+                }
+            }
+        }
+        .padding(.horizontal, TaroSpacing.xl)
+    }
+
+    private var streamingPreview: some View {
+        GlassPanel(
+            style: .summary,
+            cornerRadius: TaroRadius.xl,
+            padding: TaroSpacing.lg,
+            glowColor: .mysticCyan,
+            glowRadius: 15
+        ) {
+            VStack(alignment: .leading, spacing: TaroSpacing.sm) {
+                HStack {
+                    Text("Reading in Progress")
+                        .font(TaroTypography.caption)
+                        .foregroundColor(.mysticCyan)
+                        .textCase(.uppercase)
+                        .tracking(1)
+
+                    Spacer()
+
+                    // Typing indicator
+                    HStack(spacing: 4) {
+                        ForEach(0..<3) { i in
+                            Circle()
+                                .fill(Color.mysticCyan)
+                                .frame(width: 6, height: 6)
+                                .opacity(0.3 + (0.7 * sin(animationPhase / 60 + Double(i) * 0.5)))
+                        }
+                    }
+                }
+
+                ScrollView {
+                    Text(streamedText)
+                        .font(TaroTypography.body)
+                        .foregroundColor(.textPrimary)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxHeight: 200)
+            }
+        }
+        .padding(.horizontal, TaroSpacing.lg)
+    }
+
+    private func errorView(_ error: String) -> some View {
+        GlassPanel(
+            style: .card,
+            cornerRadius: TaroRadius.xl,
+            padding: TaroSpacing.lg,
+            glowColor: .mysticPink,
+            glowRadius: 15
+        ) {
+            VStack(spacing: TaroSpacing.md) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(.mysticPink)
+
+                Text("Generation Error")
+                    .font(TaroTypography.headline)
+                    .foregroundColor(.textPrimary)
+
+                Text(error)
+                    .font(TaroTypography.caption)
+                    .foregroundColor(.textSecondary)
+                    .multilineTextAlignment(.center)
+
+                GlassButton("Use Traditional Reading", style: .primary) {
+                    let interpretation = generateFallbackInterpretation()
+                    readingSession.setInterpretation(interpretation)
+                }
+            }
+        }
+        .padding(.horizontal, TaroSpacing.xl)
+    }
+
+    // MARK: - Generation
+
+    private func startGeneration() {
+        // Check if LLM is available
+        if DeviceCapability.supportsLocalLLM && modelManager.state.isReady {
+            Task {
+                await generateWithLLM()
+            }
+        } else if !DeviceCapability.supportsLocalLLM {
+            // Device not supported - use fallback after brief delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                let interpretation = generateFallbackInterpretation()
+                readingSession.setInterpretation(interpretation)
+            }
+        } else {
+            // Model not ready - wait and retry or use fallback
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                if readingSession.state == .generatingInterpretation {
-                    let mockInterpretation = generateMockInterpretation()
-                    readingSession.setInterpretation(mockInterpretation)
+                if modelManager.state.isReady {
+                    Task {
+                        await generateWithLLM()
+                    }
+                } else {
+                    let interpretation = generateFallbackInterpretation()
+                    readingSession.setInterpretation(interpretation)
                 }
             }
         }
     }
 
-    private func generateMockInterpretation() -> String {
-        let cards = readingSession.drawnCards
-        var text = "Your reading reveals a journey of transformation.\n\n"
+    private func generateWithLLM() async {
+        streamedText = ""
+        generationError = nil
 
-        for drawnCard in cards {
-            let orientation = drawnCard.isReversed ? "reversed" : "upright"
-            text += "**\(drawnCard.position.name)** - \(drawnCard.card.name) (\(orientation))\n"
-            text += "\(drawnCard.position.description). "
-            text += "The \(drawnCard.card.name) in this position speaks to \(drawnCard.card.keywords.joined(separator: ", ")).\n\n"
+        do {
+            for try await token in llmService.generateReading(
+                for: readingSession.drawnCards,
+                question: readingSession.question.isEmpty ? nil : readingSession.question,
+                style: .balanced
+            ) {
+                streamedText += token
+            }
+
+            // Generation complete
+            readingSession.setInterpretation(streamedText)
+
+        } catch is CancellationError {
+            // Cancelled - already handled
+        } catch {
+            generationError = error.localizedDescription
+        }
+    }
+
+    // MARK: - Fallback Interpretation
+
+    private func generateFallbackInterpretation() -> String {
+        let dataService = DataService.shared
+        let reading = dataService.interpretation(for: readingSession.drawnCards)
+
+        var text = "# Your Tarot Reading\n\n"
+
+        if !readingSession.question.isEmpty {
+            text += "*Your question: \"\(readingSession.question)\"*\n\n"
         }
 
-        text += "Together, these cards weave a story of \(cards.first?.card.keywords.first ?? "possibility") leading to \(cards.last?.card.keywords.first ?? "transformation").\n\n"
-        text += "*This is a placeholder reading. Full LLM integration coming in PR #6.*"
+        text += "The cards have been drawn and their wisdom awaits. Let us explore what they reveal.\n\n"
+
+        // Individual card interpretations
+        for interpretation in reading.cardInterpretations {
+            let card = interpretation.drawnCard
+            let orientation = card.isReversed ? "Reversed" : "Upright"
+
+            text += "## \(card.position.name)\n"
+            text += "**\(card.card.name)** (\(orientation))\n\n"
+            text += "\(interpretation.baseMeaning)\n\n"
+
+            if let modifier = interpretation.positionModifier {
+                text += "*In this position:* \(modifier)\n\n"
+            }
+        }
+
+        // Combinations
+        if !reading.combinations.isEmpty {
+            text += "## Card Connections\n\n"
+            for combo in reading.combinations {
+                text += "**\(combo.card1) & \(combo.card2):** \(combo.meaning)\n\n"
+            }
+        }
+
+        // Elemental summary
+        text += "## Elemental Balance\n\n"
+        text += "\(reading.elementalFlow.summary)\n\n"
+
+        // Closing
+        text += "---\n\n"
+        text += "*Take time to reflect on these messages. The cards offer guidance, but your intuition is the key to unlocking their deeper meaning.*"
 
         return text
+    }
+
+    // MARK: - Animations
+
+    private func startAnimations() {
+        // Rotation animation
+        withAnimation(
+            Animation
+                .linear(duration: 1.5)
+                .repeatForever(autoreverses: false)
+        ) {
+            animationPhase = 360
+        }
+
+        // Breathing animation
+        withAnimation(
+            Animation
+                .easeInOut(duration: 2)
+                .repeatForever(autoreverses: true)
+        ) {
+            breathingScale = 1.1
+            pulseOpacity = 0.6
+        }
     }
 }
 
@@ -179,5 +375,7 @@ struct GeneratingView: View {
             }
             return session
         }())
+        .environmentObject(ModelManager.shared)
+        .environmentObject(LLMService.shared)
         .preferredColorScheme(.dark)
 }
