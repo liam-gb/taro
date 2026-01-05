@@ -174,13 +174,26 @@ final class ModelManager: ObservableObject {
         state = .loading(progress: 0.3)
         loadProgress = 0.3
 
-        // Simulate loading progress for now
-        // In actual implementation, llama.cpp will provide progress callbacks
-        for progress in stride(from: 0.3, to: 1.0, by: 0.1) {
-            try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-            state = .loading(progress: progress)
-            loadProgress = progress
+        // Perform actual model file preparation
+        // The LlamaContext initialization will be handled by LLMService
+        // Here we just verify the model is ready and accessible
+
+        do {
+            // Warm up file access by reading the first few bytes
+            // This helps with memory-mapped loading later
+            try await warmUpModelFile(at: url)
+        } catch {
+            let modelError = ModelError.loadingFailed("Failed to prepare model: \(error.localizedDescription)")
+            state = .error(modelError)
+            loadError = modelError
+            throw modelError
         }
+
+        state = .loading(progress: 0.7)
+        loadProgress = 0.7
+
+        // Small delay to allow UI to update
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
 
         modelURL = url
         isModelLoaded = true
@@ -271,6 +284,29 @@ final class ModelManager: ObservableObject {
         } catch {
             throw ModelError.unknown("Failed to verify model: \(error.localizedDescription)")
         }
+    }
+
+    /// Warm up model file access for better loading performance
+    private func warmUpModelFile(at url: URL) async throws {
+        try await Task.detached(priority: .userInitiated) {
+            // Read first 4KB to warm up file system caches
+            let handle = try FileHandle(forReadingFrom: url)
+            defer { try? handle.close() }
+
+            // Read header to verify GGUF format
+            if let headerData = try handle.read(upToCount: 4096) {
+                // GGUF files start with "GGUF" magic bytes
+                if headerData.count >= 4 {
+                    let magic = headerData.prefix(4)
+                    let magicString = String(data: magic, encoding: .utf8) ?? ""
+                    if magicString != "GGUF" {
+                        print("ModelManager: Warning - File may not be a valid GGUF model")
+                    } else {
+                        print("ModelManager: GGUF format verified")
+                    }
+                }
+            }
+        }.value
     }
 }
 
