@@ -20,7 +20,7 @@ export default function KeywordList({ keywords = [], variant = 'inline', limit }
     <div className="flex flex-wrap gap-1">
       {items.map((kw, i) => (
         <span key={i} className="text-xs text-slate-500/90 font-light">
-          {kw}{i < items.length - 1 && <span className="text-violet-500/40 mx-1">·</span>}
+          {kw}{i < items.length - 1 && <span className="text-amber-500/40 mx-1">·</span>}
         </span>
       ))}
     </div>

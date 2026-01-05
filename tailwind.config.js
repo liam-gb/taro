@@ -14,13 +14,13 @@ export default {
           100: '#1a1a24',
           200: '#22222e',
         },
-        // Mystical accent colors
+        // Warm mystical accent colors
         mystic: {
-          violet: '#8b5cf6',
-          cyan: '#06b6d4',
-          pink: '#ec4899',
-          amber: '#f59e0b',
-          teal: '#14b8a6',
+          gold: '#c9a86c',      /* Aged gold - primary */
+          sienna: '#a0522d',    /* Warm terracotta */
+          sage: '#7a9e7e',      /* Mystical sage green */
+          bronze: '#d4a574',    /* Warm bronze highlight */
+          deep: '#1a1a2e',      /* Deep indigo shadow */
         },
         // Glass surface colors
         glass: {
@@ -32,7 +32,7 @@ export default {
       },
       fontFamily: {
         mystical: ['Cormorant Garamond', 'Garamond', 'Georgia', 'serif'],
-        ethereal: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        ethereal: ['Spectral', 'Georgia', 'serif'],
       },
       animation: {
         'aurora': 'aurora 15s ease infinite',
@@ -76,10 +76,10 @@ export default {
         xs: '2px',
       },
       boxShadow: {
-        'glow-violet': '0 0 30px rgba(139, 92, 246, 0.3), 0 0 60px rgba(139, 92, 246, 0.1)',
-        'glow-cyan': '0 0 30px rgba(6, 182, 212, 0.3), 0 0 60px rgba(6, 182, 212, 0.1)',
-        'glow-pink': '0 0 30px rgba(236, 72, 153, 0.3), 0 0 60px rgba(236, 72, 153, 0.1)',
-        'glow-soft': '0 0 40px rgba(139, 92, 246, 0.15)',
+        'glow-gold': '0 0 30px rgba(201, 168, 108, 0.3), 0 0 60px rgba(201, 168, 108, 0.1)',
+        'glow-sage': '0 0 30px rgba(122, 158, 126, 0.3), 0 0 60px rgba(122, 158, 126, 0.1)',
+        'glow-sienna': '0 0 30px rgba(160, 82, 45, 0.3), 0 0 60px rgba(160, 82, 45, 0.1)',
+        'glow-soft': '0 0 40px rgba(201, 168, 108, 0.15)',
         'glass': '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
         'glass-hover': '0 12px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
         'card': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
