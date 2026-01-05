@@ -18,6 +18,7 @@ final class LLMService: ObservableObject {
 
     private let modelManager = ModelManager.shared
     private let dataService = DataService.shared
+    private let promptAssembler = PromptAssembler.shared
 
     // MARK: - Private State
 
@@ -194,12 +195,23 @@ final class LLMService: ObservableObject {
         // Check for cancellation
         try Task.checkCancellation()
 
-        // Build the prompt
-        let prompt = buildPrompt(
-            for: drawnCards,
-            question: question,
-            style: style
-        )
+        // Build the optimized prompt using PromptAssembler
+        // This uses pre-calculated snippets for ~800 tokens (vs 4000+ naive approach)
+        let prompt: String
+        if let spread = drawnCards.first?.position, drawnCards.count == 10 {
+            // Use compact format for Celtic Cross
+            prompt = promptAssembler.assembleCelticCrossPrompt(for: drawnCards, question: question)
+        } else if drawnCards.count == 1 {
+            // Use quick format for single card
+            prompt = promptAssembler.assembleQuickPrompt(for: drawnCards[0], question: question)
+        } else {
+            // Standard optimized prompt
+            prompt = promptAssembler.assemblePrompt(for: drawnCards, question: question, style: style)
+        }
+
+        #if DEBUG
+        print("LLMService: Prompt size ~\(promptAssembler.estimateTokenCount(prompt)) tokens")
+        #endif
 
         // Use real llama.cpp inference if context is available, otherwise fallback to simulation
         if let context = llamaContext {

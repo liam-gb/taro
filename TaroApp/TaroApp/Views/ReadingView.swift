@@ -8,6 +8,8 @@ struct ReadingView: View {
     @State private var viewMode: ViewMode = .spread
     @State private var headerOpacity: Double = 0
     @State private var layoutAppeared: Bool = false
+    @State private var interpretationOpacity: Double = 0
+    @State private var showCopiedFeedback = false
 
     enum ViewMode {
         case spread
@@ -255,28 +257,44 @@ struct ReadingView: View {
                         .foregroundColor(.mysticViolet.opacity(0.5))
                 }
 
-                Text(readingSession.interpretation)
-                    .font(TaroTypography.ethereal(16, weight: .regular))
-                    .foregroundColor(.textPrimary)
-                    .lineSpacing(6)
+                // Markdown-rendered interpretation
+                MarkdownTextView(text: readingSession.interpretation)
+                    .opacity(interpretationOpacity)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, TaroSpacing.lg)
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.8).delay(0.3)) {
+                interpretationOpacity = 1
+            }
+        }
     }
 
     // MARK: - Action Buttons Section
 
     private var actionButtonsSection: some View {
         VStack(spacing: TaroSpacing.sm) {
-            GlassButton("Save Reading", icon: "square.and.arrow.down", style: .secondary) {
+            // Copy and Share row
+            HStack(spacing: TaroSpacing.sm) {
+                // Copy button with haptic feedback
+                GlassButton(showCopiedFeedback ? "Copied!" : "Copy Reading", icon: showCopiedFeedback ? "checkmark" : "doc.on.doc", style: .secondary) {
+                    copyReading()
+                }
+                .frame(maxWidth: .infinity)
+
+                // Share button
+                GlassButton("Share", icon: "square.and.arrow.up", style: .secondary) {
+                    showShareSheet = true
+                }
+                .frame(maxWidth: .infinity)
+            }
+
+            GlassButton("Save Reading", icon: "square.and.arrow.down", style: .primary) {
                 // TODO: Save reading
+                Haptics.success()
             }
             .frame(maxWidth: .infinity)
-
-            GlassButton("Copy Text", icon: "doc.on.doc", style: .text) {
-                UIPasteboard.general.string = readingSession.interpretation
-            }
 
             GlowingButton("New Reading") {
                 readingSession.reset()
@@ -285,6 +303,63 @@ struct ReadingView: View {
         }
         .padding(.horizontal, TaroSpacing.lg)
         .padding(.bottom, TaroSpacing.xl)
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(items: [shareableReadingText])
+        }
+    }
+
+    // MARK: - Sharing Helpers
+
+    /// Copy reading to clipboard with haptic feedback
+    private func copyReading() {
+        let text = shareableReadingText
+        UIPasteboard.general.string = text
+        Haptics.success()
+
+        // Show "Copied!" feedback
+        withAnimation(.easeInOut(duration: 0.2)) {
+            showCopiedFeedback = true
+        }
+
+        // Reset after delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showCopiedFeedback = false
+            }
+        }
+    }
+
+    /// Generate shareable reading text
+    private var shareableReadingText: String {
+        var text = ""
+
+        // Header
+        if let spread = readingSession.selectedSpread {
+            text += "\(spread.displayName) Tarot Reading\n"
+        } else {
+            text += "Tarot Reading\n"
+        }
+        text += "\(Date().formatted(date: .long, time: .omitted))\n\n"
+
+        // Question if provided
+        if !readingSession.question.isEmpty {
+            text += "Question: \"\(readingSession.question)\"\n\n"
+        }
+
+        // Cards drawn
+        text += "Cards Drawn:\n"
+        for card in readingSession.drawnCards {
+            let orientation = card.isReversed ? "Reversed" : "Upright"
+            text += "• \(card.position.name): \(card.card.name) (\(orientation))\n"
+        }
+        text += "\n"
+
+        // Interpretation
+        text += "Interpretation:\n"
+        text += readingSession.interpretation
+        text += "\n\n---\nGenerated with Taro"
+
+        return text
     }
 
     // MARK: - Card Detail Overlay
@@ -502,6 +577,144 @@ struct DrawnCardTile: View {
         let words = drawnCard.card.name.split(separator: " ")
         return words.count == 1 ? String(words[0].prefix(3)) : words.map { String($0.prefix(1)) }.joined()
     }
+}
+
+// MARK: - Markdown Text View
+
+/// Renders markdown text with proper styling for tarot readings
+/// Uses iOS built-in AttributedString for inline formatting
+struct MarkdownTextView: View {
+    let text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: TaroSpacing.md) {
+            ForEach(parseBlocks(), id: \.id) { block in
+                block.view
+            }
+        }
+    }
+
+    private func parseBlocks() -> [MarkdownBlock] {
+        var blocks: [MarkdownBlock] = []
+        var currentParagraph = ""
+
+        func flushParagraph() {
+            guard !currentParagraph.isEmpty else { return }
+            blocks.append(.paragraph(currentParagraph))
+            currentParagraph = ""
+        }
+
+        for line in text.components(separatedBy: "\n") {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+
+            switch true {
+            case trimmed.isEmpty:
+                flushParagraph()
+
+            case trimmed.hasPrefix("## "):
+                flushParagraph()
+                blocks.append(.header(String(trimmed.dropFirst(3)), level: 2))
+
+            case trimmed.hasPrefix("# "):
+                flushParagraph()
+                blocks.append(.header(String(trimmed.dropFirst(2)), level: 1))
+
+            case trimmed == "---" || trimmed == "***":
+                flushParagraph()
+                blocks.append(.divider)
+
+            case trimmed.hasPrefix("- ") || trimmed.hasPrefix("• ") || trimmed.hasPrefix("* "):
+                flushParagraph()
+                blocks.append(.listItem(String(trimmed.dropFirst(2))))
+
+            default:
+                currentParagraph += (currentParagraph.isEmpty ? "" : " ") + trimmed
+            }
+        }
+        flushParagraph()
+        return blocks
+    }
+}
+
+// MARK: - Markdown Block
+
+private enum MarkdownBlock: Identifiable {
+    case header(String, level: Int)
+    case paragraph(String)
+    case listItem(String)
+    case divider
+
+    var id: String {
+        switch self {
+        case .header(let text, let level): return "h\(level)-\(text.prefix(20))"
+        case .paragraph(let text): return "p-\(text.prefix(20))"
+        case .listItem(let text): return "li-\(text.prefix(20))"
+        case .divider: return "div-\(UUID().uuidString.prefix(8))"
+        }
+    }
+
+    @ViewBuilder
+    var view: some View {
+        switch self {
+        case .header(let text, let level):
+            Text(text)
+                .font(level == 1 ? TaroTypography.mystical(20, weight: .light) : TaroTypography.mystical(17, weight: .regular))
+                .foregroundColor(level == 1 ? .textPrimary : .mysticViolet)
+                .padding(.top, level == 1 ? TaroSpacing.md : TaroSpacing.sm)
+
+        case .paragraph(let text):
+            if let attributed = try? AttributedString(markdown: text) {
+                Text(attributed)
+                    .font(TaroTypography.ethereal(16, weight: .regular))
+                    .foregroundColor(.textPrimary)
+                    .lineSpacing(6)
+            } else {
+                Text(text)
+                    .font(TaroTypography.ethereal(16, weight: .regular))
+                    .foregroundColor(.textPrimary)
+                    .lineSpacing(6)
+            }
+
+        case .listItem(let text):
+            HStack(alignment: .top, spacing: TaroSpacing.xs) {
+                Text("•")
+                    .font(TaroTypography.body)
+                    .foregroundColor(.mysticViolet)
+                if let attributed = try? AttributedString(markdown: text) {
+                    Text(attributed)
+                        .font(TaroTypography.ethereal(15, weight: .regular))
+                        .foregroundColor(.textPrimary)
+                } else {
+                    Text(text)
+                        .font(TaroTypography.ethereal(15, weight: .regular))
+                        .foregroundColor(.textPrimary)
+                }
+            }
+            .padding(.leading, TaroSpacing.xs)
+
+        case .divider:
+            GlassDivider()
+        }
+    }
+}
+
+// MARK: - Share Sheet
+
+/// UIKit ShareSheet wrapper for SwiftUI
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+    var excludedActivityTypes: [UIActivity.ActivityType]? = nil
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: items,
+            applicationActivities: nil
+        )
+        controller.excludedActivityTypes = excludedActivityTypes
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: - Flow Layout (for keywords)

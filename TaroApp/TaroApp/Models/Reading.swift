@@ -78,6 +78,43 @@ class ReadingSession: ObservableObject {
     @Published var interpretation: String = ""
     @Published var isGenerating: Bool = false
 
+    // MARK: - Generation Performance Tracking
+
+    /// When generation started
+    @Published var generationStartTime: Date?
+
+    /// Number of tokens generated so far
+    @Published var tokensGenerated: Int = 0
+
+    /// Time when first token was received
+    @Published var firstTokenTime: Date?
+
+    /// First token latency in seconds
+    var firstTokenLatency: Double? {
+        guard let start = generationStartTime, let first = firstTokenTime else { return nil }
+        return first.timeIntervalSince(start)
+    }
+
+    /// Generation speed in tokens per second
+    var generationSpeed: Double {
+        guard let start = generationStartTime, tokensGenerated > 0 else { return 0 }
+        let elapsed = Date().timeIntervalSince(start)
+        guard elapsed > 0 else { return 0 }
+        return Double(tokensGenerated) / elapsed
+    }
+
+    /// Total generation time in seconds
+    var totalGenerationTime: Double? {
+        guard let start = generationStartTime, state == .displayingReading else { return nil }
+        return Date().timeIntervalSince(start)
+    }
+
+    /// Elapsed time since generation started (for in-progress display)
+    var elapsedGenerationTime: Double {
+        guard let start = generationStartTime else { return 0 }
+        return Date().timeIntervalSince(start)
+    }
+
     var currentSpread: Spread? {
         selectedSpread?.spread
     }
@@ -115,6 +152,44 @@ class ReadingSession: ObservableObject {
         state = .displayingReading
     }
 
+    // MARK: - Generation Tracking Methods
+
+    /// Start tracking generation time
+    func startGeneration() {
+        generationStartTime = Date()
+        tokensGenerated = 0
+        firstTokenTime = nil
+        isGenerating = true
+    }
+
+    /// Record a token being generated
+    func recordToken() {
+        if firstTokenTime == nil {
+            firstTokenTime = Date()
+        }
+        tokensGenerated += 1
+    }
+
+    /// Record multiple tokens being generated
+    func recordTokens(_ count: Int) {
+        if firstTokenTime == nil && count > 0 {
+            firstTokenTime = Date()
+        }
+        tokensGenerated += count
+    }
+
+    /// Complete generation tracking
+    func completeGeneration() {
+        isGenerating = false
+    }
+
+    /// Reset generation tracking state
+    func resetGenerationTracking() {
+        generationStartTime = nil
+        tokensGenerated = 0
+        firstTokenTime = nil
+    }
+
     func reset() {
         state = .selectingSpread
         selectedSpread = nil
@@ -122,6 +197,7 @@ class ReadingSession: ObservableObject {
         drawnCards = []
         interpretation = ""
         isGenerating = false
+        resetGenerationTracking()
     }
 
     /// Create a Reading record from the current session

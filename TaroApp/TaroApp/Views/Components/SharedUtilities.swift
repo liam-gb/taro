@@ -28,6 +28,18 @@ extension String {
     }
 }
 
+// MARK: - Time Formatting
+
+/// Formats seconds into a readable time string
+func formatElapsedTime(_ seconds: Double) -> String {
+    let mins = Int(seconds) / 60
+    let secs = Int(seconds) % 60
+    if mins > 0 {
+        return String(format: "%d:%02d", mins, secs)
+    }
+    return String(format: "%.1fs", seconds)
+}
+
 // MARK: - Card Animation State
 
 struct CardAnimationState {

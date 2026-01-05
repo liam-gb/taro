@@ -65,6 +65,16 @@ struct CardCombination: Codable, Identifiable {
         cards.sorted().joined(separator: "-")
     }
 
+    /// First card in the combination
+    var card1: String {
+        cards.indices.contains(0) ? cards[0] : ""
+    }
+
+    /// Second card in the combination
+    var card2: String {
+        cards.indices.contains(1) ? cards[1] : ""
+    }
+
     /// Check if this combination matches a pair of cards
     func matches(card1: String, card2: String) -> Bool {
         let pair = Set([card1, card2])
