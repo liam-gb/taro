@@ -167,8 +167,7 @@ struct CardSelectionView: View {
         guard !isFanExpanded else { return }
 
         isFanExpanded = true
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        Haptics.medium()
 
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
             for index in cardStates.indices {
@@ -206,8 +205,7 @@ struct CardSelectionView: View {
         guard selectedCardAnimating == nil else { return }
 
         // Haptic feedback
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        Haptics.medium()
 
         // Mark as animating
         selectedCardAnimating = index
@@ -236,8 +234,7 @@ struct CardSelectionView: View {
                 selectedCardAnimating = nil
 
                 // Success haptic
-                let notificationGenerator = UINotificationFeedbackGenerator()
-                notificationGenerator.notificationOccurred(.success)
+                Haptics.success()
             }
         }
     }
@@ -357,12 +354,7 @@ struct DrawnCardMini: View {
     }
 
     private var elementColor: Color {
-        switch drawnCard.card.element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return Color.mysticCyan
-        case .air: return Color.mysticTeal
-        case .earth: return Color.mysticEmerald
-        }
+        drawnCard.card.element.color
     }
 }
 

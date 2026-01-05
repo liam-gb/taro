@@ -12,7 +12,7 @@ struct SpreadLayoutView: View {
     var animateIn: Bool = true
     var onCardTap: ((DrawnCard) -> Void)? = nil
 
-    @State private var cardStates: [CardAnimationState] = []
+    @State private var cardStates: [CardAnimationState] = []  // Uses shared CardAnimationState from SharedUtilities
     @State private var hasAnimated: Bool = false
 
     var body: some View {
@@ -65,7 +65,7 @@ struct SpreadLayoutView: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    elementColor(for: drawnCard.card.element).opacity(0.2),
+                                    drawnCard.card.element.color.opacity(0.2),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -383,8 +383,7 @@ struct SpreadLayoutView: View {
                 }
 
                 // Haptic
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred()
+                Haptics.medium()
             }
 
             // Glow settles
@@ -407,16 +406,6 @@ struct SpreadLayoutView: View {
         }
     }
 
-    // MARK: - Helpers
-
-    private func elementColor(for element: Element) -> Color {
-        switch element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return .mysticCyan
-        case .air: return .mysticTeal
-        case .earth: return .mysticEmerald
-        }
-    }
 }
 
 // MARK: - Supporting Types
@@ -425,16 +414,6 @@ private struct CardLayout {
     let position: CGPoint
     let rotation: Double
     let zIndex: Double
-}
-
-private struct CardAnimationState {
-    var isVisible: Bool = false
-    var isFlipped: Bool = false
-    var opacity: Double = 0
-    var scale: CGFloat = 0.5
-    var offset: CGSize = CGSize(width: 0, height: 50)
-    var glowOpacity: Double = 0
-    var labelOpacity: Double = 0
 }
 
 // MARK: - SpreadCardView
@@ -623,22 +602,11 @@ struct SpreadCardFront: View {
     }
 
     private var elementColor: Color {
-        switch drawnCard.card.element {
-        case .fire: return Color(hex: "F97316")
-        case .water: return .mysticCyan
-        case .air: return .mysticTeal
-        case .earth: return .mysticEmerald
-        }
+        drawnCard.card.element.color
     }
 
     private var abbreviatedName: String {
-        if size == .small || size == .standard {
-            let words = drawnCard.card.name.split(separator: " ")
-            if words.count > 2 {
-                return words.prefix(2).joined(separator: " ")
-            }
-        }
-        return drawnCard.card.name
+        drawnCard.card.name.abbreviatedCardName(forSmallSize: size == .small || size == .standard)
     }
 }
 

@@ -61,6 +61,21 @@ enum Element: String, Codable, CaseIterable {
     }
 }
 
+// MARK: - Element Color Extension (requires SwiftUI import in views)
+import SwiftUI
+
+extension Element {
+    /// The color associated with this element for UI display
+    var color: Color {
+        switch self {
+        case .fire: return Color(hex: "F97316")    // Orange
+        case .water: return .mysticCyan
+        case .air: return .mysticTeal
+        case .earth: return .mysticEmerald
+        }
+    }
+}
+
 // MARK: - Suit
 
 enum Suit: String, Codable, CaseIterable {

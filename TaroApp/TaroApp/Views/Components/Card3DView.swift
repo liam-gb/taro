@@ -98,8 +98,7 @@ struct Card3DView: View {
         }
 
         // Haptic feedback
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+        Haptics.medium()
     }
 }
 
@@ -212,22 +211,11 @@ struct CardFrontView: View {
     }
 
     private func elementColor(for element: Element) -> Color {
-        switch element {
-        case .fire: return Color(hex: "F97316")    // Orange
-        case .water: return Color.mysticCyan
-        case .air: return Color.mysticTeal
-        case .earth: return Color.mysticEmerald
-        }
+        element.color
     }
 
     private func abbreviatedName(_ name: String) -> String {
-        if size == .small || size == .standard {
-            let words = name.split(separator: " ")
-            if words.count > 2 {
-                return words.prefix(2).joined(separator: " ")
-            }
-        }
-        return name
+        name.abbreviatedCardName(forSmallSize: size == .small || size == .standard)
     }
 }
 
@@ -318,8 +306,7 @@ struct SelectableCard: View {
                 .onEnded { _ in
                     isPressed = false
                     if !isDisabled && !isSelected {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
+                        Haptics.light()
                         onSelect?()
                     }
                 }
