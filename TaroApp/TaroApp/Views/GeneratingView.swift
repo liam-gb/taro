@@ -229,7 +229,7 @@ struct GeneratingView: View {
             HStack(spacing: TaroSpacing.xxs) {
                 Image(systemName: "clock")
                     .font(.system(size: 10))
-                Text(formatTime(elapsedTime))
+                Text(formatElapsedTime(elapsedTime))
                     .font(TaroTypography.caption2)
             }
             .foregroundColor(.textMuted)
@@ -257,15 +257,6 @@ struct GeneratingView: View {
             }
         }
         .padding(.top, TaroSpacing.xs)
-    }
-
-    private func formatTime(_ seconds: Double) -> String {
-        let mins = Int(seconds) / 60
-        let secs = Int(seconds) % 60
-        if mins > 0 {
-            return String(format: "%d:%02d", mins, secs)
-        }
-        return String(format: "%.1fs", seconds)
     }
 
     // MARK: - Unsupported Device Actions

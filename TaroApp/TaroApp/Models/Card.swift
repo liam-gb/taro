@@ -56,6 +56,16 @@ enum Element: String, Codable, CaseIterable {
         case .earth: return "Finances, career, material"
         }
     }
+
+    /// Description for use in reading prompts
+    var readingDescription: String {
+        switch self {
+        case .fire: return "Passion, action, and creative force drive this reading."
+        case .water: return "Emotions, intuition, and deep feelings flow through this reading."
+        case .air: return "Thought, communication, and mental clarity shape this reading."
+        case .earth: return "Stability, practicality, and material concerns ground this reading."
+        }
+    }
 }
 
 // MARK: - Element Color

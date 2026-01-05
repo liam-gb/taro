@@ -161,6 +161,18 @@ enum ReadingStyle: String, CaseIterable, Codable {
         }
     }
 
+    /// Instruction for the LLM on how to style the reading
+    var promptInstruction: String {
+        switch self {
+        case .balanced:
+            return "Balance intuitive insight with practical guidance. Be warm and accessible."
+        case .mystical:
+            return "Use rich symbolic language and poetic imagery. Speak to the soul's journey."
+        case .practical:
+            return "Focus on clear, actionable guidance. Be direct and grounded."
+        }
+    }
+
     var icon: String {
         switch self {
         case .balanced:
