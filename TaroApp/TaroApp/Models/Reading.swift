@@ -14,6 +14,9 @@ struct Reading: Identifiable, Codable {
     // User notes/journaling
     var notes: String?
 
+    // Favorite status
+    var isFavorite: Bool
+
     init(
         id: UUID = UUID(),
         spreadType: SpreadType,
@@ -21,7 +24,8 @@ struct Reading: Identifiable, Codable {
         drawnCards: [DrawnCardData] = [],
         interpretation: String? = nil,
         createdAt: Date = Date(),
-        notes: String? = nil
+        notes: String? = nil,
+        isFavorite: Bool = false
     ) {
         self.id = id
         self.spreadType = spreadType
@@ -30,6 +34,7 @@ struct Reading: Identifiable, Codable {
         self.interpretation = interpretation
         self.createdAt = createdAt
         self.notes = notes
+        self.isFavorite = isFavorite
     }
 }
 

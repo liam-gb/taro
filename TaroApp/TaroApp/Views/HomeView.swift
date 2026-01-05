@@ -10,6 +10,9 @@ struct HomeView: View {
     @State private var subtitleOpacity: Double = 0
     @State private var cardsAppeared: Bool = false
     @State private var headerGlowPulse: Bool = false
+    @State private var showHistory: Bool = false
+    @State private var recentReading: Reading? = nil
+    @State private var readingCount: Int = 0
 
     var body: some View {
         ZStack {
@@ -34,6 +37,17 @@ struct HomeView: View {
         .navigationBarHidden(true)
         .task {
             await animateEntrance()
+            await loadHistoryData()
+        }
+        .sheet(isPresented: $showHistory) {
+            NavigationStack {
+                HistoryView()
+            }
+            .onDisappear {
+                Task {
+                    await loadHistoryData()
+                }
+            }
         }
         .questionInputModal(
             isPresented: $showQuestionModal,
@@ -196,6 +210,13 @@ struct HomeView: View {
 
     private var bottomSection: some View {
         VStack(spacing: TaroSpacing.md) {
+            // Recent reading preview
+            if let recent = recentReading {
+                recentReadingCard(recent)
+                    .padding(.horizontal, TaroSpacing.lg)
+                    .opacity(subtitleOpacity)
+            }
+
             // Begin reading button (only shows when spread is selected)
             if selectedSpread != nil {
                 GlowingButton("Begin Reading", icon: "sparkles") {
@@ -209,13 +230,66 @@ struct HomeView: View {
                 ))
             }
 
-            // History link
-            GlassButton("Reading History", icon: "clock.arrow.circlepath", style: .text) {
-                // TODO: Navigate to history
+            // History link with count
+            GlassButton(historyButtonTitle, icon: "clock.arrow.circlepath", style: .text) {
+                showHistory = true
             }
             .opacity(subtitleOpacity)
         }
         .animation(.spring(response: 0.5, dampingFraction: 0.8), value: selectedSpread)
+    }
+
+    private var historyButtonTitle: String {
+        if readingCount > 0 {
+            return "Reading History (\(readingCount))"
+        }
+        return "Reading History"
+    }
+
+    @ViewBuilder
+    private func recentReadingCard(_ reading: Reading) -> some View {
+        Button(action: { showHistory = true }) {
+            GlassPanel(style: .light, cornerRadius: TaroRadius.lg, padding: TaroSpacing.md) {
+                HStack(spacing: TaroSpacing.md) {
+                    // Icon
+                    ZStack {
+                        RoundedRectangle(cornerRadius: TaroRadius.sm)
+                            .fill(reading.spreadType.color.opacity(0.15))
+                            .frame(width: 40, height: 40)
+
+                        Image(systemName: reading.spreadType.iconName)
+                            .font(.system(size: 16))
+                            .foregroundColor(reading.spreadType.color)
+                    }
+
+                    // Content
+                    VStack(alignment: .leading, spacing: TaroSpacing.xxxs) {
+                        Text("Recent Reading")
+                            .font(TaroTypography.caption2)
+                            .foregroundColor(.textMuted)
+                            .textCase(.uppercase)
+
+                        Text(reading.spreadType.displayName)
+                            .font(TaroTypography.ethereal(14, weight: .medium))
+                            .foregroundColor(.textPrimary)
+
+                        if let question = reading.question, !question.isEmpty {
+                            Text(question)
+                                .font(TaroTypography.caption)
+                                .foregroundColor(.textSecondary)
+                                .lineLimit(1)
+                        }
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.textMuted)
+                }
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Actions
@@ -258,6 +332,13 @@ struct HomeView: View {
         try? await Task.sleep(for: .milliseconds(400))
         guard !Task.isCancelled else { return }
         headerGlowPulse = true
+    }
+
+    // MARK: - History Data
+
+    private func loadHistoryData() async {
+        readingCount = await HistoryService.shared.readingCount()
+        recentReading = try? await HistoryService.shared.fetchMostRecentReading()
     }
 }
 
