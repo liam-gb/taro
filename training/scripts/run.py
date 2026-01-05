@@ -9,6 +9,11 @@ Usage:
     python run.py convert-sft           # Convert to SFT format
     python run.py status                # Show progress
     python run.py test                  # Run quick test
+
+FIXME: Minor arcana meanings in TaroApp/Resources/base-meanings.json show
+       "Meaning not available" - need to populate before generating training data.
+TODO: Consider adding RLAIF stage 2 pipeline (Constitutional AI style) once
+      SFT training is validated.
 """
 
 import argparse
@@ -21,20 +26,20 @@ DATA_DIR = SCRIPT_DIR.parent / "data"
 
 
 def cmd_generate_prompts(args):
-    """Generate training prompts."""
-    from prompt_generator import generate_dataset, get_dataset_stats
+    """Generate training prompts using iOS prompt format."""
+    from prompt_generator import generate_dataset, save_prompts, get_dataset_stats
 
-    output_path = DATA_DIR / "prompts.json"
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = DATA_DIR / "prompts.json"
 
-    prompts = generate_dataset(
-        target_count=args.count,
-        output_path=output_path,
-        seed=args.seed
-    )
+    print(f"Generating {args.count} prompts (seed={args.seed})...")
+    prompts = generate_dataset(args.count, args.seed)
+    save_prompts(prompts, output_path)
 
     stats = get_dataset_stats(prompts)
-    print(f"\n✓ Generated {stats['total']} prompts")
+    print(f"\n✓ Generated {stats['total']} prompts (iOS format)")
+    print(f"  With questions: {stats['with_question']}")
+    print(f"  Spreads: {', '.join(f'{k}: {v}' for k, v in stats['by_spread'].items())}")
     print(f"  Saved to: {output_path}")
 
 
@@ -67,7 +72,7 @@ def cmd_create_batches(args):
 
 def cmd_merge_responses(args):
     """Merge Claude responses into prompts."""
-    from response_parser import merge_responses_into_prompts, get_progress_report
+    from response_parser import merge_responses, get_progress_report
 
     prompts_path = DATA_DIR / "prompts.json"
     responses_dir = DATA_DIR / "batches" / "responses"
@@ -81,9 +86,7 @@ def cmd_merge_responses(args):
         print("Process some batches first to generate response files.")
         sys.exit(1)
 
-    merged, missing, errors = merge_responses_into_prompts(
-        prompts_path, responses_dir
-    )
+    merged, errors = merge_responses(prompts_path, responses_dir)
 
     print(f"\n✓ Merged {merged} responses")
     if errors:
@@ -94,7 +97,7 @@ def cmd_merge_responses(args):
 
 def cmd_convert_sft(args):
     """Convert to SFT training format."""
-    from convert_to_sft import convert_to_sft_format
+    from convert_to_sft import convert_to_sft
 
     prompts_path = DATA_DIR / "prompts.json"
     sft_dir = DATA_DIR / "sft"
@@ -103,10 +106,9 @@ def cmd_convert_sft(args):
         print("Error: prompts.json not found.")
         sys.exit(1)
 
-    counts = convert_to_sft_format(
+    counts = convert_to_sft(
         prompts_path,
         sft_dir,
-        format_type=args.format,
         train_ratio=args.train_ratio,
         valid_ratio=args.valid_ratio,
         seed=args.seed
@@ -115,7 +117,8 @@ def cmd_convert_sft(args):
     print(f"\n✓ SFT data created in: {sft_dir}")
     print(f"  Train: {counts['train']}, Valid: {counts['valid']}, Test: {counts['test']}")
     print("\nNext: Run MLX fine-tuning:")
-    print(f"  python -m mlx_lm.lora --model microsoft/Phi-4-mini-instruct \\")
+    # TODO: Update model to Phi-4-mini when available on HuggingFace
+    print(f"  python -m mlx_lm.lora --model microsoft/Phi-3-mini-4k-instruct \\")
     print(f"    --train --data {sft_dir} --iters 1000")
 
 
@@ -160,46 +163,37 @@ def cmd_test(args):
     """Quick test of the pipeline."""
     print("=== Testing Pipeline ===\n")
 
-    # Test imports
-    print("1. Testing imports...")
-    from questions import get_question_stats, sample_questions_weighted
-    from cards import FULL_DECK, draw_cards
-    from spreads import SPREADS, sample_spread_weighted
-    from prompt_generator import generate_dataset, format_prompt_for_claude
+    # Test imports and data loading
+    print("1. Testing imports and iOS data loading...")
+    from prompt_generator import (
+        generate_dataset, get_dataset_stats, QUESTIONS, SPREADS,
+        BASE_MEANINGS, COMBINATIONS, build_prompt
+    )
     print("   ✓ All imports successful")
+    print(f"   ✓ Loaded {len(BASE_MEANINGS)} card meanings from iOS resources")
+    print(f"   ✓ Loaded {len(COMBINATIONS)} card combinations")
+    print(f"   ✓ Loaded {len(QUESTIONS)} questions, {len(SPREADS)} spreads")
 
-    # Test question generation
-    print("\n2. Testing question generation...")
-    stats = get_question_stats()
-    print(f"   ✓ {stats['total_base_questions']} base questions in {stats['categories']} categories")
-
-    # Test card drawing
-    print("\n3. Testing card drawing...")
-    cards = draw_cards(3)
-    for c in cards:
-        print(f"   - {c.display_name}")
-    print("   ✓ Card drawing works")
-
-    # Test spread sampling
-    print("\n4. Testing spread sampling...")
-    spread = sample_spread_weighted()
-    print(f"   ✓ Sampled spread: {spread.name} ({len(spread.positions)} positions)")
+    # Check for incomplete meanings (FIXME)
+    incomplete = [k for k, v in BASE_MEANINGS.items()
+                  if "not available" in v.get("upright", "").lower()]
+    if incomplete:
+        print(f"   ⚠ FIXME: {len(incomplete)} cards have incomplete meanings")
 
     # Test prompt generation (small batch)
-    print("\n5. Testing prompt generation (10 prompts)...")
-    test_output = DATA_DIR / "test_prompts.json"
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    prompts = generate_dataset(10, test_output, seed=42)
-    print(f"   ✓ Generated {len(prompts)} prompts")
+    print("\n2. Testing prompt generation (10 prompts)...")
+    prompts = generate_dataset(10, seed=42)
+    stats = get_dataset_stats(prompts)
+    print(f"   ✓ Generated {stats['total']} prompts")
+    print(f"   ✓ With questions: {stats['with_question']}")
+    print(f"   ✓ Spreads: {stats['by_spread']}")
 
     # Show sample prompt
-    print("\n6. Sample formatted prompt:")
+    print("\n3. Sample prompt (first 600 chars):")
     print("-" * 50)
-    print(format_prompt_for_claude(prompts[0])[:500] + "...")
+    print(prompts[0].input_text[:600] + "...")
     print("-" * 50)
 
-    # Cleanup
-    test_output.unlink()
     print("\n✓ All tests passed!")
 
 
@@ -235,7 +229,6 @@ Examples:
 
     # convert-sft
     p = subparsers.add_parser("convert-sft", help="Convert to SFT format")
-    p.add_argument("--format", choices=["chat", "instruct"], default="chat")
     p.add_argument("--train-ratio", type=float, default=0.9)
     p.add_argument("--valid-ratio", type=float, default=0.05)
     p.add_argument("--seed", type=int, default=42)
