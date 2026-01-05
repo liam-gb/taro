@@ -318,15 +318,13 @@ struct DrawnCardMini: View {
     let drawnCard: DrawnCard
 
     var body: some View {
+        let color = drawnCard.card.element.color
         VStack(spacing: TaroSpacing.xxs) {
             ZStack {
                 RoundedRectangle(cornerRadius: TaroRadius.xs)
                     .fill(
                         LinearGradient(
-                            colors: [
-                                elementColor.opacity(0.3),
-                                elementColor.opacity(0.15)
-                            ],
+                            colors: [color.opacity(0.3), color.opacity(0.15)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -340,7 +338,7 @@ struct DrawnCardMini: View {
             }
             .overlay(
                 RoundedRectangle(cornerRadius: TaroRadius.xs)
-                    .stroke(elementColor.opacity(0.5), lineWidth: 1)
+                    .stroke(color.opacity(0.5), lineWidth: 1)
             )
 
             Text(drawnCard.position.name)
@@ -348,10 +346,6 @@ struct DrawnCardMini: View {
                 .foregroundColor(.textMuted)
                 .lineLimit(1)
         }
-    }
-
-    private var elementColor: Color {
-        drawnCard.card.element.color
     }
 }
 

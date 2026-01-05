@@ -110,15 +110,14 @@ struct CardFrontView: View {
     var size: Card3DView.CardSize = .standard
 
     var body: some View {
+        let color = (card?.element ?? .fire).color
+        let isSmall = size == .small || size == .standard
         ZStack {
             // Glass background
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color.deepSpaceLight,
-                            Color.deepSpace
-                        ],
+                        colors: [Color.deepSpaceLight, Color.deepSpace],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -133,7 +132,10 @@ struct CardFrontView: View {
             VStack(spacing: TaroSpacing.xxs) {
                 if let card = card {
                     // Element indicator
-                    elementBadge(for: card.element)
+                    Circle()
+                        .fill(card.element.color.opacity(0.3))
+                        .frame(width: size == .large ? 24 : 16, height: size == .large ? 24 : 16)
+                        .overlay(Circle().stroke(card.element.color.opacity(0.5), lineWidth: 1))
 
                     Spacer()
 
@@ -149,7 +151,7 @@ struct CardFrontView: View {
                     }
 
                     // Card name (abbreviated for smaller sizes)
-                    Text(abbreviatedName(card.name))
+                    Text(card.name.abbreviatedCardName(forSmallSize: isSmall))
                         .font(TaroTypography.mystical(size == .large ? 14 : 10, weight: .regular))
                         .foregroundColor(.textSecondary)
                         .multilineTextAlignment(.center)
@@ -159,7 +161,13 @@ struct CardFrontView: View {
                     Spacer()
 
                     // Arcana indicator
-                    arcanaIndicator(for: card)
+                    HStack(spacing: 2) {
+                        ForEach(0..<(card.arcana == .major ? 3 : 1), id: \.self) { _ in
+                            Circle()
+                                .fill(Color.mysticViolet.opacity(0.5))
+                                .frame(width: 4, height: 4)
+                        }
+                    }
                 } else {
                     // Placeholder for nil card
                     Image(systemName: "questionmark")
@@ -173,10 +181,7 @@ struct CardFrontView: View {
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .stroke(
                     LinearGradient(
-                        colors: [
-                            elementColor(for: card?.element ?? .fire).opacity(0.5),
-                            elementColor(for: card?.element ?? .fire).opacity(0.2)
-                        ],
+                        colors: [color.opacity(0.5), color.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -185,37 +190,7 @@ struct CardFrontView: View {
         }
         .frame(width: size.width, height: size.height)
         .shadow(color: Color.black.opacity(0.4), radius: 10, y: 5)
-        .shadow(color: elementColor(for: card?.element ?? .fire).opacity(0.3), radius: 15)
-    }
-
-    @ViewBuilder
-    private func elementBadge(for element: Element) -> some View {
-        Circle()
-            .fill(elementColor(for: element).opacity(0.3))
-            .frame(width: size == .large ? 24 : 16, height: size == .large ? 24 : 16)
-            .overlay(
-                Circle()
-                    .stroke(elementColor(for: element).opacity(0.5), lineWidth: 1)
-            )
-    }
-
-    @ViewBuilder
-    private func arcanaIndicator(for card: Card) -> some View {
-        HStack(spacing: 2) {
-            ForEach(0..<(card.arcana == .major ? 3 : 1), id: \.self) { _ in
-                Circle()
-                    .fill(Color.mysticViolet.opacity(0.5))
-                    .frame(width: 4, height: 4)
-            }
-        }
-    }
-
-    private func elementColor(for element: Element) -> Color {
-        element.color
-    }
-
-    private func abbreviatedName(_ name: String) -> String {
-        name.abbreviatedCardName(forSmallSize: size == .small || size == .standard)
+        .shadow(color: color.opacity(0.3), radius: 15)
     }
 }
 

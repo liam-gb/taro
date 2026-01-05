@@ -490,15 +490,14 @@ struct SpreadCardFront: View {
     var size: Card3DView.CardSize = .standard
 
     var body: some View {
+        let color = drawnCard.card.element.color
+        let isSmall = size == .small || size == .standard
         ZStack {
             // Background
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color.deepSpaceLight,
-                            Color.deepSpace
-                        ],
+                        colors: [Color.deepSpaceLight, Color.deepSpace],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -513,11 +512,7 @@ struct SpreadCardFront: View {
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            elementColor.opacity(0.15),
-                            elementColor.opacity(0.05),
-                            Color.clear
-                        ],
+                        colors: [color.opacity(0.15), color.opacity(0.05), Color.clear],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -527,12 +522,9 @@ struct SpreadCardFront: View {
             VStack(spacing: TaroSpacing.xxs) {
                 // Element badge
                 Circle()
-                    .fill(elementColor.opacity(0.3))
+                    .fill(color.opacity(0.3))
                     .frame(width: size == .large ? 24 : 16, height: size == .large ? 24 : 16)
-                    .overlay(
-                        Circle()
-                            .stroke(elementColor.opacity(0.5), lineWidth: 1)
-                    )
+                    .overlay(Circle().stroke(color.opacity(0.5), lineWidth: 1))
 
                 Spacer()
 
@@ -548,7 +540,7 @@ struct SpreadCardFront: View {
                 }
 
                 // Card name
-                Text(abbreviatedName)
+                Text(drawnCard.card.name.abbreviatedCardName(forSmallSize: isSmall))
                     .font(TaroTypography.mystical(size == .large ? 14 : 10, weight: .regular))
                     .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)
@@ -579,10 +571,7 @@ struct SpreadCardFront: View {
             RoundedRectangle(cornerRadius: TaroRadius.md)
                 .stroke(
                     LinearGradient(
-                        colors: [
-                            elementColor.opacity(0.5),
-                            elementColor.opacity(0.2)
-                        ],
+                        colors: [color.opacity(0.5), color.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -591,15 +580,7 @@ struct SpreadCardFront: View {
         }
         .frame(width: size.width, height: size.height)
         .shadow(color: Color.black.opacity(0.4), radius: 10, y: 5)
-        .shadow(color: elementColor.opacity(0.2), radius: 12)
-    }
-
-    private var elementColor: Color {
-        drawnCard.card.element.color
-    }
-
-    private var abbreviatedName: String {
-        drawnCard.card.name.abbreviatedCardName(forSmallSize: size == .small || size == .standard)
+        .shadow(color: color.opacity(0.2), radius: 12)
     }
 }
 

@@ -436,6 +436,7 @@ struct DrawnCardTile: View {
     let drawnCard: DrawnCard
 
     var body: some View {
+        let color = drawnCard.card.element.color
         VStack(spacing: TaroSpacing.xs) {
             // Card visual
             ActiveGlassPanel(
@@ -445,10 +446,7 @@ struct DrawnCardTile: View {
             ) {
                 ZStack {
                     LinearGradient(
-                        colors: [
-                            elementColor.opacity(0.3),
-                            elementColor.opacity(0.1)
-                        ],
+                        colors: [color.opacity(0.3), color.opacity(0.1)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -476,7 +474,7 @@ struct DrawnCardTile: View {
             }
             .overlay(
                 RoundedRectangle(cornerRadius: TaroRadius.sm)
-                    .stroke(elementColor.opacity(0.5), lineWidth: 1)
+                    .stroke(color.opacity(0.5), lineWidth: 1)
             )
             .rotationEffect(.degrees(drawnCard.isReversed ? 180 : 0))
 
@@ -500,16 +498,9 @@ struct DrawnCardTile: View {
         }
     }
 
-    private var elementColor: Color {
-        drawnCard.card.element.color
-    }
-
     private var cardInitials: String {
         let words = drawnCard.card.name.split(separator: " ")
-        if words.count == 1 {
-            return String(words[0].prefix(3))
-        }
-        return words.map { String($0.prefix(1)) }.joined()
+        return words.count == 1 ? String(words[0].prefix(3)) : words.map { String($0.prefix(1)) }.joined()
     }
 }
 
