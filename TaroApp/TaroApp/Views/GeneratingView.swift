@@ -3,89 +3,140 @@ import SwiftUI
 struct GeneratingView: View {
     @EnvironmentObject var readingSession: ReadingSession
     @State private var animationPhase = 0.0
+    @State private var breathingScale: CGFloat = 1.0
+    @State private var pulseOpacity: Double = 0.3
 
     var body: some View {
         ZStack {
-            // Background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.05, blue: 0.15),
-                    Color(red: 0.1, green: 0.05, blue: 0.2)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // Aurora animated background
+            AuroraBackground()
 
-            VStack(spacing: 32) {
+            VStack(spacing: TaroSpacing.xl) {
                 Spacer()
 
                 // Cards drawn summary
-                VStack(spacing: 16) {
-                    Text("Your Cards")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.5))
-                        .textCase(.uppercase)
-                        .tracking(1)
+                GlassPanel(style: .card, cornerRadius: TaroRadius.xl, padding: TaroSpacing.lg) {
+                    VStack(spacing: TaroSpacing.md) {
+                        Text("Your Cards")
+                            .font(TaroTypography.caption)
+                            .foregroundColor(.textMuted)
+                            .textCase(.uppercase)
+                            .tracking(1)
 
-                    HStack(spacing: 12) {
-                        ForEach(readingSession.drawnCards) { drawnCard in
-                            VStack(spacing: 4) {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(.white.opacity(0.1))
-                                    .frame(width: 50, height: 75)
-                                    .overlay(
-                                        Text(drawnCard.card.name.prefix(1))
-                                            .font(.system(size: 16, weight: .light, design: .serif))
-                                            .foregroundColor(.white.opacity(0.6))
-                                    )
-                                    .rotationEffect(.degrees(drawnCard.isReversed ? 180 : 0))
+                        HStack(spacing: TaroSpacing.sm) {
+                            ForEach(readingSession.drawnCards) { drawnCard in
+                                VStack(spacing: TaroSpacing.xxs) {
+                                    RoundedRectangle(cornerRadius: TaroRadius.xs)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color.mysticViolet.opacity(0.15),
+                                                    Color.deepViolet.opacity(0.1)
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: TaroRadius.xs)
+                                                .stroke(Color.mysticViolet.opacity(0.3), lineWidth: 1)
+                                        )
+                                        .frame(width: 50, height: 75)
+                                        .overlay(
+                                            Text(drawnCard.card.name.prefix(1))
+                                                .font(TaroTypography.mystical(16, weight: .light))
+                                                .foregroundColor(.textSecondary)
+                                        )
+                                        .rotationEffect(.degrees(drawnCard.isReversed ? 180 : 0))
 
-                                Text(drawnCard.position.name)
-                                    .font(.system(size: 10, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.4))
-                                    .lineLimit(1)
+                                    Text(drawnCard.position.name)
+                                        .font(TaroTypography.caption2)
+                                        .foregroundColor(.textMuted)
+                                        .lineLimit(1)
+                                }
                             }
                         }
                     }
                 }
+                .padding(.horizontal, TaroSpacing.lg)
 
                 Spacer()
 
-                // Loading indicator
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
+                // Loading indicator with breathing animation
+                GlassPanel(
+                    style: .summary,
+                    cornerRadius: TaroRadius.xl,
+                    padding: TaroSpacing.xl,
+                    glowColor: .mysticViolet,
+                    glowRadius: 20
+                ) {
+                    VStack(spacing: TaroSpacing.md) {
+                        // Animated loading indicator
+                        ZStack {
+                            Circle()
+                                .stroke(Color.mysticViolet.opacity(0.2), lineWidth: 3)
+                                .frame(width: 60, height: 60)
 
-                    Text("Weaving your reading...")
-                        .font(.system(size: 16, weight: .light, design: .serif))
-                        .foregroundColor(.white.opacity(0.7))
+                            Circle()
+                                .trim(from: 0, to: 0.7)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [.mysticViolet, .mysticCyan],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    ),
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                                )
+                                .frame(width: 60, height: 60)
+                                .rotationEffect(.degrees(animationPhase))
+                        }
+                        .scaleEffect(breathingScale)
+                        .opacity(pulseOpacity + 0.5)
 
-                    Text("The cards speak through the local oracle")
-                        .font(.system(size: 12, weight: .light))
-                        .foregroundColor(.white.opacity(0.4))
+                        Text("Weaving your reading...")
+                            .font(TaroTypography.mystical(16, weight: .light))
+                            .foregroundColor(.textSecondary)
+
+                        Text("The cards speak through the local oracle")
+                            .font(TaroTypography.caption)
+                            .foregroundColor(.textMuted)
+                    }
                 }
+                .padding(.horizontal, TaroSpacing.xl)
 
                 Spacer()
 
                 // Placeholder: Skip button for development
-                Button(action: {
+                GlassButton("Skip (Dev Only)", style: .text) {
                     // Simulate interpretation generation
                     let mockInterpretation = generateMockInterpretation()
                     readingSession.setInterpretation(mockInterpretation)
-                }) {
-                    Text("Skip (Dev Only)")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.3))
                 }
-                .padding(.bottom, 32)
+                .padding(.bottom, TaroSpacing.xl)
             }
         }
         .navigationBarHidden(true)
         .onAppear {
-            // TODO: Trigger actual LLM generation
-            // For now, auto-advance after delay
+            // Rotation animation
+            withAnimation(
+                Animation
+                    .linear(duration: 1.5)
+                    .repeatForever(autoreverses: false)
+            ) {
+                animationPhase = 360
+            }
+
+            // Breathing animation
+            withAnimation(
+                Animation
+                    .easeInOut(duration: 2)
+                    .repeatForever(autoreverses: true)
+            ) {
+                breathingScale = 1.1
+                pulseOpacity = 0.6
+            }
+
+            // Auto-advance after delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 if readingSession.state == .generatingInterpretation {
                     let mockInterpretation = generateMockInterpretation()
@@ -128,4 +179,5 @@ struct GeneratingView: View {
             }
             return session
         }())
+        .preferredColorScheme(.dark)
 }

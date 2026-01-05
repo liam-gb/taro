@@ -6,129 +6,95 @@ struct ReadingView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.05, blue: 0.15),
-                    Color(red: 0.1, green: 0.05, blue: 0.2)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // Aurora animated background
+            AuroraBackground()
 
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: TaroSpacing.lg) {
                     // Header
-                    VStack(spacing: 8) {
+                    VStack(spacing: TaroSpacing.xs) {
                         Text(readingSession.selectedSpread?.displayName ?? "Your Reading")
-                            .font(.system(size: 24, weight: .light, design: .serif))
-                            .foregroundColor(.white)
+                            .font(TaroTypography.mystical(24, weight: .light))
+                            .foregroundColor(.textPrimary)
 
                         if !readingSession.question.isEmpty {
                             Text("\"\(readingSession.question)\"")
-                                .font(.system(size: 14, weight: .light, design: .serif))
-                                .foregroundColor(.white.opacity(0.5))
+                                .font(TaroTypography.mystical(14, weight: .light))
+                                .foregroundColor(.textSecondary)
                                 .italic()
                         }
 
                         Text(Date(), style: .date)
-                            .font(.system(size: 12, weight: .light))
-                            .foregroundColor(.white.opacity(0.3))
+                            .font(TaroTypography.caption)
+                            .foregroundColor(.textMuted)
                     }
-                    .padding(.top, 32)
+                    .padding(.top, TaroSpacing.xl)
+
+                    GlassDivider()
+                        .padding(.horizontal, TaroSpacing.xxl)
 
                     // Cards display
-                    VStack(spacing: 16) {
-                        Text("Your Cards")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.5))
-                            .textCase(.uppercase)
-                            .tracking(1)
+                    GlassPanel(style: .card, cornerRadius: TaroRadius.xl, padding: TaroSpacing.lg) {
+                        VStack(spacing: TaroSpacing.md) {
+                            Text("Your Cards")
+                                .font(TaroTypography.caption)
+                                .foregroundColor(.textMuted)
+                                .textCase(.uppercase)
+                                .tracking(1)
 
-                        LazyVGrid(columns: [
-                            GridItem(.adaptive(minimum: 100, maximum: 120))
-                        ], spacing: 16) {
-                            ForEach(readingSession.drawnCards) { drawnCard in
-                                DrawnCardTile(drawnCard: drawnCard)
+                            LazyVGrid(columns: [
+                                GridItem(.adaptive(minimum: 100, maximum: 120))
+                            ], spacing: TaroSpacing.md) {
+                                ForEach(readingSession.drawnCards) { drawnCard in
+                                    DrawnCardTile(drawnCard: drawnCard)
+                                }
                             }
                         }
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, TaroSpacing.lg)
+
+                    GlassDivider()
+                        .padding(.horizontal, TaroSpacing.xxl)
 
                     // Interpretation
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Interpretation")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.5))
-                            .textCase(.uppercase)
-                            .tracking(1)
+                    GlassPanel(style: .summary, cornerRadius: TaroRadius.xl, padding: TaroSpacing.lg) {
+                        VStack(alignment: .leading, spacing: TaroSpacing.md) {
+                            Text("Interpretation")
+                                .font(TaroTypography.caption)
+                                .foregroundColor(.textMuted)
+                                .textCase(.uppercase)
+                                .tracking(1)
 
-                        Text(readingSession.interpretation)
-                            .font(.system(size: 16, weight: .regular))
-                            .foregroundColor(.white.opacity(0.9))
-                            .lineSpacing(6)
+                            Text(readingSession.interpretation)
+                                .font(TaroTypography.ethereal(16, weight: .regular))
+                                .foregroundColor(.textPrimary)
+                                .lineSpacing(6)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(.white.opacity(0.05))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(.white.opacity(0.1), lineWidth: 1)
-                            )
-                    )
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, TaroSpacing.lg)
+
+                    GlassDivider()
+                        .padding(.horizontal, TaroSpacing.xxl)
 
                     // Action buttons
-                    VStack(spacing: 12) {
-                        Button(action: {
+                    VStack(spacing: TaroSpacing.sm) {
+                        GlassButton("Save Reading", icon: "square.and.arrow.down", style: .secondary) {
                             // TODO: Save reading
-                        }) {
-                            HStack {
-                                Image(systemName: "square.and.arrow.down")
-                                Text("Save Reading")
-                            }
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(.white.opacity(0.1))
-                            )
                         }
+                        .frame(maxWidth: .infinity)
 
-                        Button(action: {
+                        GlassButton("Copy Text", icon: "doc.on.doc", style: .text) {
                             UIPasteboard.general.string = readingSession.interpretation
-                        }) {
-                            HStack {
-                                Image(systemName: "doc.on.doc")
-                                Text("Copy Text")
-                            }
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white.opacity(0.6))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
                         }
 
-                        Button(action: {
+                        GlowingButton("New Reading") {
                             readingSession.reset()
-                        }) {
-                            Text("New Reading")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(.white)
-                                )
                         }
+                        .frame(maxWidth: .infinity)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 32)
+                    .padding(.horizontal, TaroSpacing.lg)
+                    .padding(.bottom, TaroSpacing.xl)
                 }
             }
         }
@@ -140,61 +106,66 @@ struct DrawnCardTile: View {
     let drawnCard: DrawnCard
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: TaroSpacing.xs) {
             // Card visual
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                elementColor.opacity(0.3),
-                                elementColor.opacity(0.1)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(elementColor.opacity(0.5), lineWidth: 1)
+            ActiveGlassPanel(
+                isActive: false,
+                cornerRadius: TaroRadius.sm,
+                padding: 0
+            ) {
+                ZStack {
+                    LinearGradient(
+                        colors: [
+                            elementColor.opacity(0.3),
+                            elementColor.opacity(0.1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
 
-                VStack(spacing: 4) {
-                    if let numeral = drawnCard.card.numeral {
-                        Text(numeral)
-                            .font(.system(size: 12, weight: .light))
-                            .foregroundColor(.white.opacity(0.5))
-                    }
+                    VStack(spacing: TaroSpacing.xxs) {
+                        if let numeral = drawnCard.card.numeral {
+                            Text(numeral)
+                                .font(TaroTypography.caption)
+                                .foregroundColor(.textSecondary)
+                        }
 
-                    Text(cardInitials)
-                        .font(.system(size: 18, weight: .medium, design: .serif))
-                        .foregroundColor(.white)
+                        Text(cardInitials)
+                            .font(TaroTypography.mystical(18, weight: .medium))
+                            .foregroundColor(.textPrimary)
 
-                    if drawnCard.isReversed {
-                        Text("R")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.red.opacity(0.7))
+                        if drawnCard.isReversed {
+                            Text("R")
+                                .font(TaroTypography.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.mysticPink)
+                        }
                     }
                 }
+                .frame(width: 70, height: 100)
             }
-            .frame(width: 70, height: 100)
+            .overlay(
+                RoundedRectangle(cornerRadius: TaroRadius.sm)
+                    .stroke(elementColor.opacity(0.5), lineWidth: 1)
+            )
             .rotationEffect(.degrees(drawnCard.isReversed ? 180 : 0))
 
             // Card info
-            VStack(spacing: 2) {
+            VStack(spacing: TaroSpacing.xxxs) {
                 Text(drawnCard.card.name)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.white)
+                    .font(TaroTypography.ethereal(11, weight: .medium))
+                    .foregroundColor(.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
 
                 Text(drawnCard.position.name)
-                    .font(.system(size: 10, weight: .light))
-                    .foregroundColor(.white.opacity(0.5))
+                    .font(TaroTypography.caption2)
+                    .foregroundColor(.textSecondary)
 
                 Text(drawnCard.orientationText)
-                    .font(.system(size: 9, weight: .medium))
-                    .foregroundColor(drawnCard.isReversed ? .red.opacity(0.7) : .green.opacity(0.7))
+                    .font(TaroTypography.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(drawnCard.isReversed ? .mysticPink : .mysticEmerald)
             }
         }
     }
@@ -202,9 +173,9 @@ struct DrawnCardTile: View {
     private var elementColor: Color {
         switch drawnCard.card.element {
         case .fire: return .orange
-        case .water: return .blue
-        case .air: return .cyan
-        case .earth: return .green
+        case .water: return .mysticCyan
+        case .air: return .mysticTeal
+        case .earth: return .mysticEmerald
         }
     }
 
@@ -246,4 +217,5 @@ struct DrawnCardTile: View {
             """)
             return session
         }())
+        .preferredColorScheme(.dark)
 }

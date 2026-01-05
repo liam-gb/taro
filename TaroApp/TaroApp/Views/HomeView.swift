@@ -5,110 +5,80 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            // Background gradient (placeholder for aurora effect)
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.05, blue: 0.15),
-                    Color(red: 0.1, green: 0.05, blue: 0.2),
-                    Color(red: 0.05, green: 0.1, blue: 0.15)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            // Aurora animated background
+            AuroraBackground()
 
-            VStack(spacing: 32) {
+            VStack(spacing: TaroSpacing.xl) {
                 Spacer()
 
                 // App title
-                VStack(spacing: 8) {
+                VStack(spacing: TaroSpacing.xs) {
                     Text("TARO")
-                        .font(.system(size: 48, weight: .ultraLight, design: .serif))
+                        .font(TaroTypography.mystical(48, weight: .ultraLight))
                         .tracking(16)
-                        .foregroundColor(.white)
+                        .foregroundColor(.textPrimary)
 
                     Text("Private Tarot Readings")
-                        .font(.system(size: 14, weight: .light))
-                        .foregroundColor(.white.opacity(0.6))
+                        .font(TaroTypography.ethereal(14, weight: .light))
+                        .foregroundColor(.textSecondary)
                 }
 
                 Spacer()
 
                 // Spread selection
-                VStack(spacing: 16) {
+                VStack(spacing: TaroSpacing.md) {
                     Text("Choose Your Spread")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.5))
+                        .font(TaroTypography.caption)
+                        .foregroundColor(.textMuted)
                         .textCase(.uppercase)
                         .tracking(2)
 
                     ForEach(SpreadType.allCases) { spread in
-                        SpreadButton(spread: spread) {
-                            readingSession.selectSpread(spread)
+                        GlassPanel(style: .card, cornerRadius: TaroRadius.md, padding: 0) {
+                            Button(action: {
+                                readingSession.selectSpread(spread)
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: TaroSpacing.xxs) {
+                                        Text(spread.displayName)
+                                            .font(TaroTypography.ethereal(16, weight: .medium))
+                                            .foregroundColor(.textPrimary)
+
+                                        Text("\(spread.cardCount) card\(spread.cardCount == 1 ? "" : "s")")
+                                            .font(TaroTypography.caption)
+                                            .foregroundColor(.textSecondary)
+                                    }
+
+                                    Spacer()
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(.textMuted)
+                                }
+                                .padding(.horizontal, TaroSpacing.lg)
+                                .padding(.vertical, TaroSpacing.md)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, TaroSpacing.lg)
 
                 Spacer()
 
-                // History link (placeholder)
-                Button(action: {
+                // History link
+                GlassButton("Reading History", icon: "clock.arrow.circlepath", style: .text) {
                     // TODO: Navigate to history
-                }) {
-                    HStack {
-                        Image(systemName: "clock.arrow.circlepath")
-                        Text("Reading History")
-                    }
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.5))
                 }
-                .padding(.bottom, 32)
+                .padding(.bottom, TaroSpacing.xl)
             }
         }
         .navigationBarHidden(true)
     }
 }
 
-struct SpreadButton: View {
-    let spread: SpreadType
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(spread.displayName)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white)
-
-                    Text("\(spread.cardCount) card\(spread.cardCount == 1 ? "" : "s")")
-                        .font(.system(size: 12, weight: .light))
-                        .foregroundColor(.white.opacity(0.5))
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white.opacity(0.3))
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.white.opacity(0.05))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(.white.opacity(0.1), lineWidth: 1)
-                    )
-            )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 #Preview {
     HomeView()
         .environmentObject(ReadingSession())
+        .preferredColorScheme(.dark)
 }
