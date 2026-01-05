@@ -1,6 +1,16 @@
 import Foundation
 import CoreData
 
+// MARK: - Reading Filter
+
+/// Filter options for fetching readings
+enum ReadingFilter {
+    case all
+    case favorites
+    case spreadType(SpreadType)
+    case search(String)
+}
+
 // MARK: - History Service
 
 /// Singleton service for managing reading history persistence with Core Data
@@ -11,7 +21,7 @@ final class HistoryService {
 
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TaroDataModel")
-        container.loadPersistentStores { description, error in
+        container.loadPersistentStores { _, error in
             if let error = error {
                 print("HistoryService: Failed to load Core Data: \(error.localizedDescription)")
             }
@@ -24,22 +34,17 @@ final class HistoryService {
         persistentContainer.viewContext
     }
 
-    /// Creates a background context for save operations
     private func newBackgroundContext() -> NSManagedObjectContext {
         let context = persistentContainer.newBackgroundContext()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         return context
     }
 
-    // MARK: - Initialization
-
     private init() {}
 
     // MARK: - Public API
 
     /// Save a reading to Core Data
-    /// - Parameter reading: The reading to save
-    /// - Throws: Core Data save error
     func saveReading(_ reading: Reading) async throws {
         let context = newBackgroundContext()
 
@@ -53,7 +58,6 @@ final class HistoryService {
             entity.notes = reading.notes
             entity.isFavorite = reading.isFavorite
 
-            // Create drawn card entities
             for cardData in reading.drawnCards {
                 let cardEntity = DrawnCardEntity(context: context)
                 cardEntity.cardId = Int32(cardData.cardId)
@@ -66,23 +70,36 @@ final class HistoryService {
         }
     }
 
-    /// Fetch all readings sorted by date (newest first)
-    /// - Returns: Array of Reading models
-    /// - Throws: Core Data fetch error
-    func fetchAllReadings() async throws -> [Reading] {
+    /// Fetch readings with optional filter
+    func fetchReadings(filter: ReadingFilter = .all) async throws -> [Reading] {
         try await viewContext.perform {
             let request = ReadingEntity.fetchRequest()
             request.sortDescriptors = [NSSortDescriptor(keyPath: \ReadingEntity.createdAt, ascending: false)]
+
+            switch filter {
+            case .all:
+                break
+            case .favorites:
+                request.predicate = NSPredicate(format: "isFavorite == YES")
+            case .spreadType(let type):
+                request.predicate = NSPredicate(format: "spreadType == %@", type.rawValue)
+            case .search(let query):
+                if !query.isEmpty {
+                    request.predicate = NSPredicate(format: "question CONTAINS[cd] %@", query)
+                }
+            }
 
             let entities = try self.viewContext.fetch(request)
             return entities.compactMap { self.mapEntityToReading($0) }
         }
     }
 
+    /// Fetch all readings (convenience method)
+    func fetchAllReadings() async throws -> [Reading] {
+        try await fetchReadings(filter: .all)
+    }
+
     /// Fetch a specific reading by ID
-    /// - Parameter id: The reading's UUID
-    /// - Returns: The Reading if found, nil otherwise
-    /// - Throws: Core Data fetch error
     func fetchReading(id: UUID) async throws -> Reading? {
         try await viewContext.perform {
             let request = ReadingEntity.fetchRequest()
@@ -96,79 +113,7 @@ final class HistoryService {
         }
     }
 
-    /// Delete a reading by ID
-    /// - Parameter id: The reading's UUID
-    /// - Throws: Core Data error
-    func deleteReading(id: UUID) async throws {
-        let context = newBackgroundContext()
-
-        try await context.perform {
-            let request = ReadingEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-            request.fetchLimit = 1
-
-            guard let entity = try context.fetch(request).first else {
-                return
-            }
-
-            context.delete(entity)
-            try context.save()
-        }
-    }
-
-    /// Update notes for a reading
-    /// - Parameters:
-    ///   - id: The reading's UUID
-    ///   - notes: The new notes text
-    /// - Throws: Core Data error
-    func updateNotes(id: UUID, notes: String) async throws {
-        let context = newBackgroundContext()
-
-        try await context.perform {
-            let request = ReadingEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-            request.fetchLimit = 1
-
-            guard let entity = try context.fetch(request).first else {
-                throw HistoryServiceError.readingNotFound
-            }
-
-            entity.notes = notes.isEmpty ? nil : notes
-            try context.save()
-        }
-    }
-
-    /// Toggle the favorite status of a reading
-    /// - Parameter id: The reading's UUID
-    /// - Throws: Core Data error
-    func toggleFavorite(id: UUID) async throws {
-        let context = newBackgroundContext()
-
-        try await context.perform {
-            let request = ReadingEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-            request.fetchLimit = 1
-
-            guard let entity = try context.fetch(request).first else {
-                throw HistoryServiceError.readingNotFound
-            }
-
-            entity.isFavorite.toggle()
-            try context.save()
-        }
-    }
-
-    /// Get the count of saved readings
-    /// - Returns: The number of saved readings
-    func readingCount() async -> Int {
-        await viewContext.perform {
-            let request = ReadingEntity.fetchRequest()
-            return (try? self.viewContext.count(for: request)) ?? 0
-        }
-    }
-
     /// Fetch the most recent reading
-    /// - Returns: The most recent Reading if any exist
     func fetchMostRecentReading() async throws -> Reading? {
         try await viewContext.perform {
             let request = ReadingEntity.fetchRequest()
@@ -182,52 +127,62 @@ final class HistoryService {
         }
     }
 
-    /// Fetch readings filtered by spread type
-    /// - Parameter spreadType: The spread type to filter by
-    /// - Returns: Array of matching readings
-    func fetchReadings(spreadType: SpreadType) async throws -> [Reading] {
-        try await viewContext.perform {
-            let request = ReadingEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "spreadType == %@", spreadType.rawValue)
-            request.sortDescriptors = [NSSortDescriptor(keyPath: \ReadingEntity.createdAt, ascending: false)]
+    /// Delete a reading by ID
+    func deleteReading(id: UUID) async throws {
+        let context = newBackgroundContext()
 
-            let entities = try self.viewContext.fetch(request)
-            return entities.compactMap { self.mapEntityToReading($0) }
+        try await context.perform {
+            let request = ReadingEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+            request.fetchLimit = 1
+
+            guard let entity = try context.fetch(request).first else { return }
+            context.delete(entity)
+            try context.save()
         }
     }
 
-    /// Fetch only favorite readings
-    /// - Returns: Array of favorite readings
-    func fetchFavoriteReadings() async throws -> [Reading] {
-        try await viewContext.perform {
-            let request = ReadingEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "isFavorite == YES")
-            request.sortDescriptors = [NSSortDescriptor(keyPath: \ReadingEntity.createdAt, ascending: false)]
-
-            let entities = try self.viewContext.fetch(request)
-            return entities.compactMap { self.mapEntityToReading($0) }
+    /// Update notes for a reading
+    func updateNotes(id: UUID, notes: String) async throws {
+        try await updateReading(id: id) { entity in
+            entity.notes = notes.isEmpty ? nil : notes
         }
     }
 
-    /// Search readings by question text
-    /// - Parameter searchText: The text to search for
-    /// - Returns: Array of matching readings
-    func searchReadings(query: String) async throws -> [Reading] {
-        guard !query.isEmpty else {
-            return try await fetchAllReadings()
+    /// Toggle the favorite status of a reading
+    func toggleFavorite(id: UUID) async throws {
+        try await updateReading(id: id) { entity in
+            entity.isFavorite.toggle()
         }
+    }
 
-        return try await viewContext.perform {
+    /// Get the count of saved readings
+    func readingCount() async -> Int {
+        await viewContext.perform {
             let request = ReadingEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "question CONTAINS[cd] %@", query)
-            request.sortDescriptors = [NSSortDescriptor(keyPath: \ReadingEntity.createdAt, ascending: false)]
-
-            let entities = try self.viewContext.fetch(request)
-            return entities.compactMap { self.mapEntityToReading($0) }
+            return (try? self.viewContext.count(for: request)) ?? 0
         }
     }
 
     // MARK: - Private Helpers
+
+    /// Update a reading entity with a transform closure
+    private func updateReading(id: UUID, transform: @escaping (ReadingEntity) -> Void) async throws {
+        let context = newBackgroundContext()
+
+        try await context.perform {
+            let request = ReadingEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+            request.fetchLimit = 1
+
+            guard let entity = try context.fetch(request).first else {
+                throw HistoryServiceError.readingNotFound
+            }
+
+            transform(entity)
+            try context.save()
+        }
+    }
 
     /// Convert a ReadingEntity to a Reading model
     private func mapEntityToReading(_ entity: ReadingEntity) -> Reading? {
@@ -238,17 +193,15 @@ final class HistoryService {
             return nil
         }
 
-        // Map drawn cards from the ordered set
         var drawnCardsData: [DrawnCardData] = []
         if let cardsSet = entity.drawnCards {
             for case let cardEntity as DrawnCardEntity in cardsSet {
                 if let positionId = cardEntity.positionId {
-                    let cardData = DrawnCardData(
+                    drawnCardsData.append(DrawnCardData(
                         cardId: Int(cardEntity.cardId),
                         positionId: positionId,
                         isReversed: cardEntity.isReversed
-                    )
-                    drawnCardsData.append(cardData)
+                    ))
                 }
             }
         }
@@ -270,14 +223,11 @@ final class HistoryService {
 
 enum HistoryServiceError: LocalizedError {
     case readingNotFound
-    case saveFailed(Error)
 
     var errorDescription: String? {
         switch self {
         case .readingNotFound:
             return "Reading not found"
-        case .saveFailed(let error):
-            return "Failed to save: \(error.localizedDescription)"
         }
     }
 }

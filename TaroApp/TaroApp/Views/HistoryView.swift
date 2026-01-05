@@ -385,20 +385,11 @@ struct FilterPill: View {
 struct ReadingHistoryCard: View {
     let reading: Reading
 
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter
-    }
-
     var body: some View {
         GlassPanel(style: .card, cornerRadius: TaroRadius.lg, padding: TaroSpacing.md) {
             HStack(spacing: TaroSpacing.md) {
-                // Spread type icon
                 spreadTypeIcon
 
-                // Content
                 VStack(alignment: .leading, spacing: TaroSpacing.xxs) {
                     HStack {
                         Text(reading.spreadType.displayName)
@@ -413,7 +404,7 @@ struct ReadingHistoryCard: View {
 
                         Spacer()
 
-                        Text(dateFormatter.string(from: reading.createdAt))
+                        Text(TaroDateFormatters.mediumDateTime.string(from: reading.createdAt))
                             .font(TaroTypography.caption2)
                             .foregroundColor(.textMuted)
                     }
