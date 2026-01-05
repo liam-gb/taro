@@ -13,6 +13,7 @@ struct GeneratingView: View {
     @State private var showDeviceUnsupported = false
     @State private var showCopyPromptSheet = false
     @State private var externalPrompt: String = ""
+    @State private var generationTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -101,6 +102,9 @@ struct GeneratingView: View {
         .onAppear {
             startAnimations()
             startGeneration()
+        }
+        .onDisappear {
+            generationTask?.cancel()
         }
         .sheet(isPresented: $showDeviceUnsupported) {
             DeviceUnsupportedView()
@@ -269,9 +273,11 @@ struct GeneratingView: View {
     // MARK: - Generation
 
     private func startGeneration() {
+        generationTask?.cancel()
+
         // Check if LLM is available
         if DeviceCapability.supportsLocalLLM && modelManager.state.isReady {
-            Task {
+            generationTask = Task { @MainActor in
                 await generateWithLLM()
             }
         } else if !DeviceCapability.supportsLocalLLM {
@@ -279,12 +285,12 @@ struct GeneratingView: View {
             // The unsupportedDeviceActions UI will be shown automatically
             return
         } else {
-            // Model not ready - wait and retry
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            // Model not ready - wait and retry using Task
+            generationTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                guard !Task.isCancelled else { return }
                 if modelManager.state.isReady {
-                    Task {
-                        await generateWithLLM()
-                    }
+                    await generateWithLLM()
                 }
                 // If model still not ready, user can see status and take action
             }

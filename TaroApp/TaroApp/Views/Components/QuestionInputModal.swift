@@ -17,6 +17,8 @@ struct QuestionInputModal: View {
     @State private var contentOffset: CGFloat = 20
     @State private var orbsAnimating: Bool = false
     @State private var shimmerPhase: CGFloat = 0
+    @State private var animationTask: Task<Void, Never>?
+    @State private var dismissTask: Task<Void, Never>?
     @FocusState private var isTextFieldFocused: Bool
 
     var body: some View {
@@ -427,13 +429,22 @@ struct QuestionInputModal: View {
             contentOffset = 0
         }
 
-        // Start orb animations after modal appears
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // Start orb animations after modal appears using Task
+        animationTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            guard !Task.isCancelled else { return }
             orbsAnimating = true
         }
     }
 
     private func animateOut(completion: @escaping () -> Void) {
+        // Cancel any pending animation tasks
+        animationTask?.cancel()
+        dismissTask?.cancel()
+
+        // Stop orb animations
+        orbsAnimating = false
+
         // Modal exit
         withAnimation(.easeIn(duration: 0.25)) {
             modalScale = 0.9
@@ -442,7 +453,9 @@ struct QuestionInputModal: View {
             backgroundOpacity = 0
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        dismissTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 250_000_000)
+            guard !Task.isCancelled else { return }
             isPresented = false
             completion()
         }

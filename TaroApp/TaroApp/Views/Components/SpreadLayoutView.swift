@@ -14,6 +14,7 @@ struct SpreadLayoutView: View {
 
     @State private var cardStates: [CardAnimationState] = []
     @State private var hasAnimated: Bool = false
+    @State private var animationTask: Task<Void, Never>?
 
     var body: some View {
         GeometryReader { geometry in
@@ -38,6 +39,10 @@ struct SpreadLayoutView: View {
             if animateIn && !hasAnimated {
                 animateCardsSequentially()
             }
+        }
+        .onDisappear {
+            animationTask?.cancel()
+            animationTask = nil
         }
     }
 
@@ -349,12 +354,17 @@ struct SpreadLayoutView: View {
 
     private func animateCardsSequentially() {
         hasAnimated = true
+        animationTask?.cancel()
 
-        for index in 0..<drawnCards.count {
-            let delay = Double(index) * 0.15
+        animationTask = Task { @MainActor in
+            for index in 0..<drawnCards.count {
+                guard !Task.isCancelled else { return }
 
-            // Card appears
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                let delayNanos = UInt64(Double(index) * 0.15 * 1_000_000_000)
+                try? await Task.sleep(nanoseconds: delayNanos)
+                guard !Task.isCancelled else { return }
+
+                // Card appears
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                     if cardStates.indices.contains(index) {
                         cardStates[index].isVisible = true
@@ -363,41 +373,39 @@ struct SpreadLayoutView: View {
                         cardStates[index].offset = .zero
                     }
                 }
-            }
 
-            // Glow pulses in
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.2) {
+                // Glow pulses in after 0.2s
+                try? await Task.sleep(nanoseconds: 200_000_000)
+                guard !Task.isCancelled else { return }
                 withAnimation(.easeIn(duration: 0.3)) {
                     if cardStates.indices.contains(index) {
                         cardStates[index].glowOpacity = 0.8
                     }
                 }
-            }
 
-            // Card flips
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.4) {
+                // Card flips after 0.2s more
+                try? await Task.sleep(nanoseconds: 200_000_000)
+                guard !Task.isCancelled else { return }
                 withAnimation(.easeInOut(duration: 0.4)) {
                     if cardStates.indices.contains(index) {
                         cardStates[index].isFlipped = true
                     }
                 }
-
-                // Haptic
                 let generator = UIImpactFeedbackGenerator(style: .medium)
                 generator.impactOccurred()
-            }
 
-            // Glow settles
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.7) {
+                // Glow settles after 0.3s
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                guard !Task.isCancelled else { return }
                 withAnimation(.easeOut(duration: 0.5)) {
                     if cardStates.indices.contains(index) {
                         cardStates[index].glowOpacity = 0.3
                     }
                 }
-            }
 
-            // Label fades in
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.8) {
+                // Label fades in after 0.1s
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                guard !Task.isCancelled else { return }
                 withAnimation(.easeIn(duration: 0.3)) {
                     if cardStates.indices.contains(index) {
                         cardStates[index].labelOpacity = 1

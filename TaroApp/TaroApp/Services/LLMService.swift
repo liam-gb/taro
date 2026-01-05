@@ -22,6 +22,7 @@ final class LLMService: ObservableObject {
     // MARK: - Private State
 
     private var currentTask: Task<Void, Never>?
+    private var stateObservationTask: Task<Void, Never>?
     private let inferenceQueue = DispatchQueue(label: "com.taro.llm.inference", qos: .userInitiated)
     private var llamaContext: LlamaContext?
 
@@ -53,12 +54,19 @@ final class LLMService: ObservableObject {
     // MARK: - Initialization
 
     private init() {
-        // Observe model manager state
-        Task {
-            for await _ in modelManager.$state.values {
-                isModelReady = modelManager.state.isReady
+        // Observe model manager state - store the task for proper lifecycle management
+        stateObservationTask = Task { [weak self] in
+            guard let self = self else { return }
+            for await _ in self.modelManager.$state.values {
+                guard !Task.isCancelled else { break }
+                self.isModelReady = self.modelManager.state.isReady
             }
         }
+    }
+
+    deinit {
+        stateObservationTask?.cancel()
+        currentTask?.cancel()
     }
 
     // MARK: - Public API

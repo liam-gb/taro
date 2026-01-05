@@ -6,6 +6,7 @@ struct ShuffleView: View {
     @State private var shufflePhase: ShufflePhase = .idle
     @State private var cardStates: [CardShuffleState] = []
     @State private var showButton = false
+    @State private var shuffleTask: Task<Void, Never>?
 
     private let cardCount = 7
     private let shuffleDuration: Double = 2.5
@@ -99,6 +100,9 @@ struct ShuffleView: View {
         .onAppear {
             initializeCardStates()
         }
+        .onDisappear {
+            shuffleTask?.cancel()
+        }
     }
 
     private var shuffleStatusText: String {
@@ -130,6 +134,7 @@ struct ShuffleView: View {
     // MARK: - Shuffle Animation
 
     private func startShuffleAnimation() {
+        shuffleTask?.cancel()
         isShuffling = true
         shufflePhase = .spreading
 
@@ -142,14 +147,17 @@ struct ShuffleView: View {
             spreadCards()
         }
 
-        // Phase 2: Shuffle (random movements)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            shufflePhase = .shuffling
-            performShuffleSequence()
-        }
+        shuffleTask = Task { @MainActor in
+            // Wait for spread animation
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            guard !Task.isCancelled else { return }
 
-        // Phase 3: Collect cards back
-        DispatchQueue.main.asyncAfter(deadline: .now() + shuffleDuration - 0.5) {
+            // Phase 2: Shuffle (random movements)
+            shufflePhase = .shuffling
+            await performShuffleSequenceAsync()
+            guard !Task.isCancelled else { return }
+
+            // Phase 3: Collect cards back
             shufflePhase = .collecting
             withAnimation(TaroAnimation.springSmooth) {
                 collectCards()
@@ -158,10 +166,12 @@ struct ShuffleView: View {
             // Light haptic for collection
             let lightGenerator = UIImpactFeedbackGenerator(style: .light)
             lightGenerator.impactOccurred()
-        }
 
-        // Phase 4: Ready state
-        DispatchQueue.main.asyncAfter(deadline: .now() + shuffleDuration) {
+            // Wait for collect animation (0.5s)
+            try? await Task.sleep(nanoseconds: 500_000_000)
+            guard !Task.isCancelled else { return }
+
+            // Phase 4: Ready state
             shufflePhase = .ready
             isShuffling = false
 
@@ -189,22 +199,25 @@ struct ShuffleView: View {
         }
     }
 
-    private func performShuffleSequence() {
+    private func performShuffleSequenceAsync() async {
         let shuffleSteps = 6
         let stepDuration = (shuffleDuration - 1.0) / Double(shuffleSteps)
+        let stepNanos = UInt64(stepDuration * 1_000_000_000)
 
         for step in 0..<shuffleSteps {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(step) * stepDuration) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                    shuffleStep()
-                }
+            guard !Task.isCancelled else { return }
 
-                // Subtle haptic on each shuffle step
-                if step % 2 == 0 {
-                    let generator = UIImpactFeedbackGenerator(style: .soft)
-                    generator.impactOccurred()
-                }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                shuffleStep()
             }
+
+            // Subtle haptic on each shuffle step
+            if step % 2 == 0 {
+                let generator = UIImpactFeedbackGenerator(style: .soft)
+                generator.impactOccurred()
+            }
+
+            try? await Task.sleep(nanoseconds: stepNanos)
         }
     }
 

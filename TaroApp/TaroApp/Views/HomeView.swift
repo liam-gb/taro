@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var subtitleOpacity: Double = 0
     @State private var cardsAppeared: Bool = false
     @State private var headerGlowPulse: Bool = false
+    @State private var entranceTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -34,6 +35,10 @@ struct HomeView: View {
         .navigationBarHidden(true)
         .onAppear {
             animateEntrance()
+        }
+        .onDisappear {
+            entranceTask?.cancel()
+            headerGlowPulse = false
         }
         .questionInputModal(
             isPresented: $showQuestionModal,
@@ -248,6 +253,8 @@ struct HomeView: View {
     // MARK: - Animations
 
     private func animateEntrance() {
+        entranceTask?.cancel()
+
         // Title fade in
         withAnimation(.easeOut(duration: 0.6)) {
             titleOpacity = 1
@@ -258,13 +265,15 @@ struct HomeView: View {
             subtitleOpacity = 1
         }
 
-        // Cards appear
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        entranceTask = Task { @MainActor in
+            // Cards appear after 0.1s
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            guard !Task.isCancelled else { return }
             cardsAppeared = true
-        }
 
-        // Start glow pulse
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            // Start glow pulse after 0.4s more
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            guard !Task.isCancelled else { return }
             headerGlowPulse = true
         }
     }
@@ -348,7 +357,13 @@ struct SpreadSelectionCard: View {
         .animation(TaroAnimation.springSmooth, value: isSelected)
         .onChange(of: isSelected) { _, newValue in
             if newValue {
-                glowPulse = true
+                withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                    glowPulse = true
+                }
+            } else {
+                withAnimation(.linear(duration: 0.1)) {
+                    glowPulse = false
+                }
             }
         }
         .onAppear {
@@ -357,6 +372,9 @@ struct SpreadSelectionCard: View {
                     glowPulse = true
                 }
             }
+        }
+        .onDisappear {
+            glowPulse = false
         }
     }
 

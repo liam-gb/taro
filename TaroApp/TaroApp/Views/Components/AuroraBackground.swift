@@ -62,6 +62,9 @@ struct AuroraBackground: View {
         .onAppear {
             animateOrbs = true
         }
+        .onDisappear {
+            animateOrbs = false
+        }
     }
 }
 
@@ -117,6 +120,11 @@ struct AuroraOrb: View {
                             .delay(delay)
                     ) {
                         phase = 1
+                    }
+                } else {
+                    // Stop animation by resetting phase without animation
+                    withAnimation(.linear(duration: 0.1)) {
+                        phase = 0
                     }
                 }
             }
@@ -237,6 +245,9 @@ struct EnhancedAuroraBackground: View {
         .ignoresSafeArea()
         .onAppear {
             animateOrbs = true
+        }
+        .onDisappear {
+            animateOrbs = false
         }
     }
 
