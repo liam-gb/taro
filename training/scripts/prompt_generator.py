@@ -1,5 +1,5 @@
 """
-Prompt generator for training data - mirrors iOS LLMService.buildPrompt() exactly.
+Prompt generator for training data - mirrors iOS PromptAssembler exactly.
 Uses the same JSON data from TaroApp/Resources/.
 """
 
@@ -9,6 +9,50 @@ import hashlib
 from dataclasses import dataclass
 from typing import List, Dict, Optional
 from pathlib import Path
+from datetime import datetime, timezone
+
+
+# MARK: - Moon Phase (mirrors MoonPhase.swift)
+
+MOON_PHASES = [
+    {"name": "New Moon", "icon": "🌑", "meaning": "New beginnings, setting intentions, planting seeds"},
+    {"name": "Waxing Crescent", "icon": "🌒", "meaning": "Taking action, building momentum, hope emerges"},
+    {"name": "First Quarter", "icon": "🌓", "meaning": "Challenges arise, decisions needed, commitment tested"},
+    {"name": "Waxing Gibbous", "icon": "🌔", "meaning": "Refining plans, patience required, trust the process"},
+    {"name": "Full Moon", "icon": "🌕", "meaning": "Culmination, clarity, emotions heightened, harvest results"},
+    {"name": "Waning Gibbous", "icon": "🌖", "meaning": "Gratitude, sharing wisdom, integration"},
+    {"name": "Last Quarter", "icon": "🌗", "meaning": "Release, forgiveness, letting go of what no longer serves"},
+    {"name": "Waning Crescent", "icon": "🌘", "meaning": "Rest, reflection, preparing for renewal"},
+]
+
+SYNODIC_MONTH = 29.53058867
+# Reference new moon: December 30, 2024 22:27 UTC
+REFERENCE_NEW_MOON = datetime(2024, 12, 30, 22, 27, 0, tzinfo=timezone.utc)
+
+
+def get_moon_phase(date: datetime = None) -> Dict:
+    """Calculate moon phase for a given date (mirrors MoonPhaseCalculator.swift)."""
+    if date is None:
+        date = datetime.now(timezone.utc)
+
+    days_since_ref = (date - REFERENCE_NEW_MOON).total_seconds() / 86400
+    lunar_age = days_since_ref % SYNODIC_MONTH
+    if lunar_age < 0:
+        lunar_age += SYNODIC_MONTH
+
+    # Center each phase window (same algorithm as iOS)
+    phase_index = int((lunar_age + SYNODIC_MONTH / 16) / SYNODIC_MONTH * 8) % 8
+    return MOON_PHASES[phase_index]
+
+
+def get_random_moon_phase(rng: random.Random) -> Dict:
+    """Get a random moon phase for training data variety."""
+    return rng.choice(MOON_PHASES)
+
+
+def moon_phase_context(phase: Dict) -> str:
+    """Format moon phase for prompt (mirrors MoonPhase.promptContext)."""
+    return f"{phase['name']} {phase['icon']} — {phase['meaning']}"
 
 # Path to iOS app resources (source of truth)
 IOS_RESOURCES = Path(__file__).parent.parent.parent / "TaroApp" / "TaroApp" / "Resources"
@@ -174,16 +218,17 @@ SPREADS = {
 SPREAD_WEIGHTS = {"single": 0.15, "threeCard": 0.30, "situation": 0.20, "horseshoe": 0.15, "celtic": 0.20}
 
 
-# MARK: - Prompt Building (mirrors LLMService.buildPrompt exactly)
+# MARK: - Prompt Building (mirrors PromptAssembler.assemblePrompt exactly)
 
-def build_prompt(drawn_cards: List[Dict], question: Optional[str], style: str = "balanced") -> str:
+def build_prompt(drawn_cards: List[Dict], question: Optional[str], style: str = "balanced", moon_phase: Dict = None) -> str:
     """
-    Build prompt exactly as iOS LLMService.buildPrompt() does.
+    Build prompt exactly as iOS PromptAssembler.assemblePrompt() does.
 
     Args:
         drawn_cards: List of {"card": card_dict, "position": position_dict, "is_reversed": bool}
         question: Optional querent question
         style: "balanced", "mystical", or "practical"
+        moon_phase: Optional moon phase dict, uses random if None for training variety
 
     Returns:
         Complete prompt in Phi-3 chat format
@@ -238,7 +283,7 @@ def build_prompt(drawn_cards: List[Dict], question: Optional[str], style: str = 
     if dominant:
         elemental_context += f"\nDominant: {dominant} energy"
 
-    # Style instruction
+    # Style instruction (mirrors PromptAssembler)
     style_instructions = {
         "balanced": "Provide a balanced interpretation that combines intuitive insight with practical guidance.",
         "mystical": "Provide a deeply symbolic and poetic interpretation, rich with mystical imagery and spiritual insight.",
@@ -246,18 +291,24 @@ def build_prompt(drawn_cards: List[Dict], question: Optional[str], style: str = 
     }
     style_instruction = style_instructions.get(style, style_instructions["balanced"])
 
-    # Question
-    user_question = f'The querent asks: "{question}"\n\n' if question else ""
+    # Moon phase timing context (new feature)
+    if moon_phase is None:
+        # For training, we use a fixed phase based on card hash for reproducibility
+        moon_phase = MOON_PHASES[hash(card_names[0]) % len(MOON_PHASES)]
+    timing_context = f"TIMING: {moon_phase_context(moon_phase)}\n\n"
 
-    # Build full prompt in Phi-3 format (exact copy of iOS)
+    # Question context
+    question_context = f'QUESTION: "{question}"\n\n' if question else ""
+
+    # Build full prompt in Phi-3 format (mirrors iOS PromptAssembler.assemblePrompt)
     prompt = f"""<|system|>
-You are a wise and intuitive tarot reader. You provide thoughtful, personalized interpretations that weave together the meanings of the cards, their positions, and the querent's question. {style_instruction}<|end|>
+You are crafting a tarot reading. Weave the provided card interpretations into a cohesive narrative. {style_instruction}<|end|>
 <|user|>
-{user_question}The following cards were drawn:
+{timing_context}{question_context}The following cards were drawn:
 
 {card_context}{combinations_context}{elemental_context}
 
-Please provide a cohesive interpretation of this tarot reading. Weave together the individual card meanings into a narrative that addresses the querent's situation. Be insightful but accessible.<|end|>
+Weave these elements into a flowing interpretation (3-4 paragraphs). Address the seeker directly. End with actionable insight.<|end|>
 <|assistant|>
 """
     return prompt
@@ -608,7 +659,9 @@ def generate_dataset(count: int = 25000, seed: int = 42) -> List[TrainingPrompt]
                 pid = generate_id(spread_id, question, cards)
 
             seen.add(pid)
-            input_text = build_prompt(cards, question, style="balanced")
+            # Use random moon phase for training data variety
+            moon_phase = get_random_moon_phase(rng)
+            input_text = build_prompt(cards, question, style="balanced", moon_phase=moon_phase)
 
             prompts.append(TrainingPrompt(
                 id=pid,
