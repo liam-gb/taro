@@ -35,9 +35,10 @@ struct SpreadLayoutView: View {
         }
         .onAppear {
             initializeCardStates()
-            if animateIn && !hasAnimated {
-                animateCardsSequentially()
-            }
+        }
+        .task(id: animateIn) {
+            guard animateIn && !hasAnimated else { return }
+            await animateCardsSequentially()
         }
     }
 
@@ -347,60 +348,52 @@ struct SpreadLayoutView: View {
         }
     }
 
-    private func animateCardsSequentially() {
+    private func animateCardsSequentially() async {
         hasAnimated = true
 
         for index in 0..<drawnCards.count {
-            let delay = Double(index) * 0.15
+            try? await Task.sleep(for: .milliseconds(150 * index))
+            guard !Task.isCancelled else { return }
 
-            // Card appears
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].isVisible = true
-                        cardStates[index].opacity = 1
-                        cardStates[index].scale = 1
-                        cardStates[index].offset = .zero
-                    }
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].isVisible = true
+                    cardStates[index].opacity = 1
+                    cardStates[index].scale = 1
+                    cardStates[index].offset = .zero
                 }
             }
 
-            // Glow pulses in
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.2) {
-                withAnimation(.easeIn(duration: 0.3)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].glowOpacity = 0.8
-                    }
+            try? await Task.sleep(for: .milliseconds(200))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeIn(duration: 0.3)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].glowOpacity = 0.8
                 }
             }
 
-            // Card flips
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.4) {
-                withAnimation(.easeInOut(duration: 0.4)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].isFlipped = true
-                    }
+            try? await Task.sleep(for: .milliseconds(200))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.4)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].isFlipped = true
                 }
-
-                // Haptic
-                Haptics.medium()
             }
+            Haptics.medium()
 
-            // Glow settles
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.7) {
-                withAnimation(.easeOut(duration: 0.5)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].glowOpacity = 0.3
-                    }
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.5)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].glowOpacity = 0.3
                 }
             }
 
-            // Label fades in
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.8) {
-                withAnimation(.easeIn(duration: 0.3)) {
-                    if cardStates.indices.contains(index) {
-                        cardStates[index].labelOpacity = 1
-                    }
+            try? await Task.sleep(for: .milliseconds(100))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeIn(duration: 0.3)) {
+                if cardStates.indices.contains(index) {
+                    cardStates[index].labelOpacity = 1
                 }
             }
         }

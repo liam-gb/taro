@@ -32,8 +32,8 @@ struct HomeView: View {
             }
         }
         .navigationBarHidden(true)
-        .onAppear {
-            animateEntrance()
+        .task {
+            await animateEntrance()
         }
         .questionInputModal(
             isPresented: $showQuestionModal,
@@ -247,26 +247,17 @@ struct HomeView: View {
 
     // MARK: - Animations
 
-    private func animateEntrance() {
-        // Title fade in
-        withAnimation(.easeOut(duration: 0.6)) {
-            titleOpacity = 1
-        }
+    private func animateEntrance() async {
+        withAnimation(.easeOut(duration: 0.6)) { titleOpacity = 1 }
+        withAnimation(.easeOut(duration: 0.5).delay(0.2)) { subtitleOpacity = 1 }
 
-        // Subtitle and elements
-        withAnimation(.easeOut(duration: 0.5).delay(0.2)) {
-            subtitleOpacity = 1
-        }
+        try? await Task.sleep(for: .milliseconds(100))
+        guard !Task.isCancelled else { return }
+        cardsAppeared = true
 
-        // Cards appear
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            cardsAppeared = true
-        }
-
-        // Start glow pulse
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            headerGlowPulse = true
-        }
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !Task.isCancelled else { return }
+        headerGlowPulse = true
     }
 }
 
@@ -348,7 +339,13 @@ struct SpreadSelectionCard: View {
         .animation(TaroAnimation.springSmooth, value: isSelected)
         .onChange(of: isSelected) { _, newValue in
             if newValue {
-                glowPulse = true
+                withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                    glowPulse = true
+                }
+            } else {
+                withAnimation(.linear(duration: 0.1)) {
+                    glowPulse = false
+                }
             }
         }
         .onAppear {
@@ -357,6 +354,9 @@ struct SpreadSelectionCard: View {
                     glowPulse = true
                 }
             }
+        }
+        .onDisappear {
+            glowPulse = false
         }
     }
 

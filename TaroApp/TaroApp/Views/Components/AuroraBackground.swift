@@ -66,6 +66,9 @@ struct AuroraBackground: View {
         .onAppear {
             animateOrbs = true
         }
+        .onDisappear {
+            animateOrbs = false
+        }
     }
 
     @ViewBuilder
@@ -114,6 +117,11 @@ struct AuroraOrb: View {
             .onChange(of: animateOrbs) { _, newValue in
                 if newValue {
                     startAnimationIfNeeded()
+                } else {
+                    // Stop animation by resetting phase without animation
+                    withAnimation(.linear(duration: 0.1)) {
+                        phase = 0
+                    }
                 }
             }
     }

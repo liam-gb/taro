@@ -100,7 +100,9 @@ struct GeneratingView: View {
         .navigationBarHidden(true)
         .onAppear {
             startAnimations()
-            startGeneration()
+        }
+        .task {
+            await startGeneration()
         }
         .sheet(isPresented: $showDeviceUnsupported) {
             DeviceUnsupportedView()
@@ -268,26 +270,16 @@ struct GeneratingView: View {
 
     // MARK: - Generation
 
-    private func startGeneration() {
-        // Check if LLM is available
-        if DeviceCapability.supportsLocalLLM && modelManager.state.isReady {
-            Task {
-                await generateWithLLM()
-            }
-        } else if !DeviceCapability.supportsLocalLLM {
-            // Device not supported - don't auto-generate, let user choose action
-            // The unsupportedDeviceActions UI will be shown automatically
-            return
+    private func startGeneration() async {
+        guard DeviceCapability.supportsLocalLLM else { return }
+
+        if modelManager.state.isReady {
+            await generateWithLLM()
         } else {
             // Model not ready - wait and retry
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                if modelManager.state.isReady {
-                    Task {
-                        await generateWithLLM()
-                    }
-                }
-                // If model still not ready, user can see status and take action
-            }
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled, modelManager.state.isReady else { return }
+            await generateWithLLM()
         }
     }
 
