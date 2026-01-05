@@ -157,7 +157,7 @@ struct GlassButton: View {
         .foregroundColor(isPressed ? .textPrimary : .textSecondary)
         .padding(.horizontal, TaroSpacing.lg)
         .padding(.vertical, TaroSpacing.md)
-        .background(secondaryBackground)
+        .background(glassBackground)
         .clipShape(RoundedRectangle(cornerRadius: TaroRadius.md, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: TaroRadius.md, style: .continuous)
@@ -169,11 +169,11 @@ struct GlassButton: View {
         .shadow(color: Color.black.opacity(0.2), radius: 8, y: 4)
     }
 
-    private var secondaryBackground: some View {
+    /// Shared glass background used by secondary, pill, and icon styles
+    private var glassBackground: some View {
         ZStack {
             Color.white.opacity(isPressed ? 0.06 : 0.03)
-            Material.ultraThinMaterial
-                .opacity(0.3)
+            Material.ultraThinMaterial.opacity(0.3)
         }
     }
 
@@ -222,7 +222,7 @@ struct GlassButton: View {
         .foregroundColor(isPressed ? .textPrimary : .textSecondary)
         .padding(.horizontal, TaroSpacing.md)
         .padding(.vertical, TaroSpacing.sm)
-        .background(pillBackground)
+        .background(glassBackground)
         .clipShape(Capsule())
         .overlay(
             Capsule()
@@ -231,14 +231,6 @@ struct GlassButton: View {
                     lineWidth: 1
                 )
         )
-    }
-
-    private var pillBackground: some View {
-        ZStack {
-            Color.white.opacity(isPressed ? 0.06 : 0.03)
-            Material.ultraThinMaterial
-                .opacity(0.3)
-        }
     }
 
     // MARK: - Icon Style
@@ -255,7 +247,7 @@ struct GlassButton: View {
             }
         }
         .frame(width: 44, height: 44)
-        .background(iconBackground)
+        .background(glassBackground)
         .clipShape(Circle())
         .overlay(
             Circle()
@@ -265,14 +257,6 @@ struct GlassButton: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.2), radius: 8, y: 4)
-    }
-
-    private var iconBackground: some View {
-        ZStack {
-            Color.white.opacity(isPressed ? 0.06 : 0.03)
-            Material.ultraThinMaterial
-                .opacity(0.3)
-        }
     }
 
     // MARK: - Actions

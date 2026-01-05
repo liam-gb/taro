@@ -7,6 +7,58 @@ enum GlassPanelStyle {
     case card           // Card-style with gradient and stronger shadow
     case pill           // Pill-shaped for selection items
     case summary        // Summary card with enhanced effects
+
+    var whiteOpacity: Double {
+        switch self {
+        case .standard, .pill: return 0.03
+        case .light: return 0.06
+        case .card, .summary: return 0 // Uses gradient instead
+        }
+    }
+
+    var materialOpacity: Double {
+        switch self {
+        case .standard, .card: return 0.5
+        case .light, .summary: return 0.6
+        case .pill: return 0.4
+        }
+    }
+
+    var usesGradient: Bool {
+        self == .card || self == .summary
+    }
+
+    var borderOpacity: Double {
+        switch self {
+        case .standard, .pill: return 0.08
+        case .light, .card, .summary: return 0.1
+        }
+    }
+
+    var shadowOpacity: Double {
+        switch self {
+        case .standard, .pill: return 0.2
+        case .light: return 0.25
+        case .card, .summary: return 0.4
+        }
+    }
+
+    var shadowRadius: CGFloat {
+        switch self {
+        case .standard: return 16
+        case .light, .card: return 20
+        case .pill: return 8
+        case .summary: return 24
+        }
+    }
+
+    var shadowY: CGFloat {
+        switch self {
+        case .standard, .light: return 8
+        case .card, .summary: return 12
+        case .pill: return 4
+        }
+    }
 }
 
 // MARK: - Glass Panel
@@ -44,62 +96,24 @@ struct GlassPanel<Content: View>: View {
             .background(backgroundForStyle)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .overlay(borderOverlay)
-            .shadow(color: shadowColor, radius: shadowRadius, y: shadowY)
+            .shadow(color: Color.black.opacity(style.shadowOpacity), radius: style.shadowRadius, y: style.shadowY)
             .modifier(GlowModifier(color: glowColor, radius: glowRadius))
     }
 
     // MARK: - Background
     @ViewBuilder
     private var backgroundForStyle: some View {
-        switch style {
-        case .standard:
-            ZStack {
-                Color.white.opacity(0.03)
-                Material.ultraThinMaterial
-                    .opacity(0.5)
-            }
-
-        case .light:
-            ZStack {
-                Color.white.opacity(0.06)
-                Material.ultraThinMaterial
-                    .opacity(0.6)
-            }
-
-        case .card:
-            ZStack {
+        ZStack {
+            if style.usesGradient {
                 LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.05),
-                        Color.white.opacity(0.02)
-                    ],
+                    colors: [Color.white.opacity(style == .card ? 0.05 : 0.04), Color.white.opacity(0.02)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                Material.ultraThinMaterial
-                    .opacity(0.5)
+            } else {
+                Color.white.opacity(style.whiteOpacity)
             }
-
-        case .pill:
-            ZStack {
-                Color.white.opacity(0.03)
-                Material.ultraThinMaterial
-                    .opacity(0.4)
-            }
-
-        case .summary:
-            ZStack {
-                LinearGradient(
-                    colors: [
-                        Color.white.opacity(0.04),
-                        Color.white.opacity(0.02)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                Material.ultraThinMaterial
-                    .opacity(0.6)
-            }
+            Material.ultraThinMaterial.opacity(style.materialOpacity)
         }
     }
 
@@ -108,70 +122,15 @@ struct GlassPanel<Content: View>: View {
     private var borderOverlay: some View {
         if showBorder {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .stroke(borderColor, lineWidth: 1)
-                // Inner highlight
+                .stroke(Color.white.opacity(style.borderOpacity), lineWidth: 1)
                 .overlay(
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.1),
-                                    Color.clear
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
+                            LinearGradient(colors: [Color.white.opacity(0.1), .clear], startPoint: .top, endPoint: .bottom),
                             lineWidth: 1
                         )
                         .padding(1)
                 )
-        }
-    }
-
-    private var borderColor: Color {
-        switch style {
-        case .standard, .pill:
-            return Color.white.opacity(0.08)
-        case .light, .card, .summary:
-            return Color.white.opacity(0.1)
-        }
-    }
-
-    // MARK: - Shadow
-    private var shadowColor: Color {
-        switch style {
-        case .standard, .pill:
-            return Color.black.opacity(0.2)
-        case .light:
-            return Color.black.opacity(0.25)
-        case .card, .summary:
-            return Color.black.opacity(0.4)
-        }
-    }
-
-    private var shadowRadius: CGFloat {
-        switch style {
-        case .standard:
-            return 16
-        case .light:
-            return 20
-        case .card:
-            return 20
-        case .pill:
-            return 8
-        case .summary:
-            return 24
-        }
-    }
-
-    private var shadowY: CGFloat {
-        switch style {
-        case .standard, .light:
-            return 8
-        case .card, .summary:
-            return 12
-        case .pill:
-            return 4
         }
     }
 }

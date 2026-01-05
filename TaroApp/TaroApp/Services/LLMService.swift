@@ -242,7 +242,7 @@ final class LLMService: ObservableObject {
         if !reading.combinations.isEmpty {
             combinationsContext = "Card Combinations:\n"
             for combo in reading.combinations {
-                combinationsContext += "- \(combo.card1) + \(combo.card2): \(combo.meaning)\n"
+                combinationsContext += "- \(combo.cards.joined(separator: " + ")): \(combo.meaning)\n"
             }
             combinationsContext += "\n"
         }
