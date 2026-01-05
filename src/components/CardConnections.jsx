@@ -404,7 +404,7 @@ export default function CardConnections({ cards, cardPositions, allRevealed }) {
           <div className="tooltip-glass px-4 py-2.5 rounded-xl text-xs whitespace-nowrap max-w-[280px]"
             style={{ animation: 'tooltip-fade-in 0.15s ease' }}>
             {/* Decorative top accent */}
-            <div className="absolute -top-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
+            <div className="absolute -top-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
 
             <div className="text-slate-300/90 font-light text-center" style={{ whiteSpace: 'normal' }}>
               {getConnectionExplanation(connections[hoveredConnection], cards)}

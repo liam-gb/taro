@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { CARD_IMAGES, getCardImage } from '../utils/cardImages'
+import { getCardImage } from '../utils/cardImages'
+import CardBackPattern from './CardBackPattern'
 
 // Card sizes - matches PNG aspect ratio (300x527)
 const sizes = {
@@ -14,7 +15,7 @@ const transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow
 // Slow reveal hover delay in ms
 const SLOW_REVEAL_DELAY = 800
 
-// Mystical shadow system with iridescent glow
+// Mystical shadow system with warm gold glow
 const shadow = {
   idle: `
     0 20px 40px -10px rgba(0, 0, 0, 0.5),
@@ -23,16 +24,16 @@ const shadow = {
   `,
   hover: `
     0 30px 60px -15px rgba(0, 0, 0, 0.6),
-    0 0 50px rgba(139, 92, 246, 0.25),
-    0 0 100px rgba(6, 182, 212, 0.1),
-    0 0 0 1px rgba(139, 92, 246, 0.3),
+    0 0 50px rgba(201, 168, 108, 0.25),
+    0 0 100px rgba(122, 158, 126, 0.1),
+    0 0 0 1px rgba(201, 168, 108, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.15)
   `,
   revealed: `
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(139, 92, 246, 0.2),
-    0 0 80px rgba(236, 72, 153, 0.1),
-    0 0 0 1px rgba(139, 92, 246, 0.25),
+    0 0 40px rgba(201, 168, 108, 0.2),
+    0 0 80px rgba(160, 82, 45, 0.1),
+    0 0 0 1px rgba(201, 168, 108, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.1)
   `
 }
@@ -95,7 +96,7 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
     transition
   }
 
-  // Subtle iridescent glow that follows mouse position
+  // Subtle iridescent glow that follows mouse position (warm gold palette)
   const glowX = mousePos.x * 100
   const glowY = mousePos.y * 100
   const glowOverlay = hovered ? {
@@ -104,9 +105,9 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
     borderRadius: 16,
     background: `radial-gradient(
       circle at ${glowX}% ${glowY}%,
-      rgba(139, 92, 246, 0.15) 0%,
-      rgba(6, 182, 212, 0.08) 25%,
-      rgba(236, 72, 153, 0.04) 50%,
+      rgba(201, 168, 108, 0.15) 0%,
+      rgba(122, 158, 126, 0.08) 25%,
+      rgba(160, 82, 45, 0.04) 50%,
       transparent 60%
     )`,
     filter: 'blur(12px)',
@@ -137,28 +138,21 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
         transition,
         transform: `rotateX(${rot.x}deg) rotateY(${rot.y}deg) ${hovered ? 'translateZ(20px) scale(1.05)' : ''}`
       }}>
-        {/* Card Back */}
+        {/* Card Back - Animated Sacred Geometry Pattern */}
         <div style={{
           ...face,
           boxShadow: hovered ? shadow.hover : shadow.idle,
           transform: showFace ? 'rotateY(180deg)' : 'rotateY(0deg)',
         }}>
-          <img
-            src={CARD_IMAGES.back}
-            alt="Card back"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-            draggable={false}
-          />
+          {/* Animated card back pattern */}
+          <CardBackPattern />
           {/* Subtle glass reflection overlay */}
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
-            pointerEvents: 'none'
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(255,255,255,0.04) 100%)',
+            pointerEvents: 'none',
+            zIndex: 10
           }} />
           {/* Slow reveal shimmer effect */}
           {enableSlowReveal && (
@@ -167,6 +161,7 @@ export default function Card3D({ card = null, isRevealed = false, onClick, size 
               style={{
                 transition: 'opacity 0.6s ease',
                 opacity: showShimmer ? 1 : (hovered ? 0.3 : 0),
+                zIndex: 11
               }}
             />
           )}

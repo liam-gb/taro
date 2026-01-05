@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Card3D from './components/Card3D'
 import Button from './components/Button'
 import CardSlot from './components/CardSlot'
@@ -6,6 +6,7 @@ import KeywordList from './components/KeywordList'
 import CardConnections from './components/CardConnections'
 import { FULL_DECK, MAJOR_ARCANA, SPREADS } from './data'
 import { generateReadingPrompt } from './utils/generatePrompt'
+import { calculateReadingEnergy, getAtmosphereStyles } from './utils/cardEnergy'
 import useWindowSize from './hooks/useWindowSize'
 import {
   CARD_DEAL_DELAY_MS,
@@ -16,20 +17,38 @@ import {
   CELTIC_CROSS
 } from './constants'
 
-// Aurora Background Component with Enhanced Ribbons
-const AuroraBackground = () => (
-  <div className="aurora-bg">
-    {/* Original floating orbs */}
-    <div className="aurora-orb aurora-orb-1" />
-    <div className="aurora-orb aurora-orb-2" />
-    <div className="aurora-orb aurora-orb-3" />
-    <div className="aurora-orb aurora-orb-4" />
-    {/* Enhanced aurora ribbons for wow factor */}
-    <div className="aurora-ribbon aurora-ribbon-1" />
-    <div className="aurora-ribbon aurora-ribbon-2" />
-    <div className="aurora-ribbon aurora-ribbon-3" />
-  </div>
-)
+// Aurora Background Component - Responds to reading energy
+const AuroraBackground = ({ energy = 0 }) => {
+  // Shift colors based on energy: negative = cooler, positive = warmer
+  const hueShift = energy * 20 // ±20 degrees
+  const saturationMod = 1 + (energy * 0.2) // 0.8 to 1.2
+  const opacityMod = 0.25 + Math.abs(energy) * 0.1 // More intense at extremes
+
+  return (
+    <div className="aurora-bg" style={{ transition: 'all 2s ease-out' }}>
+      {/* Primary orb - shifts with energy */}
+      <div
+        className="aurora-orb aurora-orb-1"
+        style={{
+          filter: `hue-rotate(${hueShift}deg) saturate(${saturationMod})`,
+          opacity: opacityMod,
+          transition: 'all 2s ease-out'
+        }}
+      />
+      {/* Secondary orb - inverse shift for contrast */}
+      <div
+        className="aurora-orb aurora-orb-2"
+        style={{
+          filter: `hue-rotate(${-hueShift * 0.5}deg) saturate(${saturationMod})`,
+          opacity: opacityMod * 0.8,
+          transition: 'all 2s ease-out'
+        }}
+      />
+      {/* Subtle noise texture overlay */}
+      <div className="aurora-noise" />
+    </div>
+  )
+}
 
 // Cursor Spotlight Component - follows mouse with mystical glow
 const CursorSpotlight = () => {
@@ -149,6 +168,18 @@ export default function App() {
 
   // Computed state - must be defined before useEffects that reference it
   const allRevealed = drawn.length > 0 && revealed.length === drawn.length
+
+  // Dynamic atmosphere based on card energy
+  const readingEnergy = useMemo(() => {
+    if (phase !== 'reading' || revealed.length === 0) return 0
+    const revealedCards = revealed.map(i => drawn[i]).filter(Boolean)
+    return calculateReadingEnergy(revealedCards)
+  }, [phase, revealed, drawn])
+
+  const atmosphereStyles = useMemo(() =>
+    getAtmosphereStyles(readingEnergy),
+    [readingEnergy]
+  )
 
   // Update card positions when cards are revealed
   useEffect(() => {
@@ -321,44 +352,57 @@ export default function App() {
   const revealCard = (i) => setRevealed([...revealed, i])
 
   return (
-    <div className="min-h-screen text-slate-200 relative">
+    <div
+      className="min-h-screen text-slate-200 relative transition-all duration-1000"
+      style={atmosphereStyles}
+    >
       {/* Animated Aurora Background */}
-      <AuroraBackground />
+      <AuroraBackground energy={readingEnergy} />
       {/* Cursor Spotlight Effect */}
       <CursorSpotlight />
 
-      {/* Header */}
-      <div className="text-center py-8 md:py-10 relative">
-        <h1 className="text-mystical text-2xl md:text-3xl text-slate-300/90 font-light">
-          TAROT
-        </h1>
-        <div className="mt-2 w-24 h-px mx-auto bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
+      {/* Header - Asymmetric on desktop */}
+      <div className="py-8 md:py-12 relative">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center md:text-left md:pl-8 lg:pl-16">
+            <h1 className="text-mystical text-2xl md:text-4xl lg:text-5xl text-slate-300/90 font-light entrance-stagger entrance-stagger-1">
+              TAROT
+            </h1>
+            <div className="mt-3 w-24 h-px bg-gradient-to-r from-amber-500/40 to-transparent mx-auto md:mx-0 entrance-stagger entrance-stagger-2" />
+          </div>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 pb-16 relative">
-        {/* Welcome Phase */}
+        {/* Welcome Phase - Asymmetric Layout */}
         {phase === 'welcome' && (
-          <div className="text-center">
-            <p className="text-slate-500/80 text-sm font-light tracking-wide mb-8 md:mb-10">
-              Tap or hover to glimpse the cards
-            </p>
+          <div className="md:grid md:grid-cols-12 md:gap-8 lg:gap-12 items-start">
+            {/* Left Column - Cards (takes more space, offset) */}
+            <div className="md:col-span-7 lg:col-span-8 md:order-2 mb-12 md:mb-0">
+              <p className="text-slate-500/80 text-sm font-light tracking-wide mb-6 text-center md:text-right md:pr-8 entrance-stagger entrance-stagger-3">
+                Tap or hover to glimpse the cards
+              </p>
 
-            {/* Card Preview */}
-            <div className="flex justify-center gap-2 md:gap-4 mb-10 md:mb-14 flex-wrap">
-              {[0,1,2,3,4].map(i => (
-                <div
-                  key={i}
-                  className={`${i >= 3 ? 'hidden md:block' : ''} transition-transform duration-500`}
-                  style={{ transform: `rotate(${(i-2)*4}deg)` }}
-                >
-                  <Card3D card={hoverCards[i]} enableHover hoverCard={hoverCards[i]} />
-                </div>
-              ))}
+              {/* Card Preview - Asymmetric cascade */}
+              <div className="flex justify-center md:justify-end gap-2 md:gap-3 flex-wrap md:pr-4 entrance-stagger entrance-stagger-4">
+                {[0,1,2,3,4].map(i => (
+                  <div
+                    key={i}
+                    className={`${i >= 3 ? 'hidden md:block' : ''} transition-all duration-500`}
+                    style={{
+                      transform: `rotate(${(i-2)*5}deg) translateY(${Math.abs(i-2)*8}px)`,
+                    }}
+                  >
+                    <Card3D card={hoverCards[i]} enableHover hoverCard={hoverCards[i]} />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="space-y-8 max-w-lg mx-auto">
+            {/* Right Column - Controls (narrower, offset left) */}
+            <div className="md:col-span-5 lg:col-span-4 md:order-1 md:pt-8 space-y-8 text-center md:text-left">
               {/* Spread Selection Pills */}
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center md:justify-start gap-3 entrance-stagger entrance-stagger-4">
                 {Object.entries(SPREADS).map(([k, s]) => (
                   <button
                     key={k}
@@ -371,13 +415,13 @@ export default function App() {
                   >
                     <div className="flex items-center gap-2.5">
                       <span className={`text-sm font-light tracking-wide ${
-                        spread === k ? 'text-violet-300' : 'text-slate-400 group-hover:text-slate-300'
+                        spread === k ? 'text-amber-200' : 'text-slate-400 group-hover:text-slate-300'
                       }`}>
                         {s.name}
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full transition-colors duration-300 ${
                         spread === k
-                          ? 'bg-violet-500/30 text-violet-300'
+                          ? 'bg-amber-500/30 text-amber-200'
                           : 'bg-white/5 text-slate-500 group-hover:text-slate-400'
                       }`}>
                         {s.positions.length}
@@ -390,7 +434,7 @@ export default function App() {
               {/* Settings Toggle */}
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="text-slate-600 hover:text-slate-400 text-sm font-light tracking-wide transition-colors duration-300 flex items-center gap-2 mx-auto"
+                className="text-slate-600 hover:text-slate-400 text-sm font-light tracking-wide transition-colors duration-300 flex items-center gap-2 mx-auto md:mx-0"
               >
                 <span className={`transition-transform duration-300 ${showSettings ? 'rotate-90' : ''}`}>
                   ›
@@ -418,9 +462,11 @@ export default function App() {
               )}
 
               {/* Begin Button */}
-              <Button onClick={() => setPhase('question')} className="w-full">
-                Begin Reading
-              </Button>
+              <div className="entrance-stagger entrance-stagger-5">
+                <Button onClick={() => setPhase('question')} className="w-full">
+                  Begin Reading
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -543,17 +589,17 @@ export default function App() {
           <div className={`text-center transition-all duration-700 ease-out ${selectFadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <p className="text-slate-300/90 font-light tracking-wide mb-2">Choose your cards</p>
             <p className="text-slate-500/80 text-sm font-light mb-4">
-              <span className="text-violet-400/80">{selectedCards.length}</span>
+              <span className="text-amber-400/80">{selectedCards.length}</span>
               <span className="text-slate-600/60 mx-2">of</span>
               <span>{spreadData.positions.length}</span>
               {selectedCards.length < spreadData.positions.length && (
-                <span className="text-violet-400/60 ml-3">— {spreadData.positions[selectedCards.length].name}</span>
+                <span className="text-amber-400/60 ml-3">— {spreadData.positions[selectedCards.length].name}</span>
               )}
             </p>
 
             {/* Breathing pulse indicator */}
             <div className="flex justify-center mb-8">
-              <div className="breathing-pulse w-3 h-3 rounded-full bg-violet-500/30" />
+              <div className="breathing-pulse w-3 h-3 rounded-full bg-amber-500/30" />
             </div>
 
             {/* Card Fan with slow hover reveal */}
@@ -668,7 +714,7 @@ export default function App() {
                       >
                         {canSwap && isTopCard && i === 0 && (
                           <div
-                            className="absolute -bottom-7 left-1/2 text-xs text-violet-400/60 whitespace-nowrap font-light tracking-wide pointer-events-none"
+                            className="absolute -bottom-7 left-1/2 text-xs text-amber-400/60 whitespace-nowrap font-light tracking-wide pointer-events-none"
                             style={{ transform: 'translateX(-50%)' }}
                           >
                             tap to swap
@@ -751,7 +797,7 @@ export default function App() {
                 <div className="summary-card rounded-2xl p-6 md:p-8 animated-border">
                   {/* Header */}
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-8 h-px bg-gradient-to-r from-violet-500/40 to-transparent" />
+                    <div className="w-8 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
                     <h3 className="text-slate-400/90 text-sm font-light uppercase tracking-[0.2em]">
                       Reading Summary
                     </h3>
@@ -762,7 +808,7 @@ export default function App() {
                   <div className="space-y-4">
                     {drawn.map((card, i) => (
                       <div key={card.id} className="flex items-start gap-4">
-                        <span className="text-violet-400/80 font-light min-w-[140px] shrink-0 tracking-wide">
+                        <span className="text-amber-400/80 font-light min-w-[140px] shrink-0 tracking-wide">
                           {spreadData.positions[i].name}
                         </span>
                         <div>
