@@ -291,14 +291,271 @@ class TrainingPrompt:
         return cls(**d)
 
 
-# Questions (same as before)
+# Questions organized by category (~200 total)
 QUESTIONS = {
-    "love": ["Will I find love?", "Is my partner the one for me?", "Should I stay in my current relationship?", "How can I improve my relationship?", "What is blocking me from finding love?", "How does my partner really feel about me?", "Am I ready for a committed relationship?", "What do I need to learn from this relationship?", "How can I heal from my past heartbreak?", "What is the future of my relationship?"],
-    "career": ["Should I change careers?", "Will I get the promotion?", "Is this job right for me?", "How can I advance in my career?", "Should I start my own business?", "What is blocking my career success?", "Is it time to quit my job?", "What career path should I pursue?", "How can I find more fulfillment at work?", "What's holding me back professionally?"],
-    "growth": ["What is my life purpose?", "How can I become my best self?", "What lesson am I meant to learn right now?", "What is holding me back from growth?", "How can I find inner peace?", "What do I need to release?", "How can I overcome my fears?", "What patterns do I need to break?", "What gifts am I not fully using?", "How can I heal my inner child?"],
-    "general": ["What do I need to know right now?", "What should I focus on today?", "What energy surrounds me?", "What opportunities are coming?", "What challenges should I prepare for?", "What guidance do I need?"],
+    "love": [
+        # Relationships - general
+        "Will I find love?",
+        "Is my partner the one for me?",
+        "Should I stay in my current relationship?",
+        "How can I improve my relationship?",
+        "What is blocking me from finding love?",
+        "How does my partner really feel about me?",
+        "Am I ready for a committed relationship?",
+        "What do I need to learn from this relationship?",
+        "How can I heal from my past heartbreak?",
+        "What is the future of my relationship?",
+        # Dating
+        "What should I look for in a partner?",
+        "Why do I keep attracting the wrong people?",
+        "Am I ready to start dating again?",
+        "What energy am I projecting in the dating world?",
+        "How can I open myself up to new love?",
+        # Marriage & commitment
+        "Is marriage in my future?",
+        "What do I need to know before getting engaged?",
+        "How can we reignite the spark in our marriage?",
+        "What is the state of my marriage?",
+        "Are we ready to take the next step together?",
+        # Heartbreak & healing
+        "How do I move on from this breakup?",
+        "What lessons does this heartbreak hold for me?",
+        "Will I be able to trust again?",
+        "What do I need to release to heal my heart?",
+        "How long will it take me to feel whole again?",
+        # Attraction & chemistry
+        "Is there real chemistry between us?",
+        "What attracts my ideal partner to me?",
+        "Why am I drawn to this person?",
+        "What is the nature of our connection?",
+        "Does this person have genuine feelings for me?",
+        # Compatibility
+        "Are we truly compatible?",
+        "What challenges will we face together?",
+        "Where do our values align and differ?",
+        "Can we build a lasting future together?",
+        "What does our relationship need to thrive?",
+        # Communication & connection
+        "How can we communicate better?",
+        "What is my partner not telling me?",
+        "How can I express my needs more clearly?",
+        "What is causing distance between us?",
+        "How can I feel more connected to my partner?",
+    ],
+    "career": [
+        # Job changes
+        "Should I change careers?",
+        "Will I get the promotion?",
+        "Is this job right for me?",
+        "How can I advance in my career?",
+        "Should I start my own business?",
+        "What is blocking my career success?",
+        "Is it time to quit my job?",
+        "What career path should I pursue?",
+        "How can I find more fulfillment at work?",
+        "What's holding me back professionally?",
+        # New opportunities
+        "Should I accept this job offer?",
+        "What opportunities are coming my way?",
+        "Is this the right time for a career change?",
+        "What should I know about this new position?",
+        "Will this move benefit my career long-term?",
+        # Business & entrepreneurship
+        "Is my business idea viable?",
+        "What does my business need to succeed?",
+        "Should I pursue this partnership?",
+        "How can I grow my business?",
+        "What risks should I be aware of?",
+        # Purpose & fulfillment
+        "What work would truly fulfill me?",
+        "Am I on the right career path?",
+        "How can I align my work with my values?",
+        "What is my professional calling?",
+        "How do I find meaning in my current job?",
+        # Workplace dynamics
+        "How should I handle this difficult coworker?",
+        "What does my boss really think of my work?",
+        "How can I improve my standing at work?",
+        "Is the office politics affecting my growth?",
+        "How can I build better professional relationships?",
+        # Interviews & transitions
+        "How can I prepare for this interview?",
+        "What energy should I bring to this opportunity?",
+        "Will I make a good impression?",
+        "What do I need to show to get this role?",
+        "How can I present my best self professionally?",
+        # Compensation & value
+        "Am I being fairly compensated?",
+        "Should I ask for a raise?",
+        "How can I increase my earning potential?",
+        "What is my true professional value?",
+        "How do I negotiate what I deserve?",
+    ],
+    "growth": [
+        # Life purpose
+        "What is my life purpose?",
+        "How can I become my best self?",
+        "What lesson am I meant to learn right now?",
+        "What is holding me back from growth?",
+        "How can I find inner peace?",
+        "What do I need to release?",
+        "How can I overcome my fears?",
+        "What patterns do I need to break?",
+        "What gifts am I not fully using?",
+        "How can I heal my inner child?",
+        # Spirituality
+        "How can I deepen my spiritual practice?",
+        "What is my soul trying to tell me?",
+        "How can I connect with my higher self?",
+        "What spiritual lessons await me?",
+        "How can I trust my intuition more?",
+        # Healing & transformation
+        "What needs healing within me?",
+        "How can I transform my pain into wisdom?",
+        "What old wounds still need attention?",
+        "How do I forgive myself for past mistakes?",
+        "What is ready to be released from my life?",
+        # Habits & behaviors
+        "What habits are serving me? Which are not?",
+        "How can I break this destructive pattern?",
+        "What motivates my self-sabotaging behavior?",
+        "How can I build healthier routines?",
+        "What daily practice would benefit me most?",
+        # Fears & blocks
+        "What am I most afraid of?",
+        "What fear is holding me back from living fully?",
+        "How can I move through this block?",
+        "What lies beneath my anxiety?",
+        "How do I find courage in uncertain times?",
+        # Self-improvement
+        "What aspect of myself needs attention?",
+        "How can I be more authentic?",
+        "What would help me grow right now?",
+        "How can I develop more self-compassion?",
+        "What is the next step in my personal evolution?",
+        # Mindfulness & presence
+        "How can I be more present in my life?",
+        "What is distracting me from what matters?",
+        "How can I find stillness in chaos?",
+        "What would help me feel more grounded?",
+        "How do I cultivate gratitude in hard times?",
+    ],
+    "health": [
+        # General wellness
+        "What does my body need right now?",
+        "How can I improve my overall wellbeing?",
+        "What is my body trying to tell me?",
+        "What aspect of health should I focus on?",
+        "How can I feel more vibrant and alive?",
+        # Energy & vitality
+        "Why do I feel so drained lately?",
+        "How can I restore my energy?",
+        "What is depleting my life force?",
+        "How can I cultivate more vitality?",
+        "What would help me feel more energized?",
+        # Stress & balance
+        "How can I better manage my stress?",
+        "What is the source of my tension?",
+        "How do I find balance in my busy life?",
+        "What boundaries do I need for my wellbeing?",
+        "How can I create more ease in my days?",
+        # Mind-body connection
+        "How are my emotions affecting my health?",
+        "What is the mind-body message here?",
+        "How can I listen to my body's wisdom?",
+        "What emotional healing would benefit my body?",
+        "How do I honor both my mental and physical needs?",
+    ],
+    "family": [
+        # Parents
+        "How can I improve my relationship with my parents?",
+        "What do I need to understand about my family of origin?",
+        "How do I heal my relationship with my mother?",
+        "What does my father need from me?",
+        "How can I set boundaries while honoring my parents?",
+        # Children
+        "What does my child need from me right now?",
+        "How can I be a better parent?",
+        "What should I know about my child's path?",
+        "How can I support my child through this challenge?",
+        "What kind of parent am I called to be?",
+        # Siblings & extended family
+        "How can I heal this rift with my sibling?",
+        "What dynamics are at play in my family?",
+        "How do I navigate family expectations?",
+        "What role do I play in my family system?",
+        "How can I maintain peace at family gatherings?",
+        # Home & domestic life
+        "What does my home need to feel like sanctuary?",
+        "Is this the right home for me?",
+        "How can I create more harmony at home?",
+        "What energy is my living space holding?",
+        "How do I make my house feel like home?",
+    ],
+    "money": [
+        # Finances general
+        "How can I improve my financial situation?",
+        "What is my relationship with money?",
+        "What blocks my financial abundance?",
+        "How can I create more prosperity?",
+        "What do I need to know about my finances?",
+        # Investments & growth
+        "Is this a good investment?",
+        "How can I grow my wealth wisely?",
+        "What financial opportunities should I consider?",
+        "Should I take this financial risk?",
+        "What does my financial future look like?",
+        # Debt & challenges
+        "How can I get out of debt?",
+        "What lesson is this financial struggle teaching me?",
+        "How do I overcome my money fears?",
+        "What is causing my financial difficulties?",
+        "How can I break the cycle of financial stress?",
+        # Abundance mindset
+        "How can I develop an abundance mindset?",
+        "What beliefs about money are limiting me?",
+        "How do I feel worthy of financial success?",
+        "What would help me trust in abundance?",
+        "How can I shift my scarcity thinking?",
+    ],
+    "decisions": [
+        # Big choices
+        "Which path should I choose?",
+        "What do I need to consider before deciding?",
+        "What will happen if I choose this option?",
+        "Am I overlooking something important?",
+        "What is the wisest choice here?",
+        # Timing
+        "Is this the right time to act?",
+        "Should I wait or move forward now?",
+        "What timing feels right for this decision?",
+        "Am I rushing this choice?",
+        "When will conditions be favorable?",
+        # Direction & crossroads
+        "I'm at a crossroads - which way should I turn?",
+        "What direction is calling me?",
+        "How do I know I'm on the right path?",
+        "What is guiding me toward the right choice?",
+        "Where is my current path leading?",
+        # Clarity & confusion
+        "Why am I so uncertain about this?",
+        "How can I gain clarity on this matter?",
+        "What am I missing in this situation?",
+        "What would help me see more clearly?",
+        "How do I trust my decision-making?",
+    ],
 }
-QUESTION_WEIGHTS = {"love": 0.30, "career": 0.25, "growth": 0.25, "general": 0.20}
+
+# Weights based on target counts: love(40), career(40), growth(40), health(20), family(20), money(20), decisions(20)
+QUESTION_WEIGHTS = {
+    "love": 0.20,
+    "career": 0.20,
+    "growth": 0.20,
+    "health": 0.10,
+    "family": 0.10,
+    "money": 0.10,
+    "decisions": 0.10,
+}
 
 
 def draw_cards(spread_id: str, rng: random.Random) -> List[Dict]:
