@@ -21,6 +21,11 @@
 		A1000001241D3E4500000017 /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001241D3E4500000018 /* Reading.swift */; };
 		A1000001241D3E4500000019 /* CardDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001241D3E450000001A /* CardDeck.swift */; };
 		A1000001241D3E450000001B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000001241D3E450000001C /* Assets.xcassets */; };
+		A1000002241D3E4500000001 /* InterpretationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002241D3E4500000002 /* InterpretationModels.swift */; };
+		A1000002241D3E4500000003 /* DataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002241D3E4500000004 /* DataService.swift */; };
+		A1000002241D3E4500000005 /* base-meanings.json in Resources */ = {isa = PBXBuildFile; fileRef = A1000002241D3E4500000006 /* base-meanings.json */; };
+		A1000002241D3E4500000007 /* position-modifiers.json in Resources */ = {isa = PBXBuildFile; fileRef = A1000002241D3E4500000008 /* position-modifiers.json */; };
+		A1000002241D3E4500000009 /* combinations.json in Resources */ = {isa = PBXBuildFile; fileRef = A1000002241D3E450000000A /* combinations.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +44,11 @@
 		A1000001241D3E4500000018 /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
 		A1000001241D3E450000001A /* CardDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDeck.swift; sourceTree = "<group>"; };
 		A1000001241D3E450000001C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000002241D3E4500000002 /* InterpretationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterpretationModels.swift; sourceTree = "<group>"; };
+		A1000002241D3E4500000004 /* DataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataService.swift; sourceTree = "<group>"; };
+		A1000002241D3E4500000006 /* base-meanings.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "base-meanings.json"; sourceTree = "<group>"; };
+		A1000002241D3E4500000008 /* position-modifiers.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "position-modifiers.json"; sourceTree = "<group>"; };
+		A1000002241D3E450000000A /* combinations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "combinations.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +98,7 @@
 				A1000001241D3E4500000014 /* Position.swift */,
 				A1000001241D3E4500000016 /* Spread.swift */,
 				A1000001241D3E4500000018 /* Reading.swift */,
+				A1000002241D3E4500000002 /* InterpretationModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -110,6 +121,7 @@
 		A10000F5241D3E4500000001 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				A1000002241D3E4500000004 /* DataService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -126,6 +138,9 @@
 			isa = PBXGroup;
 			children = (
 				A1000001241D3E450000001C /* Assets.xcassets */,
+				A1000002241D3E4500000006 /* base-meanings.json */,
+				A1000002241D3E4500000008 /* position-modifiers.json */,
+				A1000002241D3E450000000A /* combinations.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -196,6 +211,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001241D3E450000001B /* Assets.xcassets in Resources */,
+				A1000002241D3E4500000005 /* base-meanings.json in Resources */,
+				A1000002241D3E4500000007 /* position-modifiers.json in Resources */,
+				A1000002241D3E4500000009 /* combinations.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +237,8 @@
 				A1000001241D3E4500000015 /* Spread.swift in Sources */,
 				A1000001241D3E4500000017 /* Reading.swift in Sources */,
 				A1000001241D3E4500000019 /* CardDeck.swift in Sources */,
+				A1000002241D3E4500000001 /* InterpretationModels.swift in Sources */,
+				A1000002241D3E4500000003 /* DataService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
