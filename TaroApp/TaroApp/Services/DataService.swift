@@ -89,6 +89,36 @@ final class DataService {
         }
     }
 
+    /// Find all combinations present in drawn cards
+    /// - Parameter drawnCards: Array of drawn cards in the reading
+    /// - Returns: All matching card combinations found
+    func findAllCombinations(in drawnCards: [DrawnCard]) -> [CardCombination] {
+        let cardNames = drawnCards.map { $0.card.name }
+        return findCombinations(in: cardNames)
+    }
+
+    /// Get pre-calculated card-in-position snippet
+    /// - Parameters:
+    ///   - card: The card name
+    ///   - position: The position slug (e.g., "past", "present", "future")
+    ///   - isReversed: Whether the card is reversed
+    /// - Returns: The pre-calculated interpretation snippet if available
+    func getCardInPositionSnippet(card: String, position: String, isReversed: Bool) -> String? {
+        positionModifier(for: card, position: position, isReversed: isReversed)
+    }
+
+    /// Get position definition by slug
+    /// - Parameter positionId: The position slug (e.g., "past", "challenge")
+    /// - Returns: Position definition with name and description
+    func positionDefinition(for positionId: String) -> PositionDefinition? {
+        positionModifiers?.positions[positionId]
+    }
+
+    /// Get all available position definitions
+    var allPositions: [String: PositionDefinition] {
+        positionModifiers?.positions ?? [:]
+    }
+
     // MARK: - Private Loading
 
     private func loadAllData() {

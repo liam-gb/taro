@@ -13,6 +13,8 @@ struct GeneratingView: View {
     @State private var showDeviceUnsupported = false
     @State private var showCopyPromptSheet = false
     @State private var externalPrompt: String = ""
+    @State private var elapsedTime: Double = 0
+    @State private var statsTimer: Timer?
 
     var body: some View {
         ZStack {
@@ -110,6 +112,9 @@ struct GeneratingView: View {
         .sheet(isPresented: $showCopyPromptSheet) {
             CopyPromptSheet(prompt: externalPrompt, isPresented: $showCopyPromptSheet)
         }
+        .onDisappear {
+            stopStatsTimer()
+        }
     }
 
     // MARK: - Subviews
@@ -192,17 +197,75 @@ struct GeneratingView: View {
                     }
                 }
 
-                ScrollView {
-                    Text(streamedText)
-                        .font(TaroTypography.body)
-                        .foregroundColor(.textPrimary)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        Text(streamedText)
+                            .font(TaroTypography.body)
+                            .foregroundColor(.textPrimary)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .id("streamingText")
+                    }
+                    .frame(maxHeight: 200)
+                    .onChange(of: streamedText) { _, _ in
+                        withAnimation(.easeOut(duration: 0.1)) {
+                            proxy.scrollTo("streamingText", anchor: .bottom)
+                        }
+                    }
                 }
-                .frame(maxHeight: 200)
+
+                // Generation stats bar
+                generationStatsBar
             }
         }
         .padding(.horizontal, TaroSpacing.lg)
+    }
+
+    // MARK: - Generation Stats Bar
+
+    private var generationStatsBar: some View {
+        HStack(spacing: TaroSpacing.md) {
+            // Time elapsed
+            HStack(spacing: TaroSpacing.xxs) {
+                Image(systemName: "clock")
+                    .font(.system(size: 10))
+                Text(formatTime(elapsedTime))
+                    .font(TaroTypography.caption2)
+            }
+            .foregroundColor(.textMuted)
+
+            Spacer()
+
+            // Tokens generated
+            HStack(spacing: TaroSpacing.xxs) {
+                Image(systemName: "text.word.spacing")
+                    .font(.system(size: 10))
+                Text("\(readingSession.tokensGenerated) tokens")
+                    .font(TaroTypography.caption2)
+            }
+            .foregroundColor(.textMuted)
+
+            // Generation speed
+            if readingSession.generationSpeed > 0 {
+                HStack(spacing: TaroSpacing.xxs) {
+                    Image(systemName: "speedometer")
+                        .font(.system(size: 10))
+                    Text(String(format: "%.1f tok/s", readingSession.generationSpeed))
+                        .font(TaroTypography.caption2)
+                }
+                .foregroundColor(.mysticCyan)
+            }
+        }
+        .padding(.top, TaroSpacing.xs)
+    }
+
+    private func formatTime(_ seconds: Double) -> String {
+        let mins = Int(seconds) / 60
+        let secs = Int(seconds) % 60
+        if mins > 0 {
+            return String(format: "%d:%02d", mins, secs)
+        }
+        return String(format: "%.1fs", seconds)
     }
 
     // MARK: - Unsupported Device Actions
@@ -259,13 +322,32 @@ struct GeneratingView: View {
                     .foregroundColor(.textSecondary)
                     .multilineTextAlignment(.center)
 
-                GlassButton("Use Traditional Reading", style: .primary) {
-                    let interpretation = generateFallbackInterpretation()
-                    readingSession.setInterpretation(interpretation)
+                // Action buttons
+                VStack(spacing: TaroSpacing.sm) {
+                    // Regenerate button
+                    GlassButton("Try Again", icon: "arrow.clockwise", style: .primary) {
+                        regenerate()
+                    }
+
+                    // Fallback option
+                    GlassButton("Use Traditional Reading", icon: "doc.text", style: .secondary) {
+                        let interpretation = generateFallbackInterpretation()
+                        readingSession.setInterpretation(interpretation)
+                    }
                 }
             }
         }
         .padding(.horizontal, TaroSpacing.xl)
+    }
+
+    /// Retry generation after an error
+    private func regenerate() {
+        generationError = nil
+        streamedText = ""
+        readingSession.resetGenerationTracking()
+        Task {
+            await generateWithLLM()
+        }
     }
 
     // MARK: - Generation
@@ -287,6 +369,10 @@ struct GeneratingView: View {
         streamedText = ""
         generationError = nil
 
+        // Start tracking generation
+        readingSession.startGeneration()
+        startStatsTimer()
+
         do {
             for try await token in llmService.generateReading(
                 for: readingSession.drawnCards,
@@ -294,16 +380,52 @@ struct GeneratingView: View {
                 style: .balanced
             ) {
                 streamedText += token
+                // Count tokens (approximation: split by spaces/punctuation)
+                let tokenCount = token.split(whereSeparator: { $0.isWhitespace || $0.isPunctuation }).count
+                if tokenCount > 0 {
+                    readingSession.recordTokens(tokenCount)
+                } else if !token.isEmpty {
+                    readingSession.recordToken()
+                }
             }
 
             // Generation complete
+            stopStatsTimer()
+            readingSession.completeGeneration()
             readingSession.setInterpretation(streamedText)
+
+            // Log performance stats
+            #if DEBUG
+            if let latency = readingSession.firstTokenLatency {
+                print("GeneratingView: First token latency: \(String(format: "%.2f", latency))s")
+            }
+            print("GeneratingView: Total tokens: \(readingSession.tokensGenerated)")
+            print("GeneratingView: Speed: \(String(format: "%.1f", readingSession.generationSpeed)) tok/s")
+            #endif
 
         } catch is CancellationError {
             // Cancelled - already handled
+            stopStatsTimer()
+            readingSession.completeGeneration()
         } catch {
+            stopStatsTimer()
+            readingSession.completeGeneration()
             generationError = error.localizedDescription
         }
+    }
+
+    // MARK: - Stats Timer
+
+    private func startStatsTimer() {
+        elapsedTime = 0
+        statsTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            elapsedTime = readingSession.elapsedGenerationTime
+        }
+    }
+
+    private func stopStatsTimer() {
+        statsTimer?.invalidate()
+        statsTimer = nil
     }
 
     // MARK: - Fallback Interpretation
