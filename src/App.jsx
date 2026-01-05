@@ -4,6 +4,7 @@ import Button from './components/Button'
 import CardSlot from './components/CardSlot'
 import KeywordList from './components/KeywordList'
 import CardConnections from './components/CardConnections'
+import TaroLogo from './components/TaroLogo'
 import { FULL_DECK, MAJOR_ARCANA, SPREADS } from './data'
 import { generateReadingPrompt } from './utils/generatePrompt'
 import { calculateReadingEnergy, getAtmosphereStyles } from './utils/cardEnergy'
@@ -361,109 +362,143 @@ export default function App() {
       {/* Cursor Spotlight Effect */}
       <CursorSpotlight />
 
-      {/* Header - Asymmetric on desktop */}
-      <div className="py-8 md:py-12 relative">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center md:text-left md:pl-8 lg:pl-16">
-            <h1 className="text-mystical text-2xl md:text-4xl lg:text-5xl text-slate-300/90 font-light entrance-stagger entrance-stagger-1">
-              TAROT
-            </h1>
-            <div className="mt-3 w-24 h-px bg-gradient-to-r from-amber-500/40 to-transparent mx-auto md:mx-0 entrance-stagger entrance-stagger-2" />
+      {/* Header - Bold, edge-breaking on mobile */}
+      <div className="pt-12 pb-6 md:pt-16 md:pb-8 relative overflow-visible">
+        {/* Decorative gold arc - breaks out of container */}
+        <div
+          className="absolute -left-8 top-0 w-32 h-32 md:w-48 md:h-48 opacity-20 entrance-stagger entrance-stagger-1"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(201,168,108,0.4) 0%, transparent 70%)',
+            filter: 'blur(30px)',
+            transform: 'rotate(-15deg)'
+          }}
+        />
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="text-center md:text-left">
+            {/* SVG Runic Logo */}
+            <div className="entrance-stagger entrance-stagger-1">
+              <TaroLogo size="large" className="mx-auto md:mx-0 opacity-90" />
+            </div>
+            {/* Decorative line - extends edge to edge on mobile */}
+            <div className="mt-4 h-px entrance-stagger entrance-stagger-2 -mx-6 md:mx-0 md:w-32">
+              <div className="h-full bg-gradient-to-r from-transparent via-mystic-gold/50 to-transparent md:from-mystic-gold/50 md:to-transparent" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 pb-16 relative">
-        {/* Welcome Phase - Asymmetric Layout */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 pb-16 relative">
+        {/* Welcome Phase - Mobile-first bold composition */}
         {phase === 'welcome' && (
-          <div className="md:grid md:grid-cols-12 md:gap-8 lg:gap-12 items-start">
-            {/* Left Column - Cards (takes more space, offset) */}
-            <div className="md:col-span-7 lg:col-span-8 md:order-2 mb-12 md:mb-0">
-              <p className="text-slate-500/80 text-sm font-light tracking-wide mb-6 text-center md:text-right md:pr-8 entrance-stagger entrance-stagger-3">
-                Tap or hover to glimpse the cards
-              </p>
-
-              {/* Card Preview - Asymmetric cascade */}
-              <div className="flex justify-center md:justify-end gap-2 md:gap-3 flex-wrap md:pr-4 entrance-stagger entrance-stagger-4">
-                {[0,1,2,3,4].map(i => (
-                  <div
-                    key={i}
-                    className={`${i >= 3 ? 'hidden md:block' : ''} transition-all duration-500`}
-                    style={{
-                      transform: `rotate(${(i-2)*5}deg) translateY(${Math.abs(i-2)*8}px)`,
-                    }}
-                  >
-                    <Card3D card={hoverCards[i]} enableHover hoverCard={hoverCards[i]} />
-                  </div>
-                ))}
+          <div className="relative">
+            {/* Card Preview - Overlaps into header, breaks edges on mobile */}
+            <div className="relative -mt-4 mb-8 md:mb-12 entrance-stagger entrance-stagger-3">
+              {/* Cards fan - extends beyond container on mobile */}
+              <div className="flex justify-center -mx-6 md:mx-0 overflow-visible">
+                <div className="flex items-end gap-0" style={{ transform: 'perspective(800px)' }}>
+                  {[0,1,2,3,4].map(i => {
+                    const isCenter = i === 2
+                    const offset = i - 2
+                    return (
+                      <div
+                        key={i}
+                        className={`${i === 0 || i === 4 ? 'hidden sm:block' : ''} transition-all duration-700`}
+                        style={{
+                          transform: `
+                            rotate(${offset * 8}deg)
+                            translateY(${Math.abs(offset) * 12}px)
+                            translateX(${offset * -8}px)
+                            ${isCenter ? 'scale(1.1)' : 'scale(0.95)'}
+                          `,
+                          zIndex: isCenter ? 10 : 5 - Math.abs(offset),
+                          marginLeft: i > 0 ? '-24px' : '0',
+                          filter: isCenter ? 'none' : 'brightness(0.85)',
+                        }}
+                      >
+                        <Card3D card={hoverCards[i]} enableHover hoverCard={hoverCards[i]} />
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
+              {/* Hint text */}
+              <p className="text-slate-600/70 text-xs font-light tracking-wider text-center mt-6 uppercase">
+                Tap to glimpse
+              </p>
             </div>
 
-            {/* Right Column - Controls (narrower, offset left) */}
-            <div className="md:col-span-5 lg:col-span-4 md:order-1 md:pt-8 space-y-8 text-center md:text-left">
-              {/* Spread Selection Pills */}
-              <div className="flex flex-wrap justify-center md:justify-start gap-3 entrance-stagger entrance-stagger-4">
-                {Object.entries(SPREADS).map(([k, s]) => (
-                  <button
-                    key={k}
-                    onClick={() => setSpread(k)}
-                    className={`group px-5 py-3 rounded-full transition-all duration-300 ${
-                      spread === k
-                        ? 'pill-glass-active'
-                        : 'pill-glass hover:border-white/20'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className={`text-sm font-light tracking-wide ${
-                        spread === k ? 'text-amber-200' : 'text-slate-400 group-hover:text-slate-300'
-                      }`}>
-                        {s.name}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full transition-colors duration-300 ${
+            {/* Controls Section - Stacked on mobile, cleaner hierarchy */}
+            <div className="space-y-6 md:space-y-8 max-w-sm mx-auto">
+              {/* Spread Selection - Horizontal scroll on mobile */}
+              <div className="entrance-stagger entrance-stagger-4">
+                <p className="text-slate-500/60 text-xs font-light tracking-widest uppercase text-center mb-3">
+                  Choose your spread
+                </p>
+                <div className="flex gap-2 justify-center flex-wrap">
+                  {Object.entries(SPREADS).map(([k, s]) => (
+                    <button
+                      key={k}
+                      onClick={() => setSpread(k)}
+                      className={`group px-4 py-2.5 rounded-full transition-all duration-300 ${
                         spread === k
-                          ? 'bg-amber-500/30 text-amber-200'
-                          : 'bg-white/5 text-slate-500 group-hover:text-slate-400'
-                      }`}>
-                        {s.positions.length}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+                          ? 'pill-glass-active scale-105'
+                          : 'pill-glass hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-light tracking-wide ${
+                          spread === k ? 'text-mystic-gold' : 'text-slate-400 group-hover:text-slate-300'
+                        }`}>
+                          {s.name}
+                        </span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full transition-colors duration-300 ${
+                          spread === k
+                            ? 'bg-mystic-gold/30 text-mystic-gold'
+                            : 'bg-white/5 text-slate-600 group-hover:text-slate-500'
+                        }`}>
+                          {s.positions.length}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Settings Toggle */}
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="text-slate-600 hover:text-slate-400 text-sm font-light tracking-wide transition-colors duration-300 flex items-center gap-2 mx-auto md:mx-0"
-              >
-                <span className={`transition-transform duration-300 ${showSettings ? 'rotate-90' : ''}`}>
-                  ›
-                </span>
-                <span>Deck options</span>
-              </button>
+              {/* Settings Toggle - More minimal */}
+              <div className="text-center">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="text-slate-600 hover:text-slate-400 text-xs font-light tracking-widest uppercase transition-colors duration-300 inline-flex items-center gap-2"
+                >
+                  <span className={`transition-transform duration-300 text-mystic-gold/60 ${showSettings ? 'rotate-90' : ''}`}>
+                    ›
+                  </span>
+                  <span>Options</span>
+                </button>
 
-              {/* Settings Panel */}
-              {showSettings && (
-                <div className="glass rounded-2xl p-5 space-y-4 animate-[reveal-up_0.3s_ease]">
-                  <Toggle
-                    label="Major Arcana only"
-                    hint="Use only the 22 Major Arcana cards"
-                    checked={majorOnly}
-                    onChange={() => setMajorOnly(!majorOnly)}
-                  />
-                  <div className="divider-glass" />
-                  <Toggle
-                    label="Reversed cards"
-                    hint="Allow cards to appear reversed (inverted meaning)"
-                    checked={useReversals}
-                    onChange={() => setUseReversals(!useReversals)}
-                  />
-                </div>
-              )}
+                {/* Settings Panel */}
+                {showSettings && (
+                  <div className="glass rounded-2xl p-5 mt-4 space-y-4 animate-[reveal-up_0.3s_ease] text-left">
+                    <Toggle
+                      label="Major Arcana only"
+                      hint="Use only the 22 Major Arcana cards"
+                      checked={majorOnly}
+                      onChange={() => setMajorOnly(!majorOnly)}
+                    />
+                    <div className="divider-glass" />
+                    <Toggle
+                      label="Reversed cards"
+                      hint="Allow cards to appear reversed"
+                      checked={useReversals}
+                      onChange={() => setUseReversals(!useReversals)}
+                    />
+                  </div>
+                )}
+              </div>
 
-              {/* Begin Button */}
-              <div className="entrance-stagger entrance-stagger-5">
-                <Button onClick={() => setPhase('question')} className="w-full">
+              {/* Begin Button - Hero CTA with stronger gold */}
+              <div className="entrance-stagger entrance-stagger-5 pt-2">
+                <Button onClick={() => setPhase('question')} className="w-full btn-hero">
                   Begin Reading
                 </Button>
               </div>
@@ -473,8 +508,8 @@ export default function App() {
 
         {/* Question Phase */}
         {phase === 'question' && (
-          <div className="max-w-md mx-auto text-center">
-            <p className="text-slate-400/80 text-lg font-light tracking-wide mb-8">
+          <div className="max-w-sm mx-auto text-center px-2">
+            <p className="text-slate-300/80 text-lg font-light tracking-wide mb-6 entrance-stagger entrance-stagger-1">
               What guidance do you seek?
             </p>
             <textarea
@@ -482,14 +517,16 @@ export default function App() {
               onChange={e => setQuestion(e.target.value)}
               placeholder="Your question (or leave blank for general guidance)..."
               rows={3}
-              className="input-glass w-full rounded-xl p-5 text-slate-200 resize-none mb-4 font-light tracking-wide"
+              className="input-glass w-full rounded-2xl p-5 text-slate-200 resize-none mb-3 font-light tracking-wide text-center entrance-stagger entrance-stagger-2"
             />
-            <p className="text-slate-600/80 text-xs font-light mb-8">
-              Tip: Open-ended questions yield richer insights
+            <p className="text-slate-600/60 text-xs font-light mb-8 entrance-stagger entrance-stagger-2">
+              Open-ended questions yield richer insights
             </p>
-            <Button variant="secondary" onClick={startShuffleAnimation} className="w-full">
-              Continue
-            </Button>
+            <div className="entrance-stagger entrance-stagger-3">
+              <Button variant="secondary" onClick={startShuffleAnimation} className="w-full">
+                Continue
+              </Button>
+            </div>
           </div>
         )}
 
@@ -587,47 +624,54 @@ export default function App() {
         {/* Card Selection Phase */}
         {phase === 'select' && (
           <div className={`text-center transition-all duration-700 ease-out ${selectFadeIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <p className="text-slate-300/90 font-light tracking-wide mb-2">Choose your cards</p>
-            <p className="text-slate-500/80 text-sm font-light mb-4">
-              <span className="text-amber-400/80">{selectedCards.length}</span>
-              <span className="text-slate-600/60 mx-2">of</span>
-              <span>{spreadData.positions.length}</span>
-              {selectedCards.length < spreadData.positions.length && (
-                <span className="text-amber-400/60 ml-3">— {spreadData.positions[selectedCards.length].name}</span>
-              )}
-            </p>
-
-            {/* Breathing pulse indicator */}
-            <div className="flex justify-center mb-8">
-              <div className="breathing-pulse w-3 h-3 rounded-full bg-amber-500/30" />
+            {/* Progress indicator */}
+            <div className="mb-6">
+              <p className="text-slate-500/60 text-xs font-light tracking-widest uppercase mb-2">
+                {selectedCards.length < spreadData.positions.length
+                  ? spreadData.positions[selectedCards.length].name
+                  : 'Complete'
+                }
+              </p>
+              <p className="text-slate-300/90 font-light tracking-wide">
+                <span className="text-mystic-gold text-lg">{selectedCards.length}</span>
+                <span className="text-slate-600/60 mx-1 text-sm">/</span>
+                <span className="text-slate-500/80 text-sm">{spreadData.positions.length}</span>
+              </p>
             </div>
 
-            {/* Card Fan with slow hover reveal */}
-            <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-10 max-w-4xl mx-auto">
+            {/* Breathing pulse indicator - larger on mobile */}
+            <div className="flex justify-center mb-6">
+              <div className="breathing-pulse w-4 h-4 rounded-full bg-mystic-gold/30" />
+            </div>
+
+            {/* Card Fan - extends to edges on mobile */}
+            <div className="flex flex-wrap justify-center gap-0.5 md:gap-1 mb-8 -mx-6 md:mx-0 overflow-x-auto overflow-y-visible py-4">
               {deck.slice(0, Math.min(MAX_SELECTABLE_CARDS, deck.length)).map((card, i) => (
                 <div
                   key={i}
                   onClick={() => selectCard(i)}
-                  className={`transition-all duration-500 ${
+                  className={`transition-all duration-500 flex-shrink-0 ${
                     selectedCards.includes(i)
                       ? 'opacity-10 scale-75 pointer-events-none'
-                      : 'cursor-pointer hover:z-10'
+                      : 'cursor-pointer hover:z-10 active:scale-95'
                   }`}
                   style={{
-                    transform: `rotate(${(i - 10) * 2}deg)`,
-                    marginLeft: i > 0 ? '-20px' : '0'
+                    transform: `rotate(${(i - 10) * 1.5}deg)`,
+                    marginLeft: i > 0 ? '-18px' : '0'
                   }}
                 >
                   <Card3D size="small" enableSlowReveal={!selectedCards.includes(i)} />
                 </div>
               ))}
             </div>
+
+            {/* Actions */}
             <div className="flex justify-center gap-6">
-              <Button variant="text" onClick={reset} className="text-sm">
+              <Button variant="text" onClick={reset} className="text-xs">
                 Start Over
               </Button>
-              <Button variant="text" onClick={drawAllCards} className="text-sm">
-                Draw All Cards
+              <Button variant="text" onClick={drawAllCards} className="text-xs">
+                Draw All
               </Button>
             </div>
           </div>
