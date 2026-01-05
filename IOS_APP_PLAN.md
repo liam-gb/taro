@@ -428,16 +428,32 @@ Each phase maps to a separate Pull Request for incremental progress tracking.
 ---
 
 ### PR #7: Prompt Assembly & Reading Flow
-**Status:** `PENDING`
+**Status:** `COMPLETE`
+**Branch:** `claude/prompt-assembly-reading-flow-ba7L7`
 **Dependencies:** PR #5, PR #6
 
-- [ ] `PromptAssembler.swift` - build prompts from pre-calc data
-- [ ] Combination detection (find notable pairings in spread)
-- [ ] Elemental flow calculation
-- [ ] Reading display view with streaming text
-- [ ] Reading state management
+- [x] `PromptAssembler.swift` - build prompts from pre-calc data
+- [x] Combination detection (find notable pairings in spread)
+- [x] Elemental flow calculation
+- [x] Reading display view with streaming text
+- [x] Reading state management
+- [x] Markdown rendering for LLM output
+- [x] Copy/share functionality with haptic feedback
+- [x] Generation stats display (tokens/sec, elapsed time)
+- [x] Regenerate option on error
 
 **Deliverable:** Complete end-to-end reading experience.
+
+**Files Added/Modified:**
+- `TaroApp/TaroApp/Services/PromptAssembler.swift` - Optimized prompt assembly (~800 tokens vs 4000+)
+- `TaroApp/TaroApp/Services/DataService.swift` - Added findAllCombinations, getCardInPositionSnippet
+- `TaroApp/TaroApp/Services/LLMService.swift` - Uses PromptAssembler
+- `TaroApp/TaroApp/Models/Reading.swift` - Generation tracking (timing, tokens, speed)
+- `TaroApp/TaroApp/Models/GenerationConfig.swift` - Added promptInstruction to ReadingStyle
+- `TaroApp/TaroApp/Models/Card.swift` - Added Element.readingDescription
+- `TaroApp/TaroApp/Views/ReadingView.swift` - MarkdownTextView, ShareSheet, copy with haptics
+- `TaroApp/TaroApp/Views/GeneratingView.swift` - Stats bar, regenerate button
+- `TaroApp/TaroApp/Views/Components/SharedUtilities.swift` - formatElapsedTime utility
 
 ---
 
