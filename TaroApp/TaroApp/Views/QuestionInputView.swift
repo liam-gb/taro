@@ -6,84 +6,56 @@ struct QuestionInputView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.05, blue: 0.15),
-                    Color(red: 0.1, green: 0.05, blue: 0.2)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // Aurora animated background
+            AuroraBackground()
 
-            VStack(spacing: 32) {
+            VStack(spacing: TaroSpacing.xl) {
                 Spacer()
 
                 // Spread info
-                VStack(spacing: 8) {
+                VStack(spacing: TaroSpacing.xs) {
                     Text(readingSession.selectedSpread?.displayName ?? "Reading")
-                        .font(.system(size: 24, weight: .light, design: .serif))
-                        .foregroundColor(.white)
+                        .font(TaroTypography.mystical(24, weight: .light))
+                        .foregroundColor(.textPrimary)
 
                     Text("\(readingSession.selectedSpread?.cardCount ?? 0) cards")
-                        .font(.system(size: 14, weight: .light))
-                        .foregroundColor(.white.opacity(0.5))
+                        .font(TaroTypography.ethereal(14, weight: .light))
+                        .foregroundColor(.textSecondary)
                 }
 
                 // Question input
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: TaroSpacing.sm) {
                     Text("What would you like guidance on?")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.5))
+                        .font(TaroTypography.caption)
+                        .foregroundColor(.textMuted)
                         .textCase(.uppercase)
                         .tracking(1)
 
                     TextField("Enter your question (optional)", text: $readingSession.question, axis: .vertical)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(.white)
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(.white.opacity(0.05))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(.white.opacity(0.1), lineWidth: 1)
-                                )
-                        )
+                        .font(TaroTypography.ethereal(16, weight: .regular))
+                        .foregroundColor(.textPrimary)
+                        .padding(TaroSpacing.md)
+                        .glassPanel(style: .standard, cornerRadius: TaroRadius.md)
                         .focused($isQuestionFocused)
                         .lineLimit(3...6)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, TaroSpacing.lg)
 
                 Spacer()
 
                 // Action buttons
-                VStack(spacing: 16) {
-                    Button(action: {
+                VStack(spacing: TaroSpacing.md) {
+                    GlowingButton("Begin Reading", icon: "sparkles") {
                         readingSession.startReading()
-                    }) {
-                        Text("Begin Reading")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(.white)
-                            )
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, TaroSpacing.lg)
 
-                    Button(action: {
+                    GlassButton("Back", style: .text) {
                         readingSession.reset()
-                    }) {
-                        Text("Back")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.white.opacity(0.5))
                     }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
+                .padding(.bottom, TaroSpacing.xl)
             }
         }
         .navigationBarHidden(true)
@@ -100,4 +72,5 @@ struct QuestionInputView: View {
             session.selectSpread(.threeCard)
             return session
         }())
+        .preferredColorScheme(.dark)
 }

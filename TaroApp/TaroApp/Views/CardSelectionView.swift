@@ -18,44 +18,39 @@ struct CardSelectionView: View {
 
     var body: some View {
         ZStack {
-            // Background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.05, blue: 0.15),
-                    Color(red: 0.1, green: 0.05, blue: 0.2)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // Aurora animated background
+            AuroraBackground()
 
-            VStack(spacing: 24) {
+            VStack(spacing: TaroSpacing.lg) {
                 // Position indicator
                 if let position = currentPosition {
-                    VStack(spacing: 4) {
-                        Text("Select card for")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white.opacity(0.5))
-                            .textCase(.uppercase)
-                            .tracking(1)
+                    GlassPanel(style: .standard, cornerRadius: TaroRadius.lg, padding: TaroSpacing.md) {
+                        VStack(spacing: TaroSpacing.xxs) {
+                            Text("Select card for")
+                                .font(TaroTypography.caption)
+                                .foregroundColor(.textMuted)
+                                .textCase(.uppercase)
+                                .tracking(1)
 
-                        Text(position.name)
-                            .font(.system(size: 24, weight: .light, design: .serif))
-                            .foregroundColor(.white)
+                            Text(position.name)
+                                .font(TaroTypography.mystical(24, weight: .light))
+                                .foregroundColor(.textPrimary)
 
-                        Text(position.description)
-                            .font(.system(size: 14, weight: .light))
-                            .foregroundColor(.white.opacity(0.5))
+                            Text(position.description)
+                                .font(TaroTypography.ethereal(14, weight: .light))
+                                .foregroundColor(.textSecondary)
+                        }
                     }
-                    .padding(.top, 32)
+                    .padding(.horizontal, TaroSpacing.lg)
+                    .padding(.top, TaroSpacing.xl)
                 }
 
                 // Cards remaining
                 Text("\(cardsNeeded) card\(cardsNeeded == 1 ? "" : "s") remaining")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.white.opacity(0.4))
+                    .font(TaroTypography.caption)
+                    .foregroundColor(.textMuted)
 
-                // Card fan (simplified for now)
+                // Card fan
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: -40) {
                         ForEach(Array(deck.enumerated()), id: \.element.id) { index, card in
@@ -65,8 +60,8 @@ struct CardSelectionView: View {
                                 }
                         }
                     }
-                    .padding(.horizontal, 60)
-                    .padding(.vertical, 40)
+                    .padding(.horizontal, TaroSpacing.xxxl)
+                    .padding(.vertical, TaroSpacing.xl)
                 }
 
                 Spacer()
@@ -91,31 +86,39 @@ struct CardBackView: View {
     var isSelected: Bool = false
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 8)
-            .fill(
+        ActiveGlassPanel(
+            isActive: false,
+            cornerRadius: TaroRadius.sm,
+            padding: 0
+        ) {
+            ZStack {
+                // Card gradient fill
                 LinearGradient(
                     colors: [
-                        Color(red: 0.2, green: 0.15, blue: 0.3),
-                        Color(red: 0.15, green: 0.1, blue: 0.25)
+                        Color.mysticViolet.opacity(0.2),
+                        Color.deepViolet.opacity(0.15)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(.white.opacity(isSelected ? 0.5 : 0.2), lineWidth: 1)
-            )
-            .overlay(
+
                 // Decorative pattern placeholder
                 Image(systemName: "sparkle")
                     .font(.system(size: 24))
-                    .foregroundColor(.white.opacity(0.1))
-            )
+                    .foregroundColor(.mysticViolet.opacity(0.3))
+            }
             .frame(width: 80, height: 120)
-            .opacity(isSelected ? 0.3 : 1)
-            .scaleEffect(isSelected ? 0.95 : 1)
-            .animation(.easeInOut(duration: 0.2), value: isSelected)
+        }
+        .opacity(isSelected ? 0.3 : 1)
+        .scaleEffect(isSelected ? 0.95 : 1)
+        .overlay(
+            // Selection glow effect
+            RoundedRectangle(cornerRadius: TaroRadius.sm)
+                .stroke(Color.mysticViolet, lineWidth: 2)
+                .shadow(color: Color.mysticViolet.opacity(0.5), radius: 10)
+                .opacity(isSelected ? 0 : 0)
+        )
+        .animation(TaroAnimation.springSmooth, value: isSelected)
     }
 }
 
@@ -128,4 +131,5 @@ struct CardBackView: View {
             session.beginCardSelection()
             return session
         }())
+        .preferredColorScheme(.dark)
 }
