@@ -13,19 +13,74 @@ random.seed(42)  # For reproducibility
 
 # Response templates and building blocks
 OPENINGS = [
-    "The cards before you tell a story of {theme}.",
-    "Looking at this spread, a narrative of {theme} emerges.",
-    "The cards have assembled to speak about {theme}.",
-    "What unfolds before you is a journey through {theme}.",
-    "The spread reveals a powerful message about {theme}.",
+    "Your question opens to {theme}.",
+    "The cards speak directly to {theme}.",
+    "What emerges here is a story of {theme}.",
+    "This reading addresses {theme} with clarity.",
+    "The path before you involves {theme}.",
 ]
 
+# Card-specific powerful openings
+CARD_OPENINGS = {
+    "The Fool": "The Fool appears with an invitation to trust the unknown.",
+    "The Magician": "The Magician arrives with all elements at your command.",
+    "The High Priestess": "The High Priestess emerges from the threshold between knowing and mystery.",
+    "The Empress": "The Empress brings her abundant, nurturing presence to your question.",
+    "The Emperor": "The Emperor establishes his grounded authority in this reading.",
+    "The Hierophant": "The Hierophant offers the wisdom of established paths.",
+    "The Lovers": "The Lovers bring their energy of meaningful choice and true alignment.",
+    "The Chariot": "The Chariot drives forward with unstoppable determination.",
+    "Strength": "Strength appears with her message of gentle mastery over instinct.",
+    "The Hermit": "The Hermit raises his lantern to illuminate your inner truth.",
+    "Wheel of Fortune": "The Wheel turns, marking a significant moment of change.",
+    "Justice": "Justice holds her scales, calling for honest accounting.",
+    "The Hanged Man": "The Hanged Man hangs willingly, offering a radical shift in perspective.",
+    "Death": "Death arrives as transformation's messenger, not an end but a passage.",
+    "Temperance": "Temperance flows into your reading with patient, alchemical grace.",
+    "The Devil": "The Devil appears to illuminate the chains you may not see clearly.",
+    "The Tower": "The Tower strikes with its lightning revelation.",
+    "The Star": "The Star shines with hope after difficulty.",
+    "The Moon": "The Moon illuminates the path through intuition's realm.",
+    "The Sun": "The Sun brightens everything with uncomplicated joy.",
+    "Judgement": "Judgement sounds its trumpet, calling you to awakening.",
+    "The World": "The World completes the circle with integration and fulfillment.",
+    "Four of Cups": "The Four of Cups appears with a gentle but pointed message: abundance may already be present, but you're not seeing it clearly.",
+    "Nine of Swords": "The Nine of Swords acknowledges the weight of your worry.",
+    "Ten of Wands": "The Ten of Wands reveals the burden you've been carrying.",
+    "Eight of Cups": "The Eight of Cups asks what you must walk away from to find what you seek.",
+    "Three of Swords": "The Three of Swords appears without apology for the heartbreak it represents.",
+    "Ace of Pentacles": "The Ace of Pentacles offers something tangible and real.",
+    "Ace of Cups": "The Ace of Cups overflows with new emotional possibility.",
+    "Ace of Wands": "The Ace of Wands sparks with fresh creative fire.",
+    "Ace of Swords": "The Ace of Swords cuts through confusion with brilliant clarity.",
+}
+
 CLOSINGS = [
-    "The cards invite you to consider: {insight}. Trust what resonates most deeply with you.",
-    "As you move forward, remember: {insight}. Let this wisdom guide your next steps.",
-    "The reading asks you to reflect: {insight}. Honor what feels true in your heart.",
-    "Consider this: {insight}. The cards have shown you the path; walking it remains your choice.",
-    "Take with you this understanding: {insight}. Your intuition knows which threads to follow.",
+    "{insight}",
+]
+
+# Actionable endings per style guide
+ACTIONABLE_ENDINGS = [
+    "What cup is being extended that you haven't yet reached for?",
+    "What specific opportunity is moving quickly toward you right now? That's where your attention belongs.",
+    "What would it look like to trust yourself completely in this situation?",
+    "What are you holding onto that has already completed its purpose?",
+    "Where in your body do you feel the truth of this reading? That sensation holds information.",
+    "What conversation have you been avoiding that this reading suggests you need to have?",
+    "If you knew this situation would resolve in your favor, what would you do differently today?",
+    "What small, concrete step could you take this week to honor what these cards reveal?",
+    "What permission are you waiting for that you could give yourself right now?",
+    "What would change if you stopped fighting against what is clearly ending?",
+    "What has the cards' message awakened in you that was already stirring?",
+    "Where might you be seeking complexity when simplicity is what's called for?",
+    "What truth do you already know that you've been waiting for permission to act on?",
+    "What relationship or pattern has outlived its purpose in your growth?",
+    "What would courage look like in this situation, not dramatic but steady?",
+    "Who in your life reflects the energy these cards are asking you to embody?",
+    "What fear is disguising itself as practical concern?",
+    "What would you create if you stopped waiting for perfect conditions?",
+    "Where are you giving your power away that you could reclaim today?",
+    "What decision have you actually already made that you're avoiding acknowledging?",
 ]
 
 MOON_PHRASES = {
@@ -205,11 +260,42 @@ def generate_card_interpretation(card):
 
     return f"{intro} {name} {interp_phrase} {detail}"
 
+def should_mention_moon(moon_phase, cards, question):
+    """Determine if moon phase naturally resonates with reading themes."""
+    q_lower = question.lower()
+
+    # Last Quarter + release themes
+    if "Last Quarter" in moon_phase:
+        release_words = ["release", "let go", "forgive", "end", "quit", "leave", "breakup"]
+        if any(w in q_lower for w in release_words):
+            return True
+        # Check if cards suggest release
+        card_names = [c.get("name", "").lower() for c in cards]
+        if any("death" in c or "tower" in c or "eight of cups" in c for c in card_names):
+            return True
+
+    # Full Moon + clarity/culmination
+    if "Full Moon" in moon_phase:
+        clarity_words = ["clarity", "reveal", "truth", "see", "understand", "culminat"]
+        if any(w in q_lower for w in clarity_words):
+            return True
+
+    # New Moon + beginnings
+    if "New Moon" in moon_phase:
+        begin_words = ["start", "begin", "new", "launch", "create", "fresh"]
+        if any(w in q_lower for w in begin_words):
+            return True
+        card_names = [c.get("name", "").lower() for c in cards]
+        if any("ace" in c or "fool" in c for c in card_names):
+            return True
+
+    return False
+
 def generate_response(prompt_input, seed_offset=0):
     """Generate a complete tarot reading response."""
     # Set seed based on content for consistency
     random.seed(42 + seed_offset)
-    
+
     # Extract components
     moon_phase = extract_moon_phase(prompt_input)
     question = extract_question(prompt_input)
@@ -222,163 +308,217 @@ def generate_response(prompt_input, seed_offset=0):
     if "love" in q_lower or "relationship" in q_lower or "partner" in q_lower:
         theme = "matters of the heart and authentic connection"
     elif "career" in q_lower or "job" in q_lower or "work" in q_lower or "professional" in q_lower:
-        theme = "professional growth and purposeful direction"
+        theme = "your professional path and purposeful direction"
     elif "heal" in q_lower or "health" in q_lower or "body" in q_lower:
-        theme = "healing and restoration"
+        theme = "healing and wholeness"
     elif "spiritual" in q_lower or "higher" in q_lower or "practice" in q_lower:
-        theme = "spiritual awakening and inner wisdom"
-    elif "family" in q_lower or "parent" in q_lower:
-        theme = "family bonds and ancestral patterns"
-    elif "money" in q_lower or "financial" in q_lower or "business" in q_lower:
-        theme = "material abundance and practical foundations"
+        theme = "spiritual growth and inner wisdom"
+    elif "family" in q_lower or "parent" in q_lower or "mother" in q_lower or "father" in q_lower:
+        theme = "family dynamics and inherited patterns"
+    elif "money" in q_lower or "financial" in q_lower or "business" in q_lower or "debt" in q_lower:
+        theme = "your relationship with resources and abundance"
     elif "release" in q_lower or "let go" in q_lower:
         theme = "release and transformation"
-    elif "clarity" in q_lower or "understand" in q_lower:
-        theme = "seeking clarity and deeper understanding"
-    elif "block" in q_lower or "blocking" in q_lower:
-        theme = "uncovering hidden obstacles and finding flow"
-    elif "energy" in q_lower or "vitality" in q_lower or "energized" in q_lower:
-        theme = "restoring vitality and life force"
+    elif "clarity" in q_lower or "understand" in q_lower or "see" in q_lower:
+        theme = "clarity and deeper understanding"
+    elif "block" in q_lower or "blocking" in q_lower or "stuck" in q_lower:
+        theme = "what's blocking your flow"
+    elif "energy" in q_lower or "vitality" in q_lower or "alive" in q_lower:
+        theme = "vitality and life force"
     elif "breakup" in q_lower or "move on" in q_lower:
-        theme = "transition and new beginnings"
+        theme = "transition and forward movement"
     elif "boundary" in q_lower or "boundaries" in q_lower:
-        theme = "establishing healthy boundaries"
-    elif "present" in q_lower or "mindful" in q_lower:
-        theme = "presence and grounded awareness"
-    elif "express" in q_lower or "communicate" in q_lower:
-        theme = "authentic expression and communication"
-    elif "compatible" in q_lower or "compatibility" in q_lower:
-        theme = "connection and mutual understanding"
-    elif "engaged" in q_lower or "marriage" in q_lower:
-        theme = "partnership and commitment"
-    elif "coworker" in q_lower or "colleague" in q_lower:
-        theme = "navigating workplace dynamics"
-    elif "deplet" in q_lower or "drain" in q_lower:
-        theme = "energy restoration and self-protection"
+        theme = "boundaries and self-protection"
+    elif "fear" in q_lower or "afraid" in q_lower or "scared" in q_lower:
+        theme = "facing what holds you back"
+    elif "trust" in q_lower:
+        theme = "trust and vulnerability"
+    elif "decision" in q_lower or "choose" in q_lower or "choice" in q_lower:
+        theme = "the decision before you"
+    elif "purpose" in q_lower or "meaning" in q_lower:
+        theme = "purpose and meaning"
+    elif "authentic" in q_lower or "true self" in q_lower:
+        theme = "authentic self-expression"
 
     paragraphs = []
 
-    # Opening paragraph with moon phase
-    opening = random.choice(OPENINGS).format(theme=theme)
-    moon_phrase = random.choice(MOON_PHRASES.get(moon_phase, MOON_PHRASES["Full Moon"]))
+    # Determine if moon phase should be mentioned
+    mention_moon = should_mention_moon(moon_phase, cards, question)
+    moon_phrase = random.choice(MOON_PHRASES.get(moon_phase, MOON_PHRASES["Full Moon"])) if mention_moon else None
 
     if spread_type == "daily":
         # Daily draw - shorter response (2-3 paragraphs)
         card = cards[0] if cards else None
         if card:
-            card_interp = generate_card_interpretation(card)
-            para1 = f"{opening} {moon_phrase}, amplifying the significance of this guidance. {card_interp}."
-
-            # Address the question directly
-            para2 = f"You asked, \"{question}\" The {card['name']} responds with particular wisdom for this moment. "
-            if card["orientation"] == "reversed":
-                para2 += f"In its reversed position, this card asks you to look inward, to examine where this energy may be blocked or needing integration. "
+            card_name = card['name']
+            # Use card-specific opening if available
+            if card_name in CARD_OPENINGS:
+                para1 = CARD_OPENINGS[card_name]
             else:
-                para2 += f"This card appears upright, suggesting the energy flows openly and is accessible to you now. "
-            
-            if card["meaning"] and "Meaning not available" not in card["meaning"]:
-                para2 += card["meaning"]
-            elif card["context"]:
-                para2 += f"Consider how these themes manifest in your daily experience. {card['context']}"
+                para1 = f"{card_name} appears in your daily draw with a direct message."
 
-            # Closing
-            insight = f"how might you embody the lessons of {card['name']} in one small action today"
-            closing = random.choice(CLOSINGS).format(insight=insight)
+            # Add context from card
+            if card["context"] and "Meaning not available" not in card["context"]:
+                para1 += f" {card['context']}"
+            elif card["meaning"] and "Meaning not available" not in card["meaning"]:
+                para1 += f" {card['meaning']}"
+
+            # Second paragraph addresses the question
+            para2 = f"You ask about {question.lower().rstrip('?')}. "
+            if card["orientation"] == "reversed":
+                para2 += f"The {card_name} reversed suggests this energy is currently blocked, internalized, or in process of transformation within you. Rather than flowing outward, it asks for inner attention. "
+            else:
+                para2 += f"With {card_name} upright, this energy is accessible and ready to work with you. "
+
+            # Add moon context if relevant
+            if moon_phrase:
+                para2 += f"{moon_phrase}."
+
+            # Closing with actionable insight
+            closing = random.choice(ACTIONABLE_ENDINGS)
 
             paragraphs = [para1, para2, closing]
 
     elif spread_type == "three_card":
-        # Three card spread (3-4 paragraphs)
-        para1 = f"{opening} {moon_phrase}, lending its particular quality to this reading. You have asked: \"{question}\""
+        # Three card spread (3-4 paragraphs) - weave cards into narrative
+        first_card = cards[0] if cards else None
+        card_name = first_card['name'] if first_card else ""
+
+        # Opening with first card
+        if card_name in CARD_OPENINGS:
+            para1 = f"Your question about {question.lower().rstrip('?')} unfolds across a meaningful arc. {CARD_OPENINGS[card_name]}"
+        else:
+            para1 = f"Your question about {question.lower().rstrip('?')} unfolds through three cards that tell a connected story. {card_name} opens the reading"
+            if first_card and first_card["orientation"] == "reversed":
+                para1 += " in its reversed position, suggesting this energy is currently blocked or turning inward."
+            else:
+                para1 += ", setting the foundation for what follows."
+
+        if first_card and first_card["context"] and "Meaning not available" not in first_card["context"]:
+            para1 += f" {first_card['context']}"
         paragraphs.append(para1)
 
-        # Card interpretations woven together
-        card_texts = []
-        for card in cards:
-            card_texts.append(generate_card_interpretation(card))
+        # Second paragraph weaves remaining cards
+        if len(cards) >= 2:
+            second_card = cards[1]
+            para2 = ""
+            if second_card["position"] in ["Present", "Action", "Challenge"]:
+                para2 = f"At the center of this reading, {second_card['name']} "
+            else:
+                para2 = f"Moving forward, {second_card['name']} "
 
-        if len(card_texts) >= 2:
-            para2 = f"{card_texts[0]}. {card_texts[1]}."
+            if second_card["orientation"] == "reversed":
+                para2 += "appears reversed, indicating energy that is internalized or in process. "
+            else:
+                para2 += "brings its energy clearly into focus. "
+
+            if second_card["context"] and "Meaning not available" not in second_card["context"]:
+                para2 += second_card["context"]
+
             paragraphs.append(para2)
 
-        if len(card_texts) >= 3:
-            para3 = f"{card_texts[2]}. The flow from {cards[0]['name']} through {cards[1]['name']} to {cards[2]['name']} traces an arc of development. "
-            
-            # Add contextual insight based on card combinations
-            reversed_count = sum(1 for c in cards if c["orientation"] == "reversed")
-            if reversed_count > 1:
-                para3 += "The multiple reversed cards in this spread suggest internal work is needed—energy that is present but not yet flowing freely. This is not a warning but an invitation to go deeper."
-            elif reversed_count == 1:
-                rev_card = next(c for c in cards if c["orientation"] == "reversed")
-                para3 += f"The reversed {rev_card['name']} marks a place where energy is turning inward, asking for attention and integration before it can fully express."
-            else:
-                para3 += "All cards appearing upright suggests energy flowing smoothly in this situation. The path forward is relatively clear, though action is still required on your part."
+        # Third paragraph with outcome/resolution and synthesis
+        if len(cards) >= 3:
+            third_card = cards[2]
+            para3 = f"The reading culminates with {third_card['name']}"
+            if third_card["orientation"] == "reversed":
+                para3 += " reversed"
+            para3 += ". "
+
+            if third_card["context"] and "Meaning not available" not in third_card["context"]:
+                para3 += third_card["context"] + " "
+
+            # Add moon phrase if relevant
+            if moon_phrase:
+                para3 += f"{moon_phrase}."
+
             paragraphs.append(para3)
 
-        # Closing
-        insight = f"what single step might you take to align with the wisdom of {cards[-1]['name'] if cards else 'these cards'}"
-        closing = random.choice(CLOSINGS).format(insight=insight)
+        # Closing with actionable insight
+        closing = random.choice(ACTIONABLE_ENDINGS)
         paragraphs.append(closing)
 
     else:
         # Larger spreads - Celtic Cross or custom (5-7 paragraphs)
-        para1 = f"{opening} {moon_phrase}, bringing heightened awareness to this comprehensive reading. You have asked: \"{question}\" Let us explore what the cards reveal."
+        first_card = cards[0] if cards else None
+        card_name = first_card['name'] if first_card else ""
+
+        # Opening paragraph with first card
+        if card_name in CARD_OPENINGS:
+            para1 = f"Your question about {question.lower().rstrip('?')} calls for a comprehensive exploration. {CARD_OPENINGS[card_name]}"
+        else:
+            para1 = f"Your question about {question.lower().rstrip('?')} opens to a rich tapestry of influences. {card_name} begins the reading"
+            if first_card and first_card["orientation"] == "reversed":
+                para1 += " reversed, suggesting its energy is internalized or blocked."
+
+        if first_card and first_card["context"] and "Meaning not available" not in first_card["context"]:
+            para1 += f" {first_card['context']}"
         paragraphs.append(para1)
 
-        # Group cards and interpret - first group
+        # Group cards into narrative sections
+        # Section 1: Foundation (cards 1-3)
         if len(cards) >= 3:
-            early_cards = cards[:3]
-            card_texts = [generate_card_interpretation(c) for c in early_cards]
-            para2 = " ".join(card_texts) + " These initial cards establish the foundation of your reading, showing where you have been and where you currently stand."
-            paragraphs.append(para2)
+            para2 = ""
+            for c in cards[1:3]:
+                if c["context"] and "Meaning not available" not in c["context"]:
+                    if c["orientation"] == "reversed":
+                        para2 += f"{c['name']} reversed adds complexity: {c['context']} "
+                    else:
+                        para2 += f"{c['name']} contributes: {c['context']} "
+            if para2:
+                paragraphs.append(para2.strip())
 
-        # Middle group
+        # Section 2: Influences (cards 4-6)
         if len(cards) > 3:
-            mid_start = 3
-            mid_end = min(6, len(cards))
-            mid_cards = cards[mid_start:mid_end]
-            mid_texts = [generate_card_interpretation(c) for c in mid_cards]
-            para3 = " ".join(mid_texts) + " These influences add depth to the picture, revealing factors both seen and unseen that shape your situation."
-            paragraphs.append(para3)
+            mid_cards = cards[3:min(6, len(cards))]
+            para3 = "Deeper influences shape this situation. "
+            for c in mid_cards:
+                if c["context"] and "Meaning not available" not in c["context"]:
+                    para3 += f"{c['context']} "
+            paragraphs.append(para3.strip())
 
-        # Late group
+        # Section 3: Guidance and outcome (cards 7+)
         if len(cards) > 6:
             late_cards = cards[6:]
-            late_texts = [generate_card_interpretation(c) for c in late_cards]
-            para4 = " ".join(late_texts) + " The final positions bring the reading to culmination, pointing toward resolution and growth."
-            paragraphs.append(para4)
+            para4 = "Looking toward resolution, "
+            for c in late_cards:
+                if c["context"] and "Meaning not available" not in c["context"]:
+                    if c["position"] == "Advice":
+                        para4 += f"the cards advise: {c['context']} "
+                    elif c["position"] == "Outcome":
+                        para4 += f"The trajectory points toward {c['name']}: {c['context']} "
+                    else:
+                        para4 += f"{c['context']} "
+            paragraphs.append(para4.strip())
 
-        # Synthesis paragraph about reversals
+        # Synthesis paragraph with moon if relevant
         reversed_cards = [c for c in cards if c["orientation"] == "reversed"]
         if len(reversed_cards) >= 2:
             rev_names = [c["name"] for c in reversed_cards[:3]]
-            para5 = f"Notable in this spread are the reversed cards: {', '.join(rev_names)}. These reversals do not indicate negativity but rather energy that is internalized, blocked, or in process of transformation. They invite deeper self-inquiry and patience with your own unfolding. The presence of these cards suggests that some of what you seek requires inner work before it can manifest outwardly."
+            para5 = f"Several reversed cards appear in this spread: {', '.join(rev_names)}. These are not warnings but invitations to inner work. The energy exists but is turning inward, asking for attention before it can fully express outwardly."
+            if moon_phrase:
+                para5 += f" {moon_phrase}."
             paragraphs.append(para5)
-        elif len(reversed_cards) == 1:
-            rev_card = reversed_cards[0]
-            para5 = f"The reversed {rev_card['name']} stands out in this spread as a point requiring attention. This card's energy is present but internalized—perhaps blocked by circumstance or turned inward for processing. Consider where this theme appears in your inner landscape and what it might need to flow more freely."
-            paragraphs.append(para5)
+        elif moon_phrase:
+            paragraphs.append(moon_phrase + ".")
 
-        # Final synthesis connecting to question
-        if cards:
-            outcome_card = None
-            for c in cards:
-                if c["position"] in ["Outcome", "Future"]:
-                    outcome_card = c
-                    break
-            if not outcome_card:
-                outcome_card = cards[-1]
-            
-            para6 = f"Returning to your question about {question.lower().rstrip('?')}, the overall message centers on the journey toward {outcome_card['name']}. "
-            if outcome_card["context"]:
-                para6 += outcome_card["context"] + " "
-            para6 += "The cards do not predict a fixed future but illuminate the energies at play and the potential paths before you."
+        # Final synthesis
+        outcome_card = None
+        for c in cards:
+            if c["position"] in ["Outcome", "Future"]:
+                outcome_card = c
+                break
+        if not outcome_card and cards:
+            outcome_card = cards[-1]
+
+        if outcome_card:
+            para6 = f"The arc of this reading moves toward {outcome_card['name']}. "
+            if outcome_card["context"] and "Meaning not available" not in outcome_card["context"]:
+                para6 += outcome_card["context"]
             paragraphs.append(para6)
 
-        # Closing
-        key_card = cards[-1] if cards else None
-        insight = f"as you move forward with the understanding these cards offer, what is one concrete way you might honor the message of {key_card['name'] if key_card else 'this reading'}"
-        closing = random.choice(CLOSINGS).format(insight=insight)
+        # Closing with actionable insight
+        closing = random.choice(ACTIONABLE_ENDINGS)
         paragraphs.append(closing)
 
     return "\n\n".join(paragraphs)
@@ -406,7 +546,7 @@ def process_batch(batch_path, output_path):
 
     return len(responses)
 
-def main():
+def main(start_batch=100, end_batch=200):
     batch_dir = Path("/home/user/taro/training/data/batches")
     output_dir = batch_dir / "responses"
     output_dir.mkdir(exist_ok=True)
@@ -414,8 +554,8 @@ def main():
     total_prompts = 0
     total_batches = 0
 
-    # Process batches 0050-0099
-    for batch_num in range(50, 100):
+    # Process specified batch range
+    for batch_num in range(start_batch, end_batch):
         batch_file = batch_dir / f"batch_{batch_num:04d}.json"
         output_file = output_dir / f"batch_{batch_num:04d}_responses.jsonl"
 
@@ -428,6 +568,13 @@ def main():
             print(f"Batch {batch_num:04d} not found, skipping")
 
     print(f"\nComplete! Processed {total_batches} batches with {total_prompts} total prompts.")
+    return total_batches, total_prompts
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) >= 3:
+        start = int(sys.argv[1])
+        end = int(sys.argv[2])
+        main(start, end)
+    else:
+        main()
