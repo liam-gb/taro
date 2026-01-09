@@ -1,11 +1,13 @@
-# Generated data (large files)
-data/prompts.json
+# Intermediate data (not needed in repo)
 data/batches/
 data/responses/
-data/sft/
 
-# Keep a sample for reference
+# Keep a sample batch for reference
 !data/batches/batch_0000.json
+
+# SFT data tracked via Git LFS
+# data/sft/ - now tracked
+# data/prompts.json - now tracked
 
 # Python
 __pycache__/
