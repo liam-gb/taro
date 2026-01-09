@@ -14,13 +14,12 @@
 | **Question Categories** | ✅ Excellent | Within 0.3% of targets |
 | **Spread Distribution** | ✅ Excellent | Within 0.7% of targets |
 | **Moon Phases** | ✅ Excellent | All 8 phases within 3% of uniform |
-| **Reversal Ratio** | ⚠️ Action Needed | 49.9% (target: 30-40%) |
+| **Reversal Ratio** | ✅ Correct | 49.9% (matches iOS 50% probability) |
 | **Question Diversity** | ⚠️ Action Needed | Missing themes and phrasing over-reliance |
 
 **Bottom Line**: The 40k dataset has excellent structural coverage. The main gaps are:
-1. Reversal ratio is too high (50% vs 30-40% target)
-2. Question set is missing several real-life topics
-3. Question phrasing is too homogeneous ("What/How" = 78%)
+1. Question set is missing several real-life topics
+2. Question phrasing is too homogeneous ("What/How" = 78%)
 
 ---
 
@@ -107,18 +106,16 @@
 
 ---
 
-## 6. Reversal Ratio ⚠️
+## 6. Reversal Ratio ✅
 
 | Orientation | Count | Percentage |
 |-------------|-------|------------|
-| Reversed | 94,490 | **49.9%** |
+| Reversed | 94,490 | 49.9% |
 | Upright | 94,889 | 50.1% |
 
-**Target Range**: 30-40%
-**Current**: 49.9%
-**Status**: ⚠️ **ACTION NEEDED**
-
-**Recommendation**: Reduce reversal probability in generator from 0.5 to 0.35
+**iOS Probability**: 50%
+**Training Data**: 49.9%
+**Status**: ✅ **Matches iOS behavior**
 
 ---
 
@@ -232,9 +229,8 @@ Real-world topics NOT covered by current 200 questions:
 
 | Priority | Action | Impact |
 |----------|--------|--------|
-| 🔴 High | Reduce reversal rate to 35% | Fix 50%→35% imbalance |
-| 🔴 High | Add 53 new questions (see below) | Cover missing life topics |
-| 🟡 Medium | Diversify question phrasing | Reduce "What/How" dominance |
+| 🔴 High | Add new questions (see below) | Cover missing life topics |
+| 🔴 High | Diversify question phrasing | Reduce "What/How" dominance |
 | 🟢 Low | Maintain current category balance | Already excellent |
 
 ### 8.2 Recommended 10k Allocation
@@ -327,16 +323,15 @@ Category Allocation (maintains current balance):
 
 **For model quality**: The current 40k dataset has excellent structural coverage. Adding 10k more examples is **not strictly necessary** for basic model training.
 
-**However, 10k more examples would be valuable if**:
-1. You fix the reversal ratio issue (currently 50%, should be 30-40%)
-2. You expand the question set to cover missing life situations
-3. You diversify question phrasing to handle user input variations
+**However, 10k more examples would be valuable to**:
+1. Expand the question set to cover missing life situations
+2. Diversify question phrasing to handle user input variations
 
 ### Recommended Next Steps
 
-1. **Update prompt_generator.py**: Change `is_reversed: rng.random() < 0.5` → `rng.random() < 0.35`
-2. **Expand QUESTIONS dict**: Add the 53 suggested questions
-3. **Generate 10k new examples** with updated generator
+1. **Generate 200 new questions**: Use `training/prompts/generate_new_questions.md`
+2. **Expand QUESTIONS dict**: Add the new questions to prompt_generator.py
+3. **Generate 10k new examples** with expanded generator
 4. **Re-run coverage analysis** to verify improvements
 
 ---
