@@ -1,0 +1,9 @@
+{
+  "total_examples": 25000,
+  "splits": {
+    "train": 22500,
+    "valid": 1250,
+    "test": 1250
+  },
+  "seed": 42
+}
