@@ -60,8 +60,7 @@ export default function TaroLogo({ className = '', size = 'default' }) {
         filter="url(#taro-glow)"
       >
         {/* T - Simple tau with subtle serifs */}
-        <path d="M 8 10 L 32 10" /> {/* Top bar */}
-        <path d="M 20 10 L 20 38" /> {/* Vertical stem */}
+        <path d="M 8 10 L 32 10 M 20 10 L 20 38" /> {/* T shape: top bar + vertical stem */}
 
         {/* A - Lambda style (no crossbar) */}
         <path d="M 48 38 L 62 10 L 76 38" /> {/* Triangle/Lambda shape */}
