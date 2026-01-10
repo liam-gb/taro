@@ -597,6 +597,16 @@ QUESTIONS = {
     ],
 }
 
+# Load expanded questions and merge with base questions
+_expanded_questions_path = Path(__file__).parent.parent / "data" / "questions_expanded.json"
+if _expanded_questions_path.exists():
+    with open(_expanded_questions_path) as f:
+        _expanded = json.load(f)
+    for category, questions in _expanded.items():
+        if category in QUESTIONS:
+            QUESTIONS[category].extend(questions)
+    print(f"Loaded {sum(len(v) for v in _expanded.values())} expanded questions")
+
 # Weights based on target counts: love(40), career(40), growth(40), health(20), family(20), money(20), decisions(20)
 QUESTION_WEIGHTS = {
     "love": 0.20,
